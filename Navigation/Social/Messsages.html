@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMPERIUM - Messages</title>
+    <title>IMPERIUM - Messagerie Impériale</title>
     <meta name="description" content="Consultez vos messages, rapports de bataille et communications diplomatiques.">
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
@@ -11,6 +11,489 @@
     <!-- Styles et scripts communs -->
     <link rel="stylesheet" href="../common-styles.css">
     <script src="../common-navigation.js"></script>
+    <script src="../game-engine.js"></script>
+    <script src="../advanced-game-systems.js"></script>
+    <script src="../save-system.js"></script>
+    <script src="../ui-manager.js"></script>
+    <script src="../global-console.js"></script>
+
+    <style>
+        /* Styles spécifiques à la messagerie */
+        .messages-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        .messages-sidebar {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .messages-main {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            color: var(--gold-primary);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .folder-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .folder-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem;
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.5rem;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .folder-item:hover, .folder-item.active {
+            border-color: var(--gold-primary);
+            background: rgba(217, 119, 6, 0.1);
+        }
+
+        .folder-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .folder-name {
+            color: var(--text-light);
+            font-weight: bold;
+        }
+
+        .folder-count {
+            background: var(--gold-primary);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .folder-count.unread {
+            background: #dc2626;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .compose-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border: none;
+            border-radius: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .compose-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--shadow-gold);
+        }
+
+        .messages-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-gold);
+        }
+
+        .messages-title {
+            color: var(--gold-primary);
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .messages-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--text-light);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .action-btn:hover {
+            border-color: var(--gold-light);
+            background: rgba(217, 119, 6, 0.1);
+        }
+
+        .messages-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .message-item {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .message-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-color: var(--gold-light);
+        }
+
+        .message-item.unread {
+            border-left: 4px solid var(--gold-primary);
+            background: rgba(217, 119, 6, 0.05);
+        }
+
+        .message-item.unread::before {
+            content: '';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 8px;
+            height: 8px;
+            background: #dc2626;
+            border-radius: 50%;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.8rem;
+        }
+
+        .message-sender {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .sender-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--roman-red), var(--roman-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            border: 2px solid var(--gold-primary);
+        }
+
+        .sender-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sender-name {
+            color: var(--gold-light);
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .sender-title {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .message-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.3rem;
+        }
+
+        .message-time {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .message-type {
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .type-diplomatic {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .type-military {
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+        }
+
+        .type-trade {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .type-system {
+            background: rgba(168, 85, 247, 0.2);
+            color: #a855f7;
+        }
+
+        .message-subject {
+            color: var(--text-light);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .message-preview {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .message-attachments {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+
+        .attachment-icon {
+            padding: 0.3rem 0.6rem;
+            background: rgba(217, 119, 6, 0.2);
+            color: var(--gold-light);
+            border-radius: 0.3rem;
+            font-size: 0.8rem;
+            border: 1px solid var(--gold-primary);
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-description {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Modal pour composer un message */
+        .compose-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .compose-modal.show {
+            display: flex;
+        }
+
+        .compose-form {
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 1rem;
+            border: 2px solid var(--gold-primary);
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .compose-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-gold);
+        }
+
+        .compose-title {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--gold-light);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            padding: 0.8rem;
+            color: var(--text-light);
+            font-family: 'Times New Roman', serif;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            border-color: var(--gold-light);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.2);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-primary {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--shadow-gold);
+        }
+
+        .btn-secondary {
+            padding: 0.8rem 1.5rem;
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--text-light);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--gold-light);
+            background: rgba(217, 119, 6, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .messages-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+            
+            .messages-sidebar {
+                max-height: 200px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Particules d'arrière-plan -->
@@ -45,40 +528,79 @@
             <!-- CONTENU PRINCIPAL -->
             <main class="main-content">
                 <div class="view-container">
-                    <h2 class="view-title">Messages</h2>
-                    <div class="page-content">
-                        <div class="feature-grid">
-                            <div class="feature-card">
-                                <div class="feature-icon">✉️</div>
-                                <div class="feature-title">Boîte de Réception</div>
-                                <div class="feature-description">
-                                    Consultez tous vos messages reçus des autres 
-                                    joueurs et des événements du jeu.
+                    <h2 class="view-title">Messagerie Impériale</h2>
+                    <div class="messages-layout">
+                        <!-- Barre latérale des dossiers -->
+                        <div class="messages-sidebar">
+                            <button class="compose-btn" onclick="openComposeModal()">
+                                ✉️ Nouveau Message
+                            </button>
+
+                            <div class="sidebar-section">
+                                <h3 class="sidebar-title">📁 Dossiers</h3>
+                                <div class="folder-list">
+                                    <div class="folder-item active" data-folder="inbox">
+                                        <div class="folder-info">
+                                            <span>📥</span>
+                                            <span class="folder-name">Boîte de Réception</span>
+                                        </div>
+                                        <span class="folder-count unread">12</span>
+                                    </div>
+                                    <div class="folder-item" data-folder="sent">
+                                        <div class="folder-info">
+                                            <span>📤</span>
+                                            <span class="folder-name">Messages Envoyés</span>
+                                        </div>
+                                        <span class="folder-count">8</span>
+                                    </div>
+                                    <div class="folder-item" data-folder="battles">
+                                        <div class="folder-info">
+                                            <span>⚔️</span>
+                                            <span class="folder-name">Rapports de Bataille</span>
+                                        </div>
+                                        <span class="folder-count unread">5</span>
+                                    </div>
+                                    <div class="folder-item" data-folder="diplomatic">
+                                        <div class="folder-info">
+                                            <span>🤝</span>
+                                            <span class="folder-name">Diplomatie</span>
+                                        </div>
+                                        <span class="folder-count">3</span>
+                                    </div>
+                                    <div class="folder-item" data-folder="trade">
+                                        <div class="folder-info">
+                                            <span>💰</span>
+                                            <span class="folder-name">Commerce</span>
+                                        </div>
+                                        <span class="folder-count">7</span>
+                                    </div>
+                                    <div class="folder-item" data-folder="system">
+                                        <div class="folder-info">
+                                            <span>🏛️</span>
+                                            <span class="folder-name">Système</span>
+                                        </div>
+                                        <span class="folder-count">15</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">📜</div>
-                                <div class="feature-title">Rapports de Bataille</div>
-                                <div class="feature-description">
-                                    Analysez les détails de vos combats, victoires 
-                                    et défaites pour améliorer vos stratégies.
+                        </div>
+
+                        <!-- Zone principale des messages -->
+                        <div class="messages-main">
+                            <div class="messages-header">
+                                <h3 class="messages-title">
+                                    <span id="current-folder-icon">📥</span>
+                                    <span id="current-folder-name">Boîte de Réception</span>
+                                </h3>
+                                <div class="messages-actions">
+                                    <button class="action-btn" onclick="markAllAsRead()">📖 Tout marquer lu</button>
+                                    <button class="action-btn" onclick="deleteSelected()">🗑️ Supprimer</button>
+                                    <button class="action-btn" onclick="refreshMessages()">🔄 Actualiser</button>
                                 </div>
                             </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">🏛️</div>
-                                <div class="feature-title">Messages Diplomatiques</div>
-                                <div class="feature-description">
-                                    Gérez vos négociations et accords avec les 
-                                    autres empires romains.
-                                </div>
-                            </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">📢</div>
-                                <div class="feature-title">Annonces</div>
-                                <div class="feature-description">
-                                    Restez informé des mises à jour du jeu, 
-                                    événements spéciaux et nouvelles fonctionnalités.
-                                </div>
+
+                            <div class="messages-list" id="messages-list">
+                                <!-- Messages générés par JavaScript -->
                             </div>
                         </div>
                     </div>
@@ -86,5 +608,270 @@
             </main>
         </div>
     </div>
+
+    <!-- Modal de composition -->
+    <div class="compose-modal" id="compose-modal">
+        <div class="compose-form">
+            <div class="compose-header">
+                <h3 class="compose-title">✉️ Nouveau Message</h3>
+                <button class="close-btn" onclick="closeComposeModal()">&times;</button>
+            </div>
+            <form id="compose-form">
+                <div class="form-group">
+                    <label class="form-label" for="recipient">Destinataire :</label>
+                    <input type="text" id="recipient" class="form-input" placeholder="Nom du joueur ou de l'alliance">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="message-type">Type de message :</label>
+                    <select id="message-type" class="form-select">
+                        <option value="general">Message général</option>
+                        <option value="diplomatic">Proposition diplomatique</option>
+                        <option value="trade">Offre commerciale</option>
+                        <option value="military">Coordination militaire</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="subject">Sujet :</label>
+                    <input type="text" id="subject" class="form-input" placeholder="Objet du message">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="message-content">Message :</label>
+                    <textarea id="message-content" class="form-textarea" placeholder="Rédigez votre message ici..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeComposeModal()">Annuler</button>
+                    <button type="submit" class="btn-primary">📤 Envoyer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Données de démonstration
+        const messagesData = {
+            inbox: [
+                {
+                    id: 1,
+                    sender: { name: 'Julius Caesar', title: 'Imperator', avatar: 'J' },
+                    subject: 'Proposition d\'alliance stratégique',
+                    preview: 'Salve Marcus ! J\'aimerais discuter d\'une alliance entre nos empires pour faire face à la menace carthaginoise...',
+                    time: '2h',
+                    type: 'diplomatic',
+                    unread: true,
+                    attachments: ['📜 Traité']
+                },
+                {
+                    id: 2,
+                    sender: { name: 'Système', title: 'IMPERIUM', avatar: 'S' },
+                    subject: 'Rapport de bataille - Victoire !',
+                    preview: 'Vos légions ont remporté une victoire éclatante contre les barbares. Butin récupéré : 1,250 or, 800 bois...',
+                    time: '4h',
+                    type: 'military',
+                    unread: true,
+                    attachments: ['⚔️ Rapport', '💰 Butin']
+                },
+                {
+                    id: 3,
+                    sender: { name: 'Cleopatra VII', title: 'Reine d\'Égypte', avatar: 'C' },
+                    subject: 'Accord commercial - Épices contre Marbre',
+                    preview: 'Noble Marcus, l\'Égypte souhaite établir une route commerciale privilégiée avec votre empire...',
+                    time: '1j',
+                    type: 'trade',
+                    unread: false,
+                    attachments: ['📊 Contrat']
+                },
+                {
+                    id: 4,
+                    sender: { name: 'Pompée Magnus', title: 'Général', avatar: 'P' },
+                    subject: 'Coordination pour la campagne de Gaule',
+                    preview: 'Mes espions rapportent des mouvements suspects chez les Gaulois. Nous devrions coordonner nos attaques...',
+                    time: '2j',
+                    type: 'military',
+                    unread: false
+                },
+                {
+                    id: 5,
+                    sender: { name: 'Système', title: 'IMPERIUM', avatar: 'S' },
+                    subject: 'Construction terminée - Aqueduc',
+                    preview: 'La construction de votre aqueduc est terminée ! Votre population peut maintenant croître plus rapidement...',
+                    time: '3j',
+                    type: 'system',
+                    unread: false
+                }
+            ],
+            sent: [],
+            battles: [],
+            diplomatic: [],
+            trade: [],
+            system: []
+        };
+
+        let currentFolder = 'inbox';
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page Messages chargée');
+            loadMessages(currentFolder);
+            setupFolderNavigation();
+        });
+
+        // Navigation entre dossiers
+        function setupFolderNavigation() {
+            const folderItems = document.querySelectorAll('.folder-item');
+            folderItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Retirer la classe active de tous les dossiers
+                    folderItems.forEach(f => f.classList.remove('active'));
+                    // Ajouter la classe active au dossier sélectionné
+                    this.classList.add('active');
+                    
+                    const folder = this.dataset.folder;
+                    currentFolder = folder;
+                    loadMessages(folder);
+                    
+                    // Mettre à jour le titre
+                    const folderName = this.querySelector('.folder-name').textContent;
+                    const folderIcon = this.querySelector('span').textContent;
+                    document.getElementById('current-folder-name').textContent = folderName;
+                    document.getElementById('current-folder-icon').textContent = folderIcon;
+                });
+            });
+        }
+
+        // Charger les messages d'un dossier
+        function loadMessages(folder) {
+            const messagesList = document.getElementById('messages-list');
+            const messages = messagesData[folder] || [];
+            
+            if (messages.length === 0) {
+                messagesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-title">Aucun message</div>
+                        <div class="empty-description">Ce dossier ne contient aucun message pour le moment.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            messagesList.innerHTML = messages.map(message => `
+                <div class="message-item ${message.unread ? 'unread' : ''}" onclick="openMessage(${message.id})">
+                    <div class="message-header">
+                        <div class="message-sender">
+                            <div class="sender-avatar">${message.sender.avatar}</div>
+                            <div class="sender-info">
+                                <div class="sender-name">${message.sender.name}</div>
+                                <div class="sender-title">${message.sender.title}</div>
+                            </div>
+                        </div>
+                        <div class="message-meta">
+                            <div class="message-time">${message.time}</div>
+                            <div class="message-type type-${message.type}">
+                                ${getTypeLabel(message.type)}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="message-subject">${message.subject}</div>
+                    <div class="message-preview">${message.preview}</div>
+                    ${message.attachments ? `
+                        <div class="message-attachments">
+                            ${message.attachments.map(att => `<span class="attachment-icon">${att}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Obtenir le libellé du type de message
+        function getTypeLabel(type) {
+            const labels = {
+                diplomatic: 'Diplomatie',
+                military: 'Militaire',
+                trade: 'Commerce',
+                system: 'Système',
+                general: 'Général'
+            };
+            return labels[type] || 'Général';
+        }
+
+        // Ouvrir un message
+        function openMessage(messageId) {
+            const message = messagesData[currentFolder].find(m => m.id === messageId);
+            if (message) {
+                message.unread = false;
+                loadMessages(currentFolder);
+                alert(`Ouverture du message: "${message.subject}"\n\nContenu complet sera affiché dans une future version.`);
+            }
+        }
+
+        // Modal de composition
+        function openComposeModal() {
+            document.getElementById('compose-modal').classList.add('show');
+        }
+
+        function closeComposeModal() {
+            document.getElementById('compose-modal').classList.remove('show');
+            document.getElementById('compose-form').reset();
+        }
+
+        // Gestion du formulaire de composition
+        document.getElementById('compose-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const recipient = document.getElementById('recipient').value;
+            const subject = document.getElementById('subject').value;
+            const content = document.getElementById('message-content').value;
+            
+            if (!recipient || !subject || !content) {
+                alert('Veuillez remplir tous les champs obligatoires.');
+                return;
+            }
+            
+            alert(`Message envoyé à ${recipient} !\nSujet: ${subject}`);
+            closeComposeModal();
+        });
+
+        // Actions sur les messages
+        function markAllAsRead() {
+            messagesData[currentFolder].forEach(message => {
+                message.unread = false;
+            });
+            loadMessages(currentFolder);
+            updateFolderCounts();
+        }
+
+        function deleteSelected() {
+            alert('Fonction de suppression sera implémentée dans une future version.');
+        }
+
+        function refreshMessages() {
+            loadMessages(currentFolder);
+            alert('Messages actualisés !');
+        }
+
+        // Mettre à jour les compteurs des dossiers
+        function updateFolderCounts() {
+            const folderItems = document.querySelectorAll('.folder-item');
+            folderItems.forEach(item => {
+                const folder = item.dataset.folder;
+                const messages = messagesData[folder] || [];
+                const unreadCount = messages.filter(m => m.unread).length;
+                const totalCount = messages.length;
+                
+                const countElement = item.querySelector('.folder-count');
+                if (countElement) {
+                    countElement.textContent = totalCount;
+                    countElement.classList.toggle('unread', unreadCount > 0);
+                }
+            });
+        }
+
+        // Fermer le modal en cliquant à l'extérieur
+        document.getElementById('compose-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeComposeModal();
+            }
+        });
+    </script>
 </body>
 </html>

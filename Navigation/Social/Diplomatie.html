@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMPERIUM - Diplomatie</title>
+    <title>IMPERIUM - Diplomatie Impériale</title>
     <meta name="description" content="Gérez vos relations diplomatiques avec les autres empires romains.">
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
@@ -11,6 +11,504 @@
     <!-- Styles et scripts communs -->
     <link rel="stylesheet" href="../common-styles.css">
     <script src="../common-navigation.js"></script>
+    <script src="../game-engine.js"></script>
+    <script src="../advanced-game-systems.js"></script>
+    <script src="../save-system.js"></script>
+    <script src="../ui-manager.js"></script>
+    <script src="../global-console.js"></script>
+
+    <style>
+        /* Styles spécifiques à la diplomatie */
+        .diplomacy-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        .diplomacy-main {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .diplomacy-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .empires-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .empire-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .empire-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border-color: var(--gold-light);
+        }
+
+        .empire-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .empire-card.ally::before {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+        }
+
+        .empire-card.neutral::before {
+            background: linear-gradient(90deg, #6b7280, #4b5563);
+        }
+
+        .empire-card.enemy::before {
+            background: linear-gradient(90deg, #dc2626, #b91c1c);
+        }
+
+        .empire-card.war::before {
+            background: linear-gradient(90deg, #dc2626, #7f1d1d);
+            animation: warPulse 2s infinite;
+        }
+
+        @keyframes warPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .empire-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .empire-flag {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--roman-red), var(--roman-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            border: 2px solid var(--gold-primary);
+        }
+
+        .empire-info {
+            flex: 1;
+        }
+
+        .empire-name {
+            color: var(--gold-light);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .empire-ruler {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .relation-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status-ally {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid #22c55e;
+        }
+
+        .status-neutral {
+            background: rgba(107, 114, 128, 0.2);
+            color: #6b7280;
+            border: 1px solid #6b7280;
+        }
+
+        .status-enemy {
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+            border: 1px solid #dc2626;
+        }
+
+        .status-war {
+            background: rgba(127, 29, 29, 0.3);
+            color: #fca5a5;
+            border: 1px solid #dc2626;
+            animation: warStatusPulse 1.5s infinite;
+        }
+
+        @keyframes warStatusPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .empire-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+        }
+
+        .stat-value {
+            color: var(--gold-light);
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .empire-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.6rem;
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .btn-message {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .btn-message:hover {
+            background: rgba(59, 130, 246, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-trade {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border-color: #22c55e;
+        }
+
+        .btn-trade:hover {
+            background: rgba(34, 197, 94, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-war {
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+            border-color: #dc2626;
+        }
+
+        .btn-war:hover {
+            background: rgba(220, 38, 38, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-peace {
+            background: rgba(168, 85, 247, 0.2);
+            color: #a855f7;
+            border-color: #a855f7;
+        }
+
+        .btn-peace:hover {
+            background: rgba(168, 85, 247, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .diplomacy-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .reputation-meter {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .reputation-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--gold-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .reputation-label {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .reputation-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .reputation-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #dc2626, #f59e0b, #22c55e);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .reputation-scale {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .treaties-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .treaty-item {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .treaty-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .treaty-name {
+            color: var(--gold-light);
+            font-weight: bold;
+        }
+
+        .treaty-status {
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .status-expired {
+            background: rgba(107, 114, 128, 0.2);
+            color: #6b7280;
+        }
+
+        .treaty-details {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .treaty-expires {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            margin-top: 0.3rem;
+        }
+
+        .proposals-list {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .proposal-item {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .proposal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.8rem;
+        }
+
+        .proposal-from {
+            color: var(--gold-light);
+            font-weight: bold;
+        }
+
+        .proposal-type {
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .type-peace {
+            background: rgba(168, 85, 247, 0.2);
+            color: #a855f7;
+        }
+
+        .type-trade {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .type-alliance {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .proposal-description {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .proposal-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-accept {
+            flex: 1;
+            padding: 0.5rem;
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid #22c55e;
+            border-radius: 0.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .btn-accept:hover {
+            background: rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-reject {
+            flex: 1;
+            padding: 0.5rem;
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+            border: 1px solid #dc2626;
+            border-radius: 0.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .btn-reject:hover {
+            background: rgba(220, 38, 38, 0.3);
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .quick-btn {
+            padding: 0.8rem;
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--text-light);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--gold-light);
+            background: rgba(217, 119, 6, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .diplomacy-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Particules d'arrière-plan -->
@@ -45,39 +543,118 @@
             <!-- CONTENU PRINCIPAL -->
             <main class="main-content">
                 <div class="view-container">
-                    <h2 class="view-title">Diplomatie</h2>
-                    <div class="page-content">
-                        <div class="feature-grid">
-                            <div class="feature-card">
-                                <div class="feature-icon">🤝</div>
-                                <div class="feature-title">Traités de Paix</div>
-                                <div class="feature-description">
-                                    Négociez des accords de non-agression avec vos voisins 
-                                    pour sécuriser vos frontières.
+                    <h2 class="view-title">Diplomatie Impériale</h2>
+                    <div class="diplomacy-layout">
+                        <div class="diplomacy-main">
+                            <!-- Relations avec les autres empires -->
+                            <div class="diplomacy-section">
+                                <h3 class="section-title">🏛️ Relations Diplomatiques</h3>
+                                <div class="empires-grid" id="empires-grid">
+                                    <!-- Généré par JavaScript -->
                                 </div>
                             </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">💰</div>
-                                <div class="feature-title">Accords Commerciaux</div>
-                                <div class="feature-description">
-                                    Établissez des routes commerciales privilégiées 
-                                    avec d'autres empires pour des bonus économiques.
+                        </div>
+
+                        <!-- Panneau de contrôle diplomatique -->
+                        <div class="diplomacy-panel">
+                            <!-- Réputation -->
+                            <div class="panel-section">
+                                <h3 class="section-title">👑 Réputation Impériale</h3>
+                                <div class="reputation-meter">
+                                    <div class="reputation-value">75</div>
+                                    <div class="reputation-label">Respecté</div>
+                                    <div class="reputation-bar">
+                                        <div class="reputation-fill" style="width: 75%;"></div>
+                                    </div>
+                                    <div class="reputation-scale">
+                                        <span>Haï</span>
+                                        <span>Neutre</span>
+                                        <span>Vénéré</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">⚔️</div>
-                                <div class="feature-title">Pactes Militaires</div>
-                                <div class="feature-description">
-                                    Formez des alliances défensives ou offensives 
-                                    pour des campagnes coordonnées.
+
+                            <!-- Traités actifs -->
+                            <div class="panel-section">
+                                <h3 class="section-title">📜 Traités Actifs</h3>
+                                <div class="treaties-list">
+                                    <div class="treaty-item">
+                                        <div class="treaty-header">
+                                            <div class="treaty-name">Pacte de Non-Agression</div>
+                                            <div class="treaty-status status-active">Actif</div>
+                                        </div>
+                                        <div class="treaty-details">
+                                            Avec l'Empire de Julius Caesar<br>
+                                            Bonus: +10% commerce, -50% coût de guerre
+                                        </div>
+                                        <div class="treaty-expires">Expire dans 15 jours</div>
+                                    </div>
+                                    <div class="treaty-item">
+                                        <div class="treaty-header">
+                                            <div class="treaty-name">Accord Commercial</div>
+                                            <div class="treaty-status status-active">Actif</div>
+                                        </div>
+                                        <div class="treaty-details">
+                                            Avec l'Égypte de Cléopâtre<br>
+                                            Bonus: +25% revenus commerciaux
+                                        </div>
+                                        <div class="treaty-expires">Expire dans 8 jours</div>
+                                    </div>
+                                    <div class="treaty-item">
+                                        <div class="treaty-header">
+                                            <div class="treaty-name">Alliance Défensive</div>
+                                            <div class="treaty-status status-pending">En attente</div>
+                                        </div>
+                                        <div class="treaty-details">
+                                            Avec l'Empire de Pompée<br>
+                                            Attente de ratification
+                                        </div>
+                                        <div class="treaty-expires">Expire dans 3 jours</div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">👑</div>
-                                <div class="feature-title">Relations Impériales</div>
-                                <div class="feature-description">
-                                    Gérez votre réputation et votre influence 
-                                    auprès des autres dirigeants romains.
+
+                            <!-- Propositions diplomatiques -->
+                            <div class="panel-section">
+                                <h3 class="section-title">📨 Propositions Reçues</h3>
+                                <div class="proposals-list">
+                                    <div class="proposal-item">
+                                        <div class="proposal-header">
+                                            <div class="proposal-from">Spartacus le Rebelle</div>
+                                            <div class="proposal-type type-peace">Paix</div>
+                                        </div>
+                                        <div class="proposal-description">
+                                            Propose un cessez-le-feu en échange de 5,000 or et la libération de 100 esclaves.
+                                        </div>
+                                        <div class="proposal-actions">
+                                            <button class="btn-accept" onclick="acceptProposal(1)">✓ Accepter</button>
+                                            <button class="btn-reject" onclick="rejectProposal(1)">✗ Refuser</button>
+                                        </div>
+                                    </div>
+                                    <div class="proposal-item">
+                                        <div class="proposal-header">
+                                            <div class="proposal-from">Hannibal de Carthage</div>
+                                            <div class="proposal-type type-alliance">Alliance</div>
+                                        </div>
+                                        <div class="proposal-description">
+                                            Propose une alliance militaire contre Rome en échange d'un partage des territoires conquis.
+                                        </div>
+                                        <div class="proposal-actions">
+                                            <button class="btn-accept" onclick="acceptProposal(2)">✓ Accepter</button>
+                                            <button class="btn-reject" onclick="rejectProposal(2)">✗ Refuser</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions rapides -->
+                            <div class="panel-section">
+                                <h3 class="section-title">⚡ Actions Rapides</h3>
+                                <div class="quick-actions">
+                                    <button class="quick-btn" onclick="openDiplomaticMission()">🕊️ Mission Diplomatique</button>
+                                    <button class="quick-btn" onclick="viewTreatyTemplates()">📋 Modèles de Traités</button>
+                                    <button class="quick-btn" onclick="viewDiplomaticHistory()">📚 Historique</button>
+                                    <button class="quick-btn" onclick="manageDiplomats()">👥 Gérer Diplomates</button>
                                 </div>
                             </div>
                         </div>
@@ -86,5 +663,237 @@
             </main>
         </div>
     </div>
+
+    <script>
+        // Données des empires
+        const empiresData = [
+            {
+                id: 1,
+                name: 'Empire de Julius Caesar',
+                ruler: 'Julius Caesar',
+                flag: 'J',
+                relation: 'ally',
+                power: 8500,
+                territory: 12,
+                reputation: 85,
+                treaties: ['Pacte de Non-Agression', 'Accord Commercial']
+            },
+            {
+                id: 2,
+                name: 'Royaume d\'Égypte',
+                ruler: 'Cléopâtre VII',
+                flag: 'C',
+                relation: 'ally',
+                power: 7200,
+                territory: 8,
+                reputation: 78,
+                treaties: ['Accord Commercial']
+            },
+            {
+                id: 3,
+                name: 'Empire de Pompée',
+                ruler: 'Pompée Magnus',
+                flag: 'P',
+                relation: 'neutral',
+                power: 6800,
+                territory: 10,
+                reputation: 65,
+                treaties: []
+            },
+            {
+                id: 4,
+                name: 'République de Carthage',
+                ruler: 'Hannibal Barca',
+                flag: 'H',
+                relation: 'enemy',
+                power: 9200,
+                territory: 15,
+                reputation: 45,
+                treaties: []
+            },
+            {
+                id: 5,
+                name: 'Rébellion de Spartacus',
+                ruler: 'Spartacus',
+                flag: 'S',
+                relation: 'war',
+                power: 3500,
+                territory: 3,
+                reputation: 25,
+                treaties: []
+            },
+            {
+                id: 6,
+                name: 'Tribus Gauloises',
+                ruler: 'Vercingétorix',
+                flag: 'V',
+                relation: 'neutral',
+                power: 4200,
+                territory: 6,
+                reputation: 55,
+                treaties: []
+            }
+        ];
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page Diplomatie chargée');
+            loadEmpires();
+        });
+
+        // Charger les empires
+        function loadEmpires() {
+            const empiresGrid = document.getElementById('empires-grid');
+            
+            empiresGrid.innerHTML = empiresData.map(empire => `
+                <div class="empire-card ${empire.relation}" onclick="openEmpireDetails(${empire.id})">
+                    <div class="empire-header">
+                        <div class="empire-flag">${empire.flag}</div>
+                        <div class="empire-info">
+                            <div class="empire-name">${empire.name}</div>
+                            <div class="empire-ruler">${empire.ruler}</div>
+                        </div>
+                        <div class="relation-status status-${empire.relation}">
+                            ${getRelationLabel(empire.relation)}
+                        </div>
+                    </div>
+                    <div class="empire-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">${empire.power.toLocaleString()}</span>
+                            <span class="stat-label">Puissance</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">${empire.territory}</span>
+                            <span class="stat-label">Territoires</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">${empire.reputation}</span>
+                            <span class="stat-label">Réputation</span>
+                        </div>
+                    </div>
+                    <div class="empire-actions">
+                        <button class="action-btn btn-message" onclick="event.stopPropagation(); sendMessage(${empire.id})">
+                            💬 Message
+                        </button>
+                        ${getActionButtons(empire)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Obtenir le libellé de la relation
+        function getRelationLabel(relation) {
+            const labels = {
+                ally: 'Allié',
+                neutral: 'Neutre',
+                enemy: 'Ennemi',
+                war: 'En Guerre'
+            };
+            return labels[relation] || 'Inconnu';
+        }
+
+        // Obtenir les boutons d'action selon la relation
+        function getActionButtons(empire) {
+            switch(empire.relation) {
+                case 'ally':
+                    return `
+                        <button class="action-btn btn-trade" onclick="event.stopPropagation(); proposeTradeAgreement(${empire.id})">
+                            💰 Commerce
+                        </button>
+                    `;
+                case 'neutral':
+                    return `
+                        <button class="action-btn btn-trade" onclick="event.stopPropagation(); proposeAlliance(${empire.id})">
+                            🤝 Alliance
+                        </button>
+                    `;
+                case 'enemy':
+                    return `
+                        <button class="action-btn btn-peace" onclick="event.stopPropagation(); proposePeace(${empire.id})">
+                            🕊️ Paix
+                        </button>
+                    `;
+                case 'war':
+                    return `
+                        <button class="action-btn btn-war" onclick="event.stopPropagation(); viewWarStatus(${empire.id})">
+                            ⚔️ Guerre
+                        </button>
+                    `;
+                default:
+                    return '';
+            }
+        }
+
+        // Actions diplomatiques
+        function openEmpireDetails(empireId) {
+            const empire = empiresData.find(e => e.id === empireId);
+            if (empire) {
+                alert(`Détails de ${empire.name}\n\nDirigeant: ${empire.ruler}\nRelation: ${getRelationLabel(empire.relation)}\nPuissance: ${empire.power.toLocaleString()}\nTerritoires: ${empire.territory}\nRéputation: ${empire.reputation}`);
+            }
+        }
+
+        function sendMessage(empireId) {
+            const empire = empiresData.find(e => e.id === empireId);
+            if (empire) {
+                alert(`Ouverture de la messagerie avec ${empire.name}...`);
+            }
+        }
+
+        function proposeAlliance(empireId) {
+            const empire = empiresData.find(e => e.id === empireId);
+            if (empire) {
+                alert(`Proposition d'alliance envoyée à ${empire.name} !`);
+            }
+        }
+
+        function proposeTradeAgreement(empireId) {
+            const empire = empiresData.find(e => e.id === empireId);
+            if (empire) {
+                alert(`Proposition d'accord commercial envoyée à ${empire.name} !`);
+            }
+        }
+
+        function proposePeace(empireId) {
+            const empire = empiresData.find(e => e.id === empireId);
+            if (empire) {
+                alert(`Proposition de paix envoyée à ${empire.name} !`);
+            }
+        }
+
+        function viewWarStatus(empireId) {
+            const empire = empiresData.find(e => e.id === empireId);
+            if (empire) {
+                alert(`État de guerre avec ${empire.name}\n\nBatailles en cours: 3\nVictoires: 2\nDéfaites: 1\nPertes: 450 soldats`);
+            }
+        }
+
+        // Gestion des propositions
+        function acceptProposal(proposalId) {
+            alert(`Proposition ${proposalId} acceptée !`);
+            // Ici on supprimerait la proposition de la liste
+        }
+
+        function rejectProposal(proposalId) {
+            alert(`Proposition ${proposalId} refusée !`);
+            // Ici on supprimerait la proposition de la liste
+        }
+
+        // Actions rapides
+        function openDiplomaticMission() {
+            alert('Ouverture du panneau des missions diplomatiques...');
+        }
+
+        function viewTreatyTemplates() {
+            alert('Affichage des modèles de traités disponibles...');
+        }
+
+        function viewDiplomaticHistory() {
+            alert('Consultation de l\'historique diplomatique...');
+        }
+
+        function manageDiplomats() {
+            alert('Gestion de vos diplomates et ambassadeurs...');
+        }
+    </script>
 </body>
 </html>
