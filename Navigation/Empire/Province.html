@@ -7,6 +7,9 @@
     <meta name="description" content="Gérez vos provinces romaines et étendez votre empire à travers la Méditerranée.">
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+    
+    <!-- Scripts de navigation communs -->
+    <script src="../common-navigation.js"></script>
 
     <style>
         /* =============================================================== */
@@ -262,63 +265,29 @@
 
     <script>
         // ===============================================================
-        // SCRIPT DE NAVIGATION ET UI GLOBALE
+        // Les fonctions de navigation sont maintenant fournies par common-navigation.js
         // ===============================================================
-        const NAVIGATION_CONFIG = {
-            'index':      { title: 'Accueil', file: 'index.html', section: 'Empire', icon: '🏛️' },
-            'cite':       { title: 'Ma Cité', file: 'Empire/Cite.html', section: 'Empire', icon: '🏘️' },
-            'monde':      { title: 'Monde', file: 'Empire/Monde.html', section: 'Empire', icon: '🌍' },
-            'province':   { title: 'Province', file: 'Empire/Province.html', section: 'Empire', icon: '🏝️' },
-            'academie':   { title: 'Académie', file: 'Developpement/Academie.html', section: 'Développement', icon: '📚' },
-            'commerce':   { title: 'Commerce', file: 'Developpement/Commerce.html', section: 'Développement', icon: '⚖️' },
-            'legions':    { title: 'Légions', file: 'Militaire/Légions.html', section: 'Militaire', icon: '⚔️' },
-            'flotte':     { title: 'Flotte', file: 'Militaire/Flotte.html', section: 'Militaire', icon: '🚢' },
-            'simulateur': { title: 'Simulateur', file: 'Militaire/Simulateur.html', section: 'Militaire', icon: '💥' },
-            'diplomatie': { title: 'Diplomatie', file: 'Social/Diplomatie.html', section: 'Social', icon: '🤝' },
-            'alliance':   { title: 'Alliance', file: 'Social/Alliance.html', section: 'Social', icon: '🛡️' },
-            'messages':   { title: 'Messages', file: 'Social/Messsages.html', section: 'Social', icon: '✉️' },
-            'premium':    { title: 'Premium', file: 'Premium/Premium.html', section: 'Premium', icon: '👑' }
-        };
-
-        function generateNavigationHTML() {
-            const sections = {};
-            Object.entries(NAVIGATION_CONFIG).forEach(([key, config]) => {
-                if (key === 'index') return;
-                if (!sections[config.section]) sections[config.section] = [];
-                sections[config.section].push({ key, ...config });
-            });
-            let html = '';
-            Object.entries(sections).forEach(([sectionName, pages]) => {
-                html += `<div class="nav-section"><h2 class="nav-title">${sectionName}</h2><ul class="nav-list">`;
-                pages.forEach(page => {
-                    html += `<li class="nav-item"><a href="#" data-page="${page.key}" onclick="navigateTo('${page.key}'); return false;"><span class="nav-icon">${page.icon}</span> ${page.title}</a></li>`;
-                });
-                html += `</ul></div>`;
-            });
-            return html;
-        }
-        
-        function navigateTo(pageKey) {
-            alert(`Simulation de navigation vers : ${NAVIGATION_CONFIG[pageKey].title}`);
-        }
 
         function initializeGlobalUI() {
-            const sidebar = document.querySelector('.imperium-sidebar');
-            if (sidebar) sidebar.innerHTML = generateNavigationHTML();
+            // La navigation est maintenant gérée par common-navigation.js via initializeNavigation()
+            // On met juste à jour les informations spécifiques à cette page
             
-            const currentPage = 'province'; // Page actuelle
-            document.querySelectorAll('.nav-item a').forEach(link => {
-                link.classList.toggle('active', link.getAttribute('data-page') === currentPage);
-            });
+            const playerName = document.querySelector('.player-name');
+            const playerLevel = document.querySelector('.player-level');
+            const playerAvatar = document.querySelector('.player-avatar');
+            const resourcesDisplay = document.querySelector('.resources-display');
 
-            document.querySelector('.player-name').textContent = 'Marcus Aurelius';
-            document.querySelector('.player-level').textContent = 'Consul - Niv. 12';
-            document.querySelector('.player-avatar').textContent = 'M';
-            document.querySelector('.resources-display').innerHTML = `
-                <div class="resource-item"><span class="resource-icon">🍇</span><span class="resource-value">4,560</span></div>
-                <div class="resource-item"><span class="resource-icon">🏛️</span><span class="resource-value">2,340</span></div>
-                <div class="resource-item"><span class="resource-icon">⚔️</span><span class="resource-value">8,900</span></div>
-                <div class="resource-item"><span class="resource-icon">💰</span><span class="resource-value">15,200</span></div>`;
+            if (playerName) playerName.textContent = 'Marcus Aurelius';
+            if (playerLevel) playerLevel.textContent = 'Consul - Niv. 12';
+            if (playerAvatar) playerAvatar.textContent = 'M';
+            
+            if (resourcesDisplay) {
+                resourcesDisplay.innerHTML = `
+                    <div class="resource-item"><span class="resource-icon">🍇</span><span class="resource-value">4,560</span></div>
+                    <div class="resource-item"><span class="resource-icon">🏛️</span><span class="resource-value">2,340</span></div>
+                    <div class="resource-item"><span class="resource-icon">⚔️</span><span class="resource-value">8,900</span></div>
+                    <div class="resource-item"><span class="resource-icon">💰</span><span class="resource-value">15,200</span></div>`;
+            }
         }
 
         // ===============================================================
