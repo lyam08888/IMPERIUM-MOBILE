@@ -16,6 +16,15 @@
     <script src="../save-system.js"></script>
     <script src="../ui-manager.js"></script>
     <script src="../global-console.js"></script>
+    
+    <!-- Nouveaux systèmes transformés de C# vers JavaScript -->
+    <script src="../imperium-systems-loader.js"></script>
+    <script src="../Sauvegarder.cs"></script>
+    <script src="../Charger.cs"></script>
+    <script src="Foedus - Alliances Romaines/Fonder l'Alliance.cs"></script>
+    <script src="Foedus - Alliances Romaines/Accepter.cs"></script>
+    <script src="Foedus - Alliances Romaines/Refuser.cs"></script>
+    <script src="Foedus - Alliances Romaines/Chercher des Alliances.cs"></script>
 
     <style>
         /* Styles spécifiques aux alliances */
@@ -518,7 +527,12 @@
         let pendingInvitations = [];
         
         // Initialisation
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🏛️ Initialisation de la page Diplomatie...');
+            
+            // Attendre que tous les systèmes soient chargés
+            await waitForSystems();
+            
             // Initialiser le moteur de jeu s'il n'est pas déjà initialisé
             if (!gameEngine.isRunning) {
                 gameEngine.init();
@@ -535,20 +549,40 @@
             
             console.log('🤝 Système d\'alliances initialisé!');
         });
+
+        // Attendre que tous les systèmes soient chargés
+        async function waitForSystems() {
+            return new Promise((resolve) => {
+                if (window.imperiumSystemsLoader && window.fonderAlliance) {
+                    resolve();
+                } else {
+                    const checkSystems = () => {
+                        if (window.imperiumSystemsLoader && window.fonderAlliance) {
+                            resolve();
+                        } else {
+                            setTimeout(checkSystems, 100);
+                        }
+                    };
+                    checkSystems();
+                }
+            });
+        }
         
         // Chargement des données d'alliance
         function loadAllianceData() {
             const gameState = gameEngine.getGameState();
             
             // Vérifier si le joueur a une alliance
-            if (gameState.player.alliance) {
-                currentAlliance = allianceSystem.getAllianceData(gameState.player.alliance.id);
+            if (gameState.player.alliance && gameEngine.allianceSystem) {
+                currentAlliance = gameEngine.allianceSystem.alliances[gameState.player.alliance.id];
             }
             
             // Charger les invitations en attente
-            pendingInvitations = allianceSystem.invitations.filter(inv => 
-                inv.playerId === 'player' && inv.status === 'pending'
-            );
+            if (typeof obtenirInvitationsJoueur === 'function') {
+                pendingInvitations = obtenirInvitationsJoueur().filter(inv => inv.status === 'pending');
+            } else {
+                pendingInvitations = [];
+            }
         }
         
         // Génération de l'interface
@@ -571,15 +605,63 @@
                 generateTreasurySection();
                 
             } else {
-                // Joueur sans alliance
+                // Joueur sans alliance - utiliser les nouvelles interfaces
                 container.innerHTML = `
                     <div class="alliance-section create-alliance">
-                        ${generateCreateAllianceSection()}
+                        <h3 class="section-title">Créer une Alliance</h3>
+                        <div id="creation-interface-container"></div>
                     </div>
                     <div class="alliance-section invitations-section">
-                        ${generateInvitationsSection()}
+                        <h3 class="section-title">Invitations Reçues</h3>
+                        <div id="invitations-interface-container"></div>
+                    </div>
+                    <div class="alliance-section">
+                        <h3 class="section-title">Rechercher des Alliances</h3>
+                        <div id="search-interface-container"></div>
                     </div>
                 `;
+                
+                // Injecter les nouvelles interfaces
+                setTimeout(() => {
+                    injectNewInterfaces();
+                }, 100);
+            }
+        }
+
+        // Injecter les nouvelles interfaces
+        function injectNewInterfaces() {
+            // Interface de création d'alliance
+            if (typeof creerInterfaceFondation === 'function') {
+                const creationContainer = document.getElementById('creation-interface-container');
+                if (creationContainer) {
+                    const creationInterface = creerInterfaceFondation();
+                    creationContainer.appendChild(creationInterface);
+                }
+            }
+
+            // Interface des invitations
+            if (typeof creerInterfaceAcceptation === 'function') {
+                const invitationsContainer = document.getElementById('invitations-interface-container');
+                if (invitationsContainer) {
+                    const invitationsInterface = creerInterfaceAcceptation(pendingInvitations);
+                    invitationsContainer.appendChild(invitationsInterface);
+                }
+            }
+
+            // Interface de recherche
+            if (typeof creerInterfaceRecherche === 'function') {
+                const searchContainer = document.getElementById('search-interface-container');
+                if (searchContainer) {
+                    const searchInterface = creerInterfaceRecherche();
+                    searchContainer.appendChild(searchInterface);
+                    
+                    // Afficher les recommandations par défaut
+                    setTimeout(() => {
+                        if (typeof afficherRecommandations === 'function') {
+                            afficherRecommandations();
+                        }
+                    }, 500);
+                }
             }
         }
         
