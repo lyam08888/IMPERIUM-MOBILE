@@ -11,9 +11,11 @@
     <!-- Styles et scripts communs -->
     <link rel="stylesheet" href="../common-styles.css">
     <script src="../common-navigation.js"></script>
+    <script src="../game-engine.js"></script>
+    <script src="../ui-manager.js"></script>
 
     <style>
-        /* Styles spécifiques à la page Cité */
+        /* Styles spécifiques à la cité */
         .city-layout {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -22,48 +24,51 @@
         }
 
         .city-map {
-            background: 
-                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><pattern id="marble" patternUnits="userSpaceOnUse" width="20" height="20"><rect width="20" height="20" fill="%23f1f5f9"/><path d="M0,10 Q5,5 10,10 T20,10" stroke="%23cbd5e1" stroke-width="0.5" fill="none"/></pattern><rect width="100" height="100" fill="url(%23marble)" opacity="0.1"/></svg>'),
-                linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background: rgba(15, 23, 42, 0.8);
             border-radius: 1rem;
-            position: relative;
-            overflow: hidden;
             border: 2px solid var(--gold-primary);
             padding: 2rem;
+            position: relative;
+            overflow: hidden;
         }
 
         .buildings-grid {
             display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 0.5rem;
             height: 100%;
-            grid-template-columns: repeat(5, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            gap: 1rem;
+            min-height: 500px;
         }
 
-        .building-plot {
-            background: rgba(217, 119, 6, 0.1);
-            border: 2px dashed var(--gold-primary);
-            border-radius: 0.75rem;
+        .building-slot {
+            background: rgba(30, 41, 59, 0.6);
+            border: 2px dashed var(--border-gold);
+            border-radius: 0.8rem;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             cursor: pointer;
-            transition: all 0.4s ease;
+            transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
+            min-height: 80px;
         }
 
-        .building-plot:hover {
-            background: rgba(217, 119, 6, 0.2);
+        .building-slot:hover {
             border-color: var(--gold-light);
-            transform: scale(1.05) translateY(-5px);
-            box-shadow: 0 10px 30px var(--shadow-gold);
+            background: rgba(217, 119, 6, 0.1);
+            transform: scale(1.05);
         }
 
-        .building-plot.built {
-            background: linear-gradient(135deg, rgba(217, 119, 6, 0.3), rgba(245, 158, 11, 0.2));
+        .building-slot.occupied {
+            background: rgba(217, 119, 6, 0.2);
             border: 2px solid var(--gold-primary);
+        }
+
+        .building-slot.occupied:hover {
+            background: rgba(217, 119, 6, 0.3);
+            border-color: var(--gold-light);
         }
 
         .building-icon {
@@ -73,45 +78,51 @@
         }
 
         .building-name {
-            font-size: 0.9rem;
+            color: var(--gold-light);
             font-weight: bold;
-            color: var(--gold-primary);
+            font-size: 0.8rem;
             text-align: center;
+            margin-bottom: 0.2rem;
         }
 
         .building-level {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+        }
+
+        .building-progress {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            background: var(--gold-primary);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 0 0 0.6rem 0.6rem;
+            overflow: hidden;
+        }
+
+        .building-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+            transition: width 0.3s ease;
         }
 
         .city-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .panel-section {
             background: rgba(15, 23, 42, 0.8);
             border-radius: 1rem;
             border: 1px solid var(--border-gold);
             padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            overflow-y: auto;
-        }
-
-        .panel-section {
-            background: rgba(30, 41, 59, 0.6);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            border: 1px solid var(--border-gold);
         }
 
         .section-title {
             color: var(--gold-primary);
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: bold;
             margin-bottom: 1rem;
             display: flex;
@@ -119,30 +130,147 @@
             gap: 0.5rem;
         }
 
-        .quick-stats {
+        .city-stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
         }
 
-        .stat-card {
-            background: rgba(15, 23, 42, 0.5);
+        .stat-item {
+            text-align: center;
+            background: rgba(30, 41, 59, 0.6);
             padding: 1rem;
             border-radius: 0.5rem;
-            text-align: center;
             border: 1px solid var(--border-gold);
         }
 
         .stat-value {
+            color: var(--gold-light);
             font-size: 1.5rem;
             font-weight: bold;
-            color: var(--gold-light);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
         }
 
         .stat-label {
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+        }
+
+        .production-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .production-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(30, 41, 59, 0.6);
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .production-resource {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .production-icon {
+            font-size: 1.2rem;
+        }
+
+        .production-name {
+            color: var(--text-light);
+            font-weight: bold;
+        }
+
+        .production-rate {
+            color: var(--gold-light);
+            font-weight: bold;
+        }
+
+        .storage-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .storage-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem;
+        }
+
+        .storage-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            margin: 0 1rem;
+            overflow: hidden;
+        }
+
+        .storage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .storage-text {
+            color: var(--text-light);
+            font-size: 0.8rem;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        /* Actions rapides */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .quick-action-btn {
+            padding: 1rem;
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--text-light);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .quick-action-btn:hover {
+            border-color: var(--gold-light);
+            background: rgba(217, 119, 6, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .city-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+            
+            .buildings-grid {
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(4, 1fr);
+                min-height: 300px;
+            }
+            
+            .city-panel {
+                max-height: 400px;
+                overflow-y: auto;
+            }
         }
     </style>
 </head>
@@ -179,131 +307,80 @@
             <!-- CONTENU PRINCIPAL -->
             <main class="main-content">
                 <div class="view-container">
-                    <h2 class="view-title">Ma Cité</h2>
+                    <h2 class="view-title">Ma Cité Romaine</h2>
                     <div class="city-layout">
+                        <!-- Carte de la cité -->
                         <div class="city-map">
-                            <div class="buildings-grid">
-                                <!-- Bâtiments de base -->
-                                <div class="building-plot built">
-                                    <div class="building-icon">🏛️</div>
-                                    <div class="building-name">Sénat</div>
-                                    <div class="building-level">Niv. 3</div>
-                                </div>
-                                <div class="building-plot built">
-                                    <div class="building-icon">🏠</div>
-                                    <div class="building-name">Habitations</div>
-                                    <div class="building-level">Niv. 5</div>
-                                </div>
-                                <div class="building-plot built">
-                                    <div class="building-icon">🌾</div>
-                                    <div class="building-name">Ferme</div>
-                                    <div class="building-level">Niv. 4</div>
-                                </div>
-                                <div class="building-plot built">
-                                    <div class="building-icon">🏭</div>
-                                    <div class="building-name">Scierie</div>
-                                    <div class="building-level">Niv. 3</div>
-                                </div>
-                                <div class="building-plot built">
-                                    <div class="building-icon">⛏️</div>
-                                    <div class="building-name">Mine</div>
-                                    <div class="building-level">Niv. 2</div>
-                                </div>
-                                
-                                <!-- Emplacements vides -->
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
-                                
-                                <!-- Plus d'emplacements -->
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
-                                
-                                <!-- Dernière rangée -->
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
-                                <div class="building-plot">
-                                    <div class="building-icon">➕</div>
-                                    <div class="building-name">Construire</div>
-                                </div>
+                            <div id="buildings-grid" class="buildings-grid">
+                                <!-- Les emplacements de bâtiments seront générés par JS -->
                             </div>
                         </div>
+
+                        <!-- Panneau d'informations -->
                         <div class="city-panel">
+                            <!-- Statistiques de la cité -->
                             <div class="panel-section">
-                                <h3 class="section-title">📊 Statistiques de la Cité</h3>
-                                <div class="quick-stats">
-                                    <div class="stat-card">
-                                        <div class="stat-value">12,450</div>
+                                <h3 class="section-title">📊 Statistiques</h3>
+                                <div class="city-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-value" id="population-value">75</div>
                                         <div class="stat-label">Population</div>
                                     </div>
-                                    <div class="stat-card">
-                                        <div class="stat-value">85%</div>
+                                    <div class="stat-item">
+                                        <div class="stat-value" id="happiness-value">60</div>
                                         <div class="stat-label">Bonheur</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value" id="max-population-value">75</div>
+                                        <div class="stat-label">Pop. Max</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value" id="city-level-value">1</div>
+                                        <div class="stat-label">Niveau</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="panel-section">
-                                <h3 class="section-title">📦 Entrepôt</h3>
-                                <p>Capacité de base: 50,000</p>
-                                <p>Bonus de stockage: +25%</p>
-                                <p>Capacité totale: 62,500</p>
-                            </div>
+
+                            <!-- Production -->
                             <div class="panel-section">
                                 <h3 class="section-title">⚡ Production / heure</h3>
-                                <p>Bois: +125/h</p>
-                                <p>Pierre: +89/h</p>
-                                <p>Vin: +45/h</p>
-                                <p>Fer: +67/h</p>
-                                <p>Or: +234/h</p>
+                                <div id="production-list" class="production-list">
+                                    <!-- Généré par JS -->
+                                </div>
+                            </div>
+
+                            <!-- Stockage -->
+                            <div class="panel-section">
+                                <h3 class="section-title">📦 Stockage</h3>
+                                <div id="storage-list" class="storage-list">
+                                    <!-- Généré par JS -->
+                                </div>
+                            </div>
+
+                            <!-- Files d'attente -->
+                            <div class="panel-section">
+                                <h3 class="section-title">🏗️ Construction</h3>
+                                <div id="building-queue-main" class="queue-container">
+                                    <p class="queue-empty">Aucune construction en cours</p>
+                                </div>
+                            </div>
+
+                            <div class="panel-section">
+                                <h3 class="section-title">⚔️ Recrutement</h3>
+                                <div id="recruitment-queue-main" class="queue-container">
+                                    <p class="queue-empty">Aucun recrutement en cours</p>
+                                </div>
+                            </div>
+
+                            <!-- Actions rapides -->
+                            <div class="panel-section">
+                                <h3 class="section-title">⚡ Actions Rapides</h3>
+                                <div class="quick-actions">
+                                    <button class="quick-action-btn" id="save-btn">💾 Sauvegarder</button>
+                                    <button class="quick-action-btn" id="load-btn">📁 Charger</button>
+                                    <button class="quick-action-btn" onclick="location.href='../Developpement/Academie.html'">📚 Académie</button>
+                                    <button class="quick-action-btn" onclick="location.href='../Militaire/Légions.html'">⚔️ Légions</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -311,5 +388,261 @@
             </main>
         </div>
     </div>
+
+    <script>
+        // Variables globales
+        let uiManager;
+        
+        // Initialisation du jeu
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser le moteur de jeu
+            gameEngine.init();
+            
+            // Initialiser le gestionnaire d'interface
+            uiManager = new ImperiumUIManager(gameEngine);
+            
+            // Générer la grille de bâtiments
+            generateBuildingsGrid();
+            
+            // Mettre à jour l'interface
+            updateCityInterface();
+            
+            console.log('🏛️ IMPERIUM - Cité initialisée avec succès!');
+        });
+        
+        // Génération de la grille de bâtiments
+        function generateBuildingsGrid() {
+            const grid = document.getElementById('buildings-grid');
+            const gameState = gameEngine.getGameState();
+            const city = gameState.cities.main;
+            
+            // Créer une grille 6x6
+            for (let y = 0; y < 6; y++) {
+                for (let x = 0; x < 6; x++) {
+                    const slot = document.createElement('div');
+                    slot.className = 'building-slot';
+                    slot.dataset.x = x;
+                    slot.dataset.y = y;
+                    
+                    // Vérifier s'il y a un bâtiment à cette position
+                    const building = findBuildingAtPosition(city.buildings, x, y);
+                    
+                    if (building) {
+                        slot.classList.add('occupied');
+                        slot.dataset.building = building.type;
+                        
+                        const config = BUILDINGS_CONFIG[building.type];
+                        slot.innerHTML = `
+                            <div class="building-icon">${config.icon}</div>
+                            <div class="building-name">${config.name}</div>
+                            <div class="building-level">Niveau ${building.level}</div>
+                        `;
+                    } else {
+                        slot.innerHTML = `
+                            <div class="building-icon">➕</div>
+                            <div class="building-name">Construire</div>
+                        `;
+                    }
+                    
+                    grid.appendChild(slot);
+                }
+            }
+        }
+        
+        // Trouver un bâtiment à une position donnée
+        function findBuildingAtPosition(buildings, x, y) {
+            for (const [type, building] of Object.entries(buildings)) {
+                if (building.x === x && building.y === y) {
+                    return { type, ...building };
+                }
+            }
+            return null;
+        }
+        
+        // Mise à jour de l'interface de la cité
+        function updateCityInterface() {
+            const gameState = gameEngine.getGameState();
+            const city = gameState.cities.main;
+            
+            // Statistiques de la cité
+            document.getElementById('population-value').textContent = Math.floor(city.population);
+            document.getElementById('happiness-value').textContent = city.happiness;
+            document.getElementById('max-population-value').textContent = gameEngine.calculateMaxPopulation('main');
+            document.getElementById('city-level-value').textContent = city.buildings.forum ? city.buildings.forum.level : 0;
+            
+            // Production
+            updateProductionDisplay();
+            
+            // Stockage
+            updateStorageDisplay();
+        }
+        
+        // Mise à jour de l'affichage de la production
+        function updateProductionDisplay() {
+            const production = gameEngine.calculateProduction('main');
+            const productionList = document.getElementById('production-list');
+            
+            productionList.innerHTML = Object.keys(production).map(resource => {
+                const rate = production[resource];
+                const config = RESOURCES_CONFIG[resource];
+                
+                return `
+                    <div class="production-item">
+                        <div class="production-resource">
+                            <span class="production-icon">${config.icon}</span>
+                            <span class="production-name">${config.name}</span>
+                        </div>
+                        <span class="production-rate">+${rate.toFixed(1)}/h</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Mise à jour de l'affichage du stockage
+        function updateStorageDisplay() {
+            const resources = gameEngine.getResources();
+            const capacity = gameEngine.calculateStorageCapacity('main');
+            const storageList = document.getElementById('storage-list');
+            
+            storageList.innerHTML = Object.keys(resources).map(resource => {
+                const current = resources[resource];
+                const max = capacity[resource];
+                const percentage = Math.min(100, (current / max) * 100);
+                const config = RESOURCES_CONFIG[resource];
+                
+                return `
+                    <div class="storage-item">
+                        <span class="production-icon">${config.icon}</span>
+                        <div class="storage-bar">
+                            <div class="storage-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <span class="storage-text">${Math.floor(current)}/${Math.floor(max)}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Mise à jour périodique de l'interface
+        setInterval(() => {
+            updateCityInterface();
+            updateBuildingsGrid();
+        }, 1000);
+        
+        // Mise à jour de la grille de bâtiments
+        function updateBuildingsGrid() {
+            const gameState = gameEngine.getGameState();
+            const city = gameState.cities.main;
+            
+            // Mettre à jour les barres de progression des constructions en cours
+            if (city.buildingQueue) {
+                city.buildingQueue.forEach(building => {
+                    const slot = document.querySelector(`[data-x="${building.x}"][data-y="${building.y}"]`);
+                    if (slot) {
+                        const progress = uiManager.calculateProgress(building.startTime, building.endTime);
+                        
+                        // Ajouter la barre de progression si elle n'existe pas
+                        if (!slot.querySelector('.building-progress')) {
+                            const progressBar = document.createElement('div');
+                            progressBar.className = 'building-progress';
+                            progressBar.innerHTML = '<div class="building-progress-bar"></div>';
+                            slot.appendChild(progressBar);
+                        }
+                        
+                        // Mettre à jour la progression
+                        const progressBarFill = slot.querySelector('.building-progress-bar');
+                        if (progressBarFill) {
+                            progressBarFill.style.width = progress + '%';
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Gestion des événements spécifiques à la cité
+        gameEngine.on('buildingCompleted', (data) => {
+            // Régénérer la grille quand un bâtiment est terminé
+            setTimeout(() => {
+                const grid = document.getElementById('buildings-grid');
+                grid.innerHTML = '';
+                generateBuildingsGrid();
+            }, 100);
+        });
+        
+        // Fonction pour obtenir des conseils de développement
+        function getCityAdvice() {
+            const gameState = gameEngine.getGameState();
+            const city = gameState.cities.main;
+            const resources = gameEngine.getResources();
+            const advice = [];
+            
+            // Conseils basés sur l'état de la cité
+            if (city.happiness < 50) {
+                advice.push("🍺 Construisez une Taverne pour améliorer le bonheur de vos citoyens");
+            }
+            
+            if (!city.buildings.warehouse || city.buildings.warehouse.level < 3) {
+                advice.push("📦 Améliorez votre Entrepôt pour augmenter la capacité de stockage");
+            }
+            
+            if (resources.wood < 500) {
+                advice.push("🌲 Construisez plus de Camps de Bûcherons pour la production de bois");
+            }
+            
+            if (!city.buildings.academy) {
+                advice.push("📚 Construisez une Académie pour débloquer les technologies");
+            }
+            
+            if (!city.buildings.barracks) {
+                advice.push("⚔️ Construisez une Caserne pour recruter des légions");
+            }
+            
+            return advice;
+        }
+        
+        // Afficher les conseils (peut être appelé depuis la console ou un bouton)
+        function showCityAdvice() {
+            const advice = getCityAdvice();
+            if (advice.length > 0) {
+                uiManager.showNotification('Conseils de développement', advice.join('\n'), 'info', 10000);
+            } else {
+                uiManager.showNotification('Félicitations', 'Votre cité se développe parfaitement!', 'success');
+            }
+        }
+        
+        // Fonction de débogage pour ajouter des ressources (développement)
+        function addResources(resource, amount) {
+            if (typeof gameState !== 'undefined') {
+                gameState.resources[resource] = (gameState.resources[resource] || 0) + amount;
+                uiManager.showNotification('Debug', `+${amount} ${resource} ajouté`, 'info');
+            }
+        }
+        
+        // Raccourcis clavier pour le développement
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey) {
+                switch(e.key) {
+                    case 'S':
+                        e.preventDefault();
+                        uiManager.saveGame();
+                        break;
+                    case 'L':
+                        e.preventDefault();
+                        uiManager.loadGame();
+                        break;
+                    case 'A':
+                        e.preventDefault();
+                        showCityAdvice();
+                        break;
+                    case 'R':
+                        e.preventDefault();
+                        // Ajouter 1000 de chaque ressource (debug)
+                        Object.keys(RESOURCES_CONFIG).forEach(resource => {
+                            addResources(resource, 1000);
+                        });
+                        break;
+                }
+            }
+        });
+    </script>
 </body>
 </html>

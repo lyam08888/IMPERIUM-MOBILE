@@ -3,304 +3,407 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMPERIUM - Commerce</title>
-    <meta name="description" content="Gérez le commerce de votre empire romain, négociez avec d'autres joueurs et développez vos routes commerciales.">
+    <title>IMPERIUM - Marché Impérial</title>
+    <meta name="description" content="Échangez vos ressources sur le marché impérial d'IMPERIUM.">
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
 
     <!-- Styles et scripts communs -->
     <link rel="stylesheet" href="../common-styles.css">
     <script src="../common-navigation.js"></script>
+    <script src="../game-engine.js"></script>
+    <script src="../advanced-game-systems.js"></script>
+    <script src="../save-system.js"></script>
+    <script src="../ui-manager.js"></script>
 
     <style>
-        /* Styles spécifiques au Commerce */
-        .commerce-layout {
+        /* Styles spécifiques au marché */
+        .market-layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
-            height: calc(100% - 100px);
+            margin-bottom: 2rem;
         }
 
-        .trade-section {
+        .market-section {
             background: rgba(15, 23, 42, 0.8);
             border-radius: 1rem;
-            border: 1px solid var(--border-gold);
-            padding: 1.5rem;
-            overflow-y: auto;
+            border: 2px solid var(--border-gold);
+            padding: 2rem;
         }
 
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-gold);
+        .market-section.buy {
+            border-color: #22c55e;
         }
 
-        .section-title {
+        .market-section.sell {
+            border-color: #dc2626;
+        }
+
+        .market-title {
             color: var(--gold-primary);
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .trade-tabs {
-            display: flex;
-            gap: 0.5rem;
             margin-bottom: 1.5rem;
-        }
-
-        .trade-tab {
-            padding: 0.5rem 1rem;
-            background: rgba(30, 41, 59, 0.6);
-            border: 1px solid var(--border-gold);
-            border-radius: 0.5rem;
-            color: var(--text-light);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .trade-tab.active {
-            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
-            color: white;
-        }
-
-        .trade-offer {
-            background: rgba(30, 41, 59, 0.6);
-            border-radius: 0.8rem;
-            border: 1px solid var(--border-gold);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .trade-offer:hover {
-            border-color: var(--gold-light);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px var(--shadow-gold);
-        }
-
-        .offer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .trader-info {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .trader-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--roman-red), var(--roman-purple));
+            text-align: center;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: white;
-            border: 2px solid var(--gold-primary);
+            gap: 0.5rem;
         }
 
-        .trader-name {
-            color: var(--gold-light);
-            font-weight: bold;
+        .market-title.buy {
+            color: #22c55e;
         }
 
-        .trader-rating {
-            color: var(--text-muted);
-            font-size: 0.8rem;
+        .market-title.sell {
+            color: #dc2626;
         }
 
-        .offer-time {
-            color: var(--text-muted);
-            font-size: 0.8rem;
+        .resource-selector {
+            margin-bottom: 2rem;
         }
 
-        .trade-exchange {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
+        .resource-tabs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
         }
 
-        .trade-side {
-            flex: 1;
-            background: rgba(15, 23, 42, 0.5);
+        .resource-tab {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border-gold);
             border-radius: 0.5rem;
             padding: 1rem;
             text-align: center;
-        }
-
-        .trade-resources {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .resource-amount {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            font-weight: bold;
-            color: var(--gold-light);
-        }
-
-        .trade-arrow {
-            font-size: 1.5rem;
-            color: var(--gold-primary);
-        }
-
-        .trade-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .trade-btn {
-            flex: 1;
-            padding: 0.6rem 1rem;
-            border: none;
-            border-radius: 0.5rem;
-            font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-family: 'Times New Roman', serif;
         }
 
-        .trade-btn.accept {
-            background: linear-gradient(135deg, var(--success-green), #16a34a);
-            color: white;
-        }
-
-        .trade-btn.decline {
-            background: rgba(30, 41, 59, 0.8);
-            color: var(--text-light);
-            border: 1px solid var(--border-gold);
-        }
-
-        .trade-btn:hover {
+        .resource-tab:hover {
+            border-color: var(--gold-light);
             transform: translateY(-2px);
         }
 
-        .create-offer-form {
+        .resource-tab.active {
+            border-color: var(--gold-primary);
+            background: rgba(217, 119, 6, 0.2);
+        }
+
+        .resource-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .resource-name {
+            color: var(--text-light);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .resource-price {
+            color: var(--gold-light);
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        .order-form {
             background: rgba(30, 41, 59, 0.6);
             border-radius: 0.8rem;
             border: 1px solid var(--border-gold);
             padding: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .form-label {
-            color: var(--gold-primary);
+            color: var(--text-light);
             font-weight: bold;
             margin-bottom: 0.5rem;
             display: block;
         }
 
-        .resource-selector {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .resource-input {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(15, 23, 42, 0.5);
-            padding: 0.5rem;
-            border-radius: 0.5rem;
+        .form-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-gold);
-        }
-
-        .resource-input input {
-            background: transparent;
-            border: none;
+            border-radius: 0.5rem;
+            padding: 1rem;
             color: var(--text-light);
-            width: 60px;
-            text-align: center;
-            font-family: 'Times New Roman', serif;
+            font-size: 1.1rem;
+            font-weight: bold;
         }
 
-        .resource-input input:focus {
+        .form-input:focus {
+            border-color: var(--gold-light);
             outline: none;
         }
 
-        .create-btn {
-            width: 100%;
+        .form-help {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .order-summary {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 0.5rem;
             padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--border-gold);
+            font-weight: bold;
+        }
+
+        .summary-label {
+            color: var(--text-light);
+        }
+
+        .summary-value {
+            color: var(--gold-light);
+            font-weight: bold;
+        }
+
+        .place-order-btn {
+            width: 100%;
+            padding: 1.2rem;
             background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
             color: white;
             border: none;
-            border-radius: 0.5rem;
+            border-radius: 0.8rem;
+            font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             font-family: 'Times New Roman', serif;
-            font-size: 1rem;
         }
 
-        .create-btn:hover {
+        .place-order-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px var(--shadow-gold);
         }
 
-        .my-offers {
-            max-height: 400px;
-            overflow-y: auto;
+        .place-order-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        .my-offer {
-            background: rgba(30, 41, 59, 0.6);
-            border-radius: 0.8rem;
-            border: 1px solid var(--border-gold);
-            padding: 1rem;
-            margin-bottom: 1rem;
-            position: relative;
+        .place-order-btn.buy {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
         }
 
-        .offer-status {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            padding: 0.2rem 0.6rem;
+        .place-order-btn.sell {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+
+        .market-orders {
+            background: rgba(15, 23, 42, 0.8);
             border-radius: 1rem;
-            font-size: 0.7rem;
+            border: 2px solid var(--border-gold);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .orders-title {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
             font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-align: center;
         }
 
-        .status-active {
-            background: rgba(34, 197, 94, 0.2);
-            color: var(--success-green);
+        .orders-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            justify-content: center;
         }
 
-        .status-pending {
+        .orders-tab {
+            padding: 0.8rem 1.5rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .orders-tab:hover {
+            border-color: var(--gold-light);
+        }
+
+        .orders-tab.active {
+            border-color: var(--gold-primary);
             background: rgba(217, 119, 6, 0.2);
             color: var(--gold-light);
         }
 
+        .orders-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .order-item {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-gold);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-item.buy {
+            border-left: 4px solid #22c55e;
+        }
+
+        .order-item.sell {
+            border-left: 4px solid #dc2626;
+        }
+
+        .order-info {
+            flex: 1;
+        }
+
+        .order-resource {
+            color: var(--gold-light);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .order-details {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .order-price {
+            color: var(--gold-primary);
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-align: right;
+        }
+
+        .order-actions {
+            margin-left: 1rem;
+        }
+
         .cancel-btn {
-            background: var(--roman-red);
-            color: white;
-            border: none;
-            padding: 0.4rem 0.8rem;
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+            border: 1px solid #dc2626;
             border-radius: 0.3rem;
+            padding: 0.5rem 1rem;
             cursor: pointer;
+            transition: all 0.3s ease;
             font-size: 0.8rem;
-            margin-top: 0.5rem;
+        }
+
+        .cancel-btn:hover {
+            background: rgba(220, 38, 38, 0.3);
+        }
+
+        .price-chart {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 2px solid var(--border-gold);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-title {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .chart-container {
+            height: 200px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .market-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            color: var(--gold-primary);
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        .stat-change.positive {
+            color: #22c55e;
+        }
+
+        .stat-change.negative {
+            color: #dc2626;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .market-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .resource-tabs {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .orders-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 </head>
@@ -337,237 +440,553 @@
             <!-- CONTENU PRINCIPAL -->
             <main class="main-content">
                 <div class="view-container">
-                    <h2 class="view-title">Forum Commercial</h2>
-                    <div class="commerce-layout">
-                        <!-- Section des offres disponibles -->
-                        <div class="trade-section">
-                            <div class="section-header">
-                                <h3 class="section-title">⚖️ Offres Disponibles</h3>
+                    <h2 class="view-title">Marché Impérial</h2>
+                    
+                    <!-- Statistiques du marché -->
+                    <div class="market-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-orders">0</div>
+                            <div class="stat-label">Ordres actifs</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="daily-volume">0</div>
+                            <div class="stat-label">Volume quotidien</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="tax-collected">0</div>
+                            <div class="stat-label">Taxes collectées</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="my-orders">0</div>
+                            <div class="stat-label">Mes ordres</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Interface de trading -->
+                    <div class="market-layout">
+                        <!-- Section d'achat -->
+                        <div class="market-section buy">
+                            <h3 class="market-title buy">💰 Acheter des Ressources</h3>
+                            
+                            <div class="resource-selector">
+                                <div class="resource-tabs" id="buy-resource-tabs">
+                                    <!-- Généré par JavaScript -->
+                                </div>
                             </div>
                             
-                            <div class="trade-tabs">
-                                <div class="trade-tab active">Toutes</div>
-                                <div class="trade-tab">Ressources</div>
-                                <div class="trade-tab">Équipement</div>
-                                <div class="trade-tab">Spécial</div>
-                            </div>
-
-                            <div class="trade-offers">
-                                <!-- Offre 1 -->
-                                <div class="trade-offer">
-                                    <div class="offer-header">
-                                        <div class="trader-info">
-                                            <div class="trader-avatar">C</div>
-                                            <div>
-                                                <div class="trader-name">Caesar Augustus</div>
-                                                <div class="trader-rating">⭐⭐⭐⭐⭐ (98%)</div>
-                                            </div>
-                                        </div>
-                                        <div class="offer-time">Il y a 2h</div>
+                            <div class="order-form">
+                                <div class="form-group">
+                                    <label class="form-label">Quantité à acheter</label>
+                                    <input type="number" class="form-input" id="buy-quantity" placeholder="0" min="1">
+                                    <div class="form-help">Quantité de ressources que vous souhaitez acheter</div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Prix maximum par unité</label>
+                                    <input type="number" class="form-input" id="buy-price" placeholder="0" min="0.1" step="0.1">
+                                    <div class="form-help">Prix maximum que vous êtes prêt à payer (en or)</div>
+                                </div>
+                                
+                                <div class="order-summary" id="buy-summary">
+                                    <div class="summary-row">
+                                        <span class="summary-label">Quantité:</span>
+                                        <span class="summary-value" id="buy-summary-quantity">0</span>
                                     </div>
-                                    <div class="trade-exchange">
-                                        <div class="trade-side">
-                                            <div class="trade-resources">
-                                                <div class="resource-amount">🌲 500</div>
-                                                <div class="resource-amount">🪨 300</div>
-                                            </div>
-                                        </div>
-                                        <div class="trade-arrow">⇄</div>
-                                        <div class="trade-side">
-                                            <div class="trade-resources">
-                                                <div class="resource-amount">💰 800</div>
-                                            </div>
-                                        </div>
+                                    <div class="summary-row">
+                                        <span class="summary-label">Prix unitaire:</span>
+                                        <span class="summary-value" id="buy-summary-price">0 or</span>
                                     </div>
-                                    <div class="trade-actions">
-                                        <button class="trade-btn accept">Accepter</button>
-                                        <button class="trade-btn decline">Décliner</button>
+                                    <div class="summary-row">
+                                        <span class="summary-label">Taxe impériale (5%):</span>
+                                        <span class="summary-value" id="buy-summary-tax">0 or</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span class="summary-label">Coût total:</span>
+                                        <span class="summary-value" id="buy-summary-total">0 or</span>
                                     </div>
                                 </div>
-
-                                <!-- Offre 2 -->
-                                <div class="trade-offer">
-                                    <div class="offer-header">
-                                        <div class="trader-info">
-                                            <div class="trader-avatar">P</div>
-                                            <div>
-                                                <div class="trader-name">Pompey Magnus</div>
-                                                <div class="trader-rating">⭐⭐⭐⭐ (87%)</div>
-                                            </div>
-                                        </div>
-                                        <div class="offer-time">Il y a 4h</div>
-                                    </div>
-                                    <div class="trade-exchange">
-                                        <div class="trade-side">
-                                            <div class="trade-resources">
-                                                <div class="resource-amount">🍇 200</div>
-                                            </div>
-                                        </div>
-                                        <div class="trade-arrow">⇄</div>
-                                        <div class="trade-side">
-                                            <div class="trade-resources">
-                                                <div class="resource-amount">⛏️ 150</div>
-                                                <div class="resource-amount">💰 300</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="trade-actions">
-                                        <button class="trade-btn accept">Accepter</button>
-                                        <button class="trade-btn decline">Décliner</button>
-                                    </div>
-                                </div>
-
-                                <!-- Offre 3 -->
-                                <div class="trade-offer">
-                                    <div class="offer-header">
-                                        <div class="trader-info">
-                                            <div class="trader-avatar">S</div>
-                                            <div>
-                                                <div class="trader-name">Spartacus</div>
-                                                <div class="trader-rating">⭐⭐⭐ (76%)</div>
-                                            </div>
-                                        </div>
-                                        <div class="offer-time">Il y a 6h</div>
-                                    </div>
-                                    <div class="trade-exchange">
-                                        <div class="trade-side">
-                                            <div class="trade-resources">
-                                                <div class="resource-amount">💰 1200</div>
-                                            </div>
-                                        </div>
-                                        <div class="trade-arrow">⇄</div>
-                                        <div class="trade-side">
-                                            <div class="trade-resources">
-                                                <div class="resource-amount">🌲 400</div>
-                                                <div class="resource-amount">🪨 600</div>
-                                                <div class="resource-amount">⛏️ 200</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="trade-actions">
-                                        <button class="trade-btn accept">Accepter</button>
-                                        <button class="trade-btn decline">Décliner</button>
-                                    </div>
-                                </div>
+                                
+                                <button class="place-order-btn buy" id="place-buy-order">
+                                    💰 Placer l'ordre d'achat
+                                </button>
                             </div>
                         </div>
 
-                        <!-- Section création d'offres et mes offres -->
-                        <div class="trade-section">
-                            <div class="section-header">
-                                <h3 class="section-title">📝 Créer une Offre</h3>
+                        <!-- Section de vente -->
+                        <div class="market-section sell">
+                            <h3 class="market-title sell">💎 Vendre des Ressources</h3>
+                            
+                            <div class="resource-selector">
+                                <div class="resource-tabs" id="sell-resource-tabs">
+                                    <!-- Généré par JavaScript -->
+                                </div>
                             </div>
-
-                            <div class="create-offer-form">
+                            
+                            <div class="order-form">
                                 <div class="form-group">
-                                    <label class="form-label">Je propose:</label>
-                                    <div class="resource-selector">
-                                        <div class="resource-input">
-                                            <span>🌲</span>
-                                            <input type="number" placeholder="0" min="0">
-                                        </div>
-                                        <div class="resource-input">
-                                            <span>🪨</span>
-                                            <input type="number" placeholder="0" min="0">
-                                        </div>
-                                        <div class="resource-input">
-                                            <span>🍇</span>
-                                            <input type="number" placeholder="0" min="0">
-                                        </div>
-                                        <div class="resource-input">
-                                            <span>⛏️</span>
-                                            <input type="number" placeholder="0" min="0">
-                                        </div>
-                                        <div class="resource-input">
-                                            <span>💰</span>
-                                            <input type="number" placeholder="0" min="0">
-                                        </div>
-                                        <div class="resource-input">
-                                            <span>📚</span>
-                                            <input type="number" placeholder="0" min="0">
-                                        </div>
-                                    </div>
+                                    <label class="form-label">Quantité à vendre</label>
+                                    <input type="number" class="form-input" id="sell-quantity" placeholder="0" min="1">
+                                    <div class="form-help" id="sell-available">Disponible: 0</div>
                                 </div>
-
+                                
                                 <div class="form-group">
-                                    <label class="form-label">Je souhaite recevoir:</label>
-                                    <div class="resource-selector">
-                                        <div class="resource-input">
-                                            <span>🌲</span>
-                                            <input type="number" placeholder="0" min="0">
-                                        </div>
-                                        <div class="resource-input">
-                                            <span>🪨</span>
-                                            <input type="number" placeholder="0" min="0">
-                                        </div>
-                                        <div class="resource-input">
-                                            <span>🍇</span>
-                                            <input type="number" placeholder="0" min="0">
-                                        </div>
-                                        <div class="resource-input">
-                                            <span>⛏️</span>
-                                            <input type="number" placeholder="0" min="0">
-                                        </div>
-                                        <div class="resource-input">
-                                            <span>💰</span>
-                                            <input type="number" placeholder="0" min="0">
-                                        </div>
-                                        <div class="resource-input">
-                                            <span>📚</span>
-                                            <input type="number" placeholder="0" min="0">
-                                        </div>
+                                    <label class="form-label">Prix minimum par unité</label>
+                                    <input type="number" class="form-input" id="sell-price" placeholder="0" min="0.1" step="0.1">
+                                    <div class="form-help">Prix minimum que vous acceptez (en or)</div>
+                                </div>
+                                
+                                <div class="order-summary" id="sell-summary">
+                                    <div class="summary-row">
+                                        <span class="summary-label">Quantité:</span>
+                                        <span class="summary-value" id="sell-summary-quantity">0</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span class="summary-label">Prix unitaire:</span>
+                                        <span class="summary-value" id="sell-summary-price">0 or</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span class="summary-label">Taxe impériale (5%):</span>
+                                        <span class="summary-value" id="sell-summary-tax">0 or</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span class="summary-label">Revenus nets:</span>
+                                        <span class="summary-value" id="sell-summary-total">0 or</span>
                                     </div>
                                 </div>
-
-                                <button class="create-btn">Créer l'Offre</button>
+                                
+                                <button class="place-order-btn sell" id="place-sell-order">
+                                    💎 Placer l'ordre de vente
+                                </button>
                             </div>
-
-                            <div style="margin-top: 2rem;">
-                                <h3 class="section-title">📋 Mes Offres</h3>
-                                <div class="my-offers">
-                                    <div class="my-offer">
-                                        <div class="offer-status status-active">Active</div>
-                                        <div class="trade-exchange">
-                                            <div class="trade-side">
-                                                <div class="trade-resources">
-                                                    <div class="resource-amount">🌲 300</div>
-                                                </div>
-                                            </div>
-                                            <div class="trade-arrow">⇄</div>
-                                            <div class="trade-side">
-                                                <div class="trade-resources">
-                                                    <div class="resource-amount">💰 450</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button class="cancel-btn">Annuler</button>
-                                    </div>
-
-                                    <div class="my-offer">
-                                        <div class="offer-status status-pending">En attente</div>
-                                        <div class="trade-exchange">
-                                            <div class="trade-side">
-                                                <div class="trade-resources">
-                                                    <div class="resource-amount">⛏️ 100</div>
-                                                    <div class="resource-amount">🪨 200</div>
-                                                </div>
-                                            </div>
-                                            <div class="trade-arrow">⇄</div>
-                                            <div class="trade-side">
-                                                <div class="trade-resources">
-                                                    <div class="resource-amount">🍇 150</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button class="cancel-btn">Annuler</button>
-                                    </div>
-                                </div>
-                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ordres du marché -->
+                    <div class="market-orders">
+                        <h3 class="orders-title">📋 Ordres du Marché</h3>
+                        
+                        <div class="orders-tabs">
+                            <div class="orders-tab active" data-tab="all">Tous les ordres</div>
+                            <div class="orders-tab" data-tab="buy">Ordres d'achat</div>
+                            <div class="orders-tab" data-tab="sell">Ordres de vente</div>
+                            <div class="orders-tab" data-tab="my">Mes ordres</div>
+                        </div>
+                        
+                        <div class="orders-list" id="orders-list">
+                            <!-- Généré par JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Graphique des prix -->
+                    <div class="price-chart">
+                        <h3 class="chart-title">📈 Évolution des Prix</h3>
+                        <div class="chart-container">
+                            Graphique des prix en développement...
+                            <br>
+                            <small>Les données historiques seront affichées ici</small>
                         </div>
                     </div>
                 </div>
             </main>
         </div>
     </div>
+
+    <script>
+        // Variables globales
+        let uiManager;
+        let selectedBuyResource = 'wood';
+        let selectedSellResource = 'wood';
+        let currentOrdersTab = 'all';
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser le moteur de jeu s'il n'est pas déjà initialisé
+            if (!gameEngine.isRunning) {
+                gameEngine.init();
+            }
+            
+            // Initialiser le gestionnaire d'interface
+            uiManager = new ImperiumUIManager(gameEngine);
+            
+            // Générer l'interface du marché
+            generateResourceTabs();
+            setupEventListeners();
+            updateMarketInterface();
+            
+            console.log('💰 Marché impérial initialisé!');
+        });
+        
+        // Génération des onglets de ressources
+        function generateResourceTabs() {
+            const buyTabs = document.getElementById('buy-resource-tabs');
+            const sellTabs = document.getElementById('sell-resource-tabs');
+            
+            // Exclure l'or des échanges
+            const tradableResources = Object.keys(RESOURCES_CONFIG).filter(r => r !== 'gold');
+            
+            tradableResources.forEach(resource => {
+                const config = RESOURCES_CONFIG[resource];
+                const currentPrice = marketSystem.getCurrentPrice(resource);
+                
+                // Onglet d'achat
+                const buyTab = document.createElement('div');
+                buyTab.className = `resource-tab ${resource === selectedBuyResource ? 'active' : ''}`;
+                buyTab.dataset.resource = resource;
+                buyTab.innerHTML = `
+                    <div class="resource-icon">${config.icon}</div>
+                    <div class="resource-name">${config.name}</div>
+                    <div class="resource-price">${currentPrice.toFixed(1)} or</div>
+                `;
+                buyTab.addEventListener('click', () => selectBuyResource(resource));
+                buyTabs.appendChild(buyTab);
+                
+                // Onglet de vente
+                const sellTab = document.createElement('div');
+                sellTab.className = `resource-tab ${resource === selectedSellResource ? 'active' : ''}`;
+                sellTab.dataset.resource = resource;
+                sellTab.innerHTML = `
+                    <div class="resource-icon">${config.icon}</div>
+                    <div class="resource-name">${config.name}</div>
+                    <div class="resource-price">${currentPrice.toFixed(1)} or</div>
+                `;
+                sellTab.addEventListener('click', () => selectSellResource(resource));
+                sellTabs.appendChild(sellTab);
+            });
+        }
+        
+        // Sélection des ressources
+        function selectBuyResource(resource) {
+            selectedBuyResource = resource;
+            updateResourceTabs('buy');
+            updateBuySummary();
+        }
+        
+        function selectSellResource(resource) {
+            selectedSellResource = resource;
+            updateResourceTabs('sell');
+            updateSellSummary();
+            updateSellAvailable();
+        }
+        
+        function updateResourceTabs(type) {
+            const container = document.getElementById(`${type}-resource-tabs`);
+            const selectedResource = type === 'buy' ? selectedBuyResource : selectedSellResource;
+            
+            container.querySelectorAll('.resource-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.resource === selectedResource);
+            });
+        }
+        
+        // Configuration des événements
+        function setupEventListeners() {
+            // Mise à jour des résumés en temps réel
+            document.getElementById('buy-quantity').addEventListener('input', updateBuySummary);
+            document.getElementById('buy-price').addEventListener('input', updateBuySummary);
+            document.getElementById('sell-quantity').addEventListener('input', updateSellSummary);
+            document.getElementById('sell-price').addEventListener('input', updateSellSummary);
+            
+            // Boutons de placement d'ordres
+            document.getElementById('place-buy-order').addEventListener('click', placeBuyOrder);
+            document.getElementById('place-sell-order').addEventListener('click', placeSellOrder);
+            
+            // Onglets des ordres
+            document.querySelectorAll('.orders-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    currentOrdersTab = tab.dataset.tab;
+                    updateOrdersTabs();
+                    updateOrdersList();
+                });
+            });
+            
+            // Mise à jour périodique
+            setInterval(updateMarketInterface, 5000);
+        }
+        
+        // Mise à jour des résumés
+        function updateBuySummary() {
+            const quantity = parseInt(document.getElementById('buy-quantity').value) || 0;
+            const price = parseFloat(document.getElementById('buy-price').value) || 0;
+            const subtotal = quantity * price;
+            const tax = subtotal * 0.05;
+            const total = subtotal + tax;
+            
+            document.getElementById('buy-summary-quantity').textContent = quantity;
+            document.getElementById('buy-summary-price').textContent = price.toFixed(1) + ' or';
+            document.getElementById('buy-summary-tax').textContent = tax.toFixed(1) + ' or';
+            document.getElementById('buy-summary-total').textContent = total.toFixed(1) + ' or';
+            
+            // Vérifier si le joueur peut payer
+            const canAfford = gameState.resources.gold >= total;
+            const buyBtn = document.getElementById('place-buy-order');
+            buyBtn.disabled = !canAfford || quantity === 0 || price === 0;
+            
+            if (!canAfford && total > 0) {
+                buyBtn.textContent = '💰 Or insuffisant';
+            } else {
+                buyBtn.textContent = '💰 Placer l\'ordre d\'achat';
+            }
+        }
+        
+        function updateSellSummary() {
+            const quantity = parseInt(document.getElementById('sell-quantity').value) || 0;
+            const price = parseFloat(document.getElementById('sell-price').value) || 0;
+            const subtotal = quantity * price;
+            const tax = subtotal * 0.05;
+            const total = subtotal - tax;
+            
+            document.getElementById('sell-summary-quantity').textContent = quantity;
+            document.getElementById('sell-summary-price').textContent = price.toFixed(1) + ' or';
+            document.getElementById('sell-summary-tax').textContent = tax.toFixed(1) + ' or';
+            document.getElementById('sell-summary-total').textContent = total.toFixed(1) + ' or';
+            
+            // Vérifier si le joueur a les ressources
+            const available = gameState.resources[selectedSellResource] || 0;
+            const canSell = available >= quantity;
+            const sellBtn = document.getElementById('place-sell-order');
+            sellBtn.disabled = !canSell || quantity === 0 || price === 0;
+            
+            if (!canSell && quantity > 0) {
+                sellBtn.textContent = '💎 Ressources insuffisantes';
+            } else {
+                sellBtn.textContent = '💎 Placer l\'ordre de vente';
+            }
+        }
+        
+        function updateSellAvailable() {
+            const available = gameState.resources[selectedSellResource] || 0;
+            document.getElementById('sell-available').textContent = `Disponible: ${available}`;
+            
+            // Mettre à jour la limite max de l'input
+            document.getElementById('sell-quantity').max = available;
+        }
+        
+        // Placement des ordres
+        function placeBuyOrder() {
+            const quantity = parseInt(document.getElementById('buy-quantity').value);
+            const price = parseFloat(document.getElementById('buy-price').value);
+            
+            if (!quantity || !price) {
+                uiManager.showNotification('Erreur', 'Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            
+            try {
+                const order = marketSystem.placeBuyOrder(selectedBuyResource, quantity, price);
+                uiManager.showNotification(
+                    'Ordre placé', 
+                    `Ordre d'achat créé: ${quantity} ${RESOURCES_CONFIG[selectedBuyResource].name} à ${price} or/unité`, 
+                    'success'
+                );
+                
+                // Réinitialiser le formulaire
+                document.getElementById('buy-quantity').value = '';
+                document.getElementById('buy-price').value = '';
+                updateBuySummary();
+                updateMarketInterface();
+                
+            } catch (error) {
+                uiManager.showNotification('Erreur', error.message, 'error');
+            }
+        }
+        
+        function placeSellOrder() {
+            const quantity = parseInt(document.getElementById('sell-quantity').value);
+            const price = parseFloat(document.getElementById('sell-price').value);
+            
+            if (!quantity || !price) {
+                uiManager.showNotification('Erreur', 'Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            
+            try {
+                const order = marketSystem.placeSellOrder(selectedSellResource, quantity, price);
+                uiManager.showNotification(
+                    'Ordre placé', 
+                    `Ordre de vente créé: ${quantity} ${RESOURCES_CONFIG[selectedSellResource].name} à ${price} or/unité`, 
+                    'success'
+                );
+                
+                // Réinitialiser le formulaire
+                document.getElementById('sell-quantity').value = '';
+                document.getElementById('sell-price').value = '';
+                updateSellSummary();
+                updateSellAvailable();
+                updateMarketInterface();
+                
+            } catch (error) {
+                uiManager.showNotification('Erreur', error.message, 'error');
+            }
+        }
+        
+        // Mise à jour de l'interface du marché
+        function updateMarketInterface() {
+            updateMarketStats();
+            updateOrdersList();
+            updateResourcePrices();
+        }
+        
+        function updateMarketStats() {
+            const marketData = marketSystem.getMarketData();
+            const allOrders = [...marketSystem.orders.buy, ...marketSystem.orders.sell];
+            const myOrders = allOrders.filter(order => order.playerId === 'player');
+            
+            document.getElementById('total-orders').textContent = allOrders.length;
+            document.getElementById('my-orders').textContent = myOrders.length;
+            
+            // Simuler les autres statistiques
+            document.getElementById('daily-volume').textContent = Math.floor(Math.random() * 50000);
+            document.getElementById('tax-collected').textContent = Math.floor(Math.random() * 2500);
+        }
+        
+        function updateOrdersList() {
+            const container = document.getElementById('orders-list');
+            const allOrders = [...marketSystem.orders.buy, ...marketSystem.orders.sell];
+            
+            let filteredOrders = allOrders;
+            
+            switch (currentOrdersTab) {
+                case 'buy':
+                    filteredOrders = marketSystem.orders.buy;
+                    break;
+                case 'sell':
+                    filteredOrders = marketSystem.orders.sell;
+                    break;
+                case 'my':
+                    filteredOrders = allOrders.filter(order => order.playerId === 'player');
+                    break;
+            }
+            
+            if (filteredOrders.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 2rem;">Aucun ordre trouvé</div>';
+                return;
+            }
+            
+            container.innerHTML = filteredOrders.map(order => {
+                const config = RESOURCES_CONFIG[order.resource];
+                const isMyOrder = order.playerId === 'player';
+                const timeAgo = formatTimeAgo(Date.now() - order.timestamp);
+                
+                return `
+                    <div class="order-item ${order.type}">
+                        <div class="order-info">
+                            <div class="order-resource">
+                                ${config.icon} ${config.name}
+                            </div>
+                            <div class="order-details">
+                                ${order.type === 'buy' ? 'Achat' : 'Vente'} de ${order.quantity} unités
+                                • ${isMyOrder ? 'Mon ordre' : 'Autre joueur'}
+                                • ${timeAgo}
+                            </div>
+                        </div>
+                        <div class="order-price">
+                            ${order.price.toFixed(1)} or
+                        </div>
+                        ${isMyOrder ? `
+                            <div class="order-actions">
+                                <button class="cancel-btn" onclick="cancelOrder('${order.id}')">
+                                    Annuler
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function updateOrdersTabs() {
+            document.querySelectorAll('.orders-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === currentOrdersTab);
+            });
+        }
+        
+        function updateResourcePrices() {
+            // Mettre à jour les prix dans les onglets
+            document.querySelectorAll('.resource-tab').forEach(tab => {
+                const resource = tab.dataset.resource;
+                const currentPrice = marketSystem.getCurrentPrice(resource);
+                const priceElement = tab.querySelector('.resource-price');
+                if (priceElement) {
+                    priceElement.textContent = currentPrice.toFixed(1) + ' or';
+                }
+            });
+        }
+        
+        // Annulation d'ordre
+        function cancelOrder(orderId) {
+            try {
+                marketSystem.cancelOrder(orderId);
+                uiManager.showNotification('Ordre annulé', 'Votre ordre a été annulé et les ressources restituées', 'success');
+                updateMarketInterface();
+            } catch (error) {
+                uiManager.showNotification('Erreur', error.message, 'error');
+            }
+        }
+        
+        // Utilitaires
+        function formatTimeAgo(ms) {
+            const seconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            
+            if (hours > 0) {
+                return `il y a ${hours}h`;
+            } else if (minutes > 0) {
+                return `il y a ${minutes}min`;
+            } else {
+                return `il y a ${seconds}s`;
+            }
+        }
+        
+        // Écouter les événements de trading
+        gameEngine.on('tradeExecuted', (data) => {
+            if (data.buyer === 'player' || data.seller === 'player') {
+                const action = data.buyer === 'player' ? 'acheté' : 'vendu';
+                uiManager.showNotification(
+                    'Transaction réalisée',
+                    `Vous avez ${action} ${data.quantity} ${RESOURCES_CONFIG[data.resource].name} à ${data.price.toFixed(1)} or/unité`,
+                    'success'
+                );
+                updateMarketInterface();
+            }
+        });
+        
+        // Conseils de trading
+        function showTradingTips() {
+            const tips = [
+                "💡 Surveillez les fluctuations de prix pour acheter bas et vendre haut",
+                "📊 Les prix évoluent selon l'offre et la demande du marché",
+                "💰 Une taxe impériale de 5% est prélevée sur chaque transaction",
+                "⏰ Vos ordres restent actifs jusqu'à ce qu'ils soient exécutés ou annulés",
+                "🎯 Placez des ordres à des prix compétitifs pour qu'ils s'exécutent rapidement",
+                "📈 Diversifiez vos investissements entre différentes ressources"
+            ];
+            
+            const randomTip = tips[Math.floor(Math.random() * tips.length)];
+            uiManager.showNotification('Conseil de trading', randomTip, 'info', 8000);
+        }
+        
+        // Afficher un conseil au chargement
+        setTimeout(showTradingTips, 3000);
+        
+        // Raccourcis clavier
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey) {
+                switch(e.key) {
+                    case 'B':
+                        e.preventDefault();
+                        document.getElementById('buy-quantity').focus();
+                        break;
+                    case 'S':
+                        e.preventDefault();
+                        document.getElementById('sell-quantity').focus();
+                        break;
+                    case 'T':
+                        e.preventDefault();
+                        showTradingTips();
+                        break;
+                }
+            }
+        });
+    </script>
 </body>
 </html>
