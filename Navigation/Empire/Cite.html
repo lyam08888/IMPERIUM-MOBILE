@@ -1,72 +1,276 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMPERIUM - Ma Cité Romaine</title>
+    <title>IMPERIUM - Ma Cité</title>
     <meta name="description" content="Gérez votre cité romaine dans IMPERIUM - Construisez, développez, prospérez.">
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
 
-    <!-- Styles et scripts communs -->
-    <link rel="stylesheet" href="../common-styles.css">
-    <script src="../common-navigation.js"></script>
-    <script src="../game-engine.js"></script>
-    <script src="../advanced-game-systems.js"></script>
-    <script src="../save-system.js"></script>
-    <script src="../ui-manager.js"></script>
-    <script src="../global-console.js"></script>
-
     <style>
-        /* Variables CSS pour le thème romain moderne */
+        /* =============================================================== */
+        /* STYLES COMMUNS DE L'APPLICATION (common-style.css)            */
+        /* =============================================================== */
         :root {
-            --roman-red: #8B0000;
-            --roman-gold: #FFD700;
-            --roman-bronze: #CD7F32;
-            --roman-marble: #F8F8FF;
-            --roman-stone: #696969;
-            --roman-purple: #800080;
-            --gradient-primary: linear-gradient(135deg, var(--roman-red), var(--roman-bronze));
-            --gradient-gold: linear-gradient(135deg, var(--roman-gold), #FFA500);
-            --shadow-gold: 0 8px 32px rgba(255, 215, 0, 0.3);
-            --shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --gold-primary: #d97706;
+            --gold-secondary: #f59e0b;
+            --gold-light: #fbbf24;
+            --marble-white: #f8fafc;
+            --roman-red: #dc2626;
+            --roman-purple: #7c3aed;
+            --dark-stone: #1e293b;
+            --dark-marble: #334155;
+            --dark-bg: #0f172a;
+            --text-light: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-gold: rgba(217, 119, 6, 0.3);
+            --shadow-gold: rgba(217, 119, 6, 0.4);
+            --success-green: #22c55e;
+            --storage-full-red: #ef4444;
         }
 
-        /* Layout responsive moderne */
-        .city-container {
-            padding: 1rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            min-height: calc(100vh - 120px);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
         }
 
-        .city-header {
-            text-align: center;
-            margin-bottom: 2rem;
-            animation: fadeInDown 0.8s ease-out;
-        }
-
-        .city-title {
-            color: var(--roman-gold);
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: bold;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+        body {
             font-family: 'Times New Roman', serif;
-            margin-bottom: 0.5rem;
-            background: var(--gradient-gold);
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(217, 119, 6, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-stone) 100%);
+            color: var(--text-light);
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: var(--gold-light);
+            border-radius: 50%;
+            animation: float 8s infinite linear;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        .imperium-ui {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+
+        .imperium-header {
+            background: linear-gradient(135deg, var(--dark-marble) 0%, var(--dark-stone) 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--border-gold);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .imperium-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .city-subtitle {
-            color: var(--roman-marble);
+        .imperium-logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 10px var(--shadow-gold));
+        }
+
+        .resources-display {
+            display: flex;
+            gap: 1.5rem;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 0.75rem 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            font-size: 1rem;
+            position: relative;
+        }
+
+        .resource-icon {
             font-size: 1.2rem;
-            opacity: 0.9;
-            font-style: italic;
+            filter: drop-shadow(0 0 5px var(--shadow-gold));
         }
 
-        /* Layout principal responsive */
+        .resource-value {
+            color: var(--gold-light);
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--roman-red), var(--roman-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 2px solid var(--gold-primary);
+        }
+
+        .player-details {
+            font-size: 0.9rem;
+        }
+
+        .player-name {
+            color: var(--gold-light);
+            font-weight: bold;
+        }
+
+        .player-level {
+            color: var(--text-muted);
+        }
+
+        .imperium-body {
+            display: flex;
+            flex-grow: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            gap: 1.5rem;
+            padding: 1.5rem 2rem;
+            overflow: hidden;
+        }
+
+        .imperium-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            overflow-y: auto;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-title {
+            color: var(--gold-primary);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item a:hover, .nav-item a.active {
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.2), rgba(245, 158, 11, 0.1));
+            border-color: var(--gold-primary);
+            transform: translateX(5px);
+            color: var(--gold-light);
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .view-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            overflow-y: auto;
+            padding: 2rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .view-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--gold-primary);
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* =============================================================== */
+        /* STYLES SPÉCIFIQUES À LA PAGE "MA CITÉ"                        */
+        /* =============================================================== */
+        
         .city-layout {
             display: grid;
             grid-template-columns: 1fr;
@@ -79,135 +283,88 @@
             }
         }
 
-        /* Section de la carte de la cité */
         .city-map-section {
-            background: linear-gradient(135deg, 
-                rgba(139, 0, 0, 0.1) 0%, 
-                rgba(205, 127, 50, 0.1) 50%, 
-                rgba(255, 215, 0, 0.1) 100%);
-            border-radius: 1.5rem;
-            border: 2px solid var(--roman-bronze);
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
             padding: 1.5rem;
             position: relative;
             overflow: hidden;
-            backdrop-filter: blur(10px);
             animation: slideInLeft 0.8s ease-out;
         }
 
-        .city-map-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="marble" patternUnits="userSpaceOnUse" width="20" height="20"><rect width="20" height="20" fill="%23f8f8ff" opacity="0.03"/><path d="M0,20 L20,0 M-5,5 L5,-5 M15,25 L25,15" stroke="%23ddd" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23marble)"/></svg>') repeat;
-            pointer-events: none;
-            z-index: 0;
-        }
-
         .map-header {
-            position: relative;
-            z-index: 1;
             text-align: center;
             margin-bottom: 1.5rem;
         }
 
         .map-title {
-            color: var(--roman-gold);
+            color: var(--gold-primary);
             font-size: 1.5rem;
             font-weight: bold;
             margin-bottom: 0.5rem;
         }
 
-        /* Grille des bâtiments responsive */
         .buildings-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 1rem;
-            position: relative;
-            z-index: 1;
             min-height: 400px;
         }
 
         @media (min-width: 768px) {
             .buildings-grid {
-                grid-template-columns: repeat(6, 1fr);
-                min-height: 500px;
+                grid-template-columns: repeat(5, 1fr);
             }
         }
 
         .building-slot {
-            background: linear-gradient(135deg, 
-                rgba(248, 248, 255, 0.1) 0%, 
-                rgba(205, 127, 50, 0.1) 100%);
-            border: 2px dashed var(--roman-stone);
+            background: rgba(30, 41, 59, 0.6);
+            border: 2px dashed var(--text-muted);
             border-radius: 1rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+            transition: all 0.3s ease;
             min-height: 120px;
-            backdrop-filter: blur(5px);
+            padding: 0.5rem;
         }
 
         .building-slot:hover {
-            border-color: var(--roman-gold);
-            background: linear-gradient(135deg, 
-                rgba(255, 215, 0, 0.2) 0%, 
-                rgba(139, 0, 0, 0.1) 100%);
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: var(--shadow-gold);
+            border-color: var(--gold-light);
+            background: rgba(217, 119, 6, 0.1);
+            transform: translateY(-5px);
         }
 
         .building-slot.occupied {
-            border: 2px solid var(--roman-bronze);
-            background: linear-gradient(135deg, 
-                rgba(255, 215, 0, 0.2) 0%, 
-                rgba(205, 127, 50, 0.2) 100%);
-            animation: buildingPulse 3s ease-in-out infinite;
+            border: 2px solid var(--border-gold);
         }
-
-        @keyframes buildingPulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
-            50% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
-        }
-
+        
         .building-icon {
-            font-size: clamp(2rem, 4vw, 3rem);
+            font-size: 2.5rem;
             margin-bottom: 0.5rem;
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
-            transition: transform 0.3s ease;
-        }
-
-        .building-slot:hover .building-icon {
-            transform: scale(1.1) rotate(5deg);
         }
 
         .building-name {
-            color: var(--roman-marble);
+            color: var(--text-light);
             font-weight: bold;
-            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            font-size: 0.9rem;
             text-align: center;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
-            font-family: 'Times New Roman', serif;
         }
 
         .building-level {
-            color: var(--roman-gold);
+            color: var(--gold-light);
             font-size: 0.8rem;
             font-weight: bold;
             margin-top: 0.3rem;
             padding: 0.2rem 0.5rem;
-            background: rgba(255, 215, 0, 0.2);
+            background: rgba(217, 119, 6, 0.2);
             border-radius: 1rem;
         }
 
-        /* Panneau de contrôle responsive */
         .city-control-panel {
             display: flex;
             flex-direction: column;
@@ -216,108 +373,44 @@
         }
 
         .panel-section {
-            background: linear-gradient(135deg, 
-                rgba(139, 0, 0, 0.1) 0%, 
-                rgba(0, 0, 0, 0.3) 100%);
-            border: 2px solid var(--roman-bronze);
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-gold);
             border-radius: 1rem;
             padding: 1.5rem;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
 
-        .panel-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .panel-section:hover::before {
-            left: 100%;
-        }
-
-        .panel-section:hover {
-            border-color: var(--roman-gold);
-            box-shadow: var(--shadow-gold);
-            transform: translateY(-2px);
-        }
-
-        .section-title {
-            color: var(--roman-gold);
+        .panel-section .section-title {
+            color: var(--gold-primary);
             font-size: 1.3rem;
             font-weight: bold;
             margin-bottom: 1rem;
             text-align: center;
-            font-family: 'Times New Roman', serif;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            position: relative;
         }
 
-        .section-title::before,
-        .section-title::after {
-            content: '⚜️';
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.8em;
-            opacity: 0.7;
-        }
-
-        .section-title::before {
-            left: -2rem;
-        }
-
-        .section-title::after {
-            right: -2rem;
-        }
-
-        /* Statistiques avec animations */
         .city-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 1rem;
         }
 
         .stat-item {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(30, 41, 59, 0.6);
             border-radius: 0.8rem;
             padding: 1rem;
             text-align: center;
-            border: 1px solid var(--roman-bronze);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .stat-item:hover {
-            border-color: var(--roman-gold);
-            background: rgba(255, 215, 0, 0.1);
-            transform: scale(1.05);
+            border: 1px solid var(--border-gold);
         }
 
         .stat-value {
-            color: var(--roman-gold);
+            color: var(--gold-light);
             font-size: 1.5rem;
             font-weight: bold;
             margin-bottom: 0.3rem;
-            animation: countUp 2s ease-out;
-        }
-
-        @keyframes countUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .stat-label {
-            color: var(--roman-marble);
+            color: var(--text-muted);
             font-size: 0.9rem;
-            font-family: 'Times New Roman', serif;
         }
 
         .stat-icon {
@@ -325,7 +418,6 @@
             margin-right: 0.5rem;
         }
 
-        /* Production en temps réel */
         .production-display {
             display: flex;
             flex-direction: column;
@@ -336,423 +428,237 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(30, 41, 59, 0.6);
             border-radius: 0.8rem;
-            padding: 1rem;
-            border: 1px solid var(--roman-bronze);
-            transition: all 0.3s ease;
+            padding: 0.75rem;
+            border: 1px solid var(--border-gold);
         }
-
-        .production-item:hover {
-            border-color: var(--roman-gold);
-            background: rgba(255, 215, 0, 0.1);
-        }
-
+        
         .production-resource {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            color: var(--roman-marble);
+            color: var(--text-light);
             font-weight: bold;
         }
 
         .production-rate {
-            color: var(--roman-gold);
+            color: var(--gold-light);
             font-weight: bold;
             font-size: 1.1rem;
         }
 
         .production-rate.positive {
-            color: #22c55e;
-            animation: pulse 2s infinite;
+            color: var(--success-green);
         }
 
         .production-rate.negative {
-            color: #dc2626;
+            color: var(--roman-red);
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        /* Actions rapides */
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 1rem;
         }
 
         .quick-action-btn {
-            background: var(--gradient-primary);
-            color: var(--roman-marble);
-            border: 2px solid var(--roman-gold);
-            border-radius: 1rem;
-            padding: 1rem;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.8rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             font-family: 'Times New Roman', serif;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
         }
-
-        .quick-action-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .quick-action-btn:hover::before {
-            left: 100%;
-        }
-
+        
         .quick-action-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: var(--shadow-gold);
-            border-color: var(--roman-marble);
-        }
-
-        .quick-action-btn:active {
-            transform: translateY(-1px) scale(0.98);
-        }
-
-        /* Animations d'entrée */
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px var(--shadow-gold);
         }
 
         @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* Responsive design pour mobile */
-        @media (max-width: 768px) {
-            .city-container {
-                padding: 0.5rem;
-            }
-
-            .city-layout {
-                gap: 1rem;
-            }
-
-            .city-map-section,
-            .panel-section {
-                padding: 1rem;
-            }
-
-            .buildings-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 0.5rem;
-                min-height: 300px;
-            }
-
-            .building-slot {
-                min-height: 100px;
-            }
-
-            .section-title::before,
-            .section-title::after {
-                display: none;
-            }
-
-            .quick-actions {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .buildings-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .city-stats {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        /* Indicateurs de progression */
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 0.5rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--gradient-gold);
-            width: 0%;
-            transition: width 0.3s ease;
-            position: relative;
-        }
-
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        /* Tooltips */
-        .tooltip {
-            position: relative;
-        }
-
-        .tooltip::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
-            color: var(--roman-gold);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            z-index: 1000;
-        }
-
-        .tooltip:hover::after {
-            opacity: 1;
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
         }
     </style>
 </head>
 <body>
+    <div class="particles"></div>
+
     <div class="imperium-ui">
-        <!-- Header avec navigation -->
         <header class="imperium-header">
             <div class="header-content">
-                <div class="imperium-logo" onclick="navigateTo('index')">IMPERIUM</div>
-                <nav class="main-navigation">
-                    <div class="nav-sections">
-                        <div class="nav-section">
-                            <span class="nav-section-title">Empire</span>
-                            <div class="nav-items">
-                                <a href="#" onclick="navigateTo('cite')" class="nav-item active">
-                                    <span class="nav-icon">🏛️</span>
-                                    <span class="nav-text">Ma Cité</span>
-                                </a>
-                                <a href="#" onclick="navigateTo('monde')" class="nav-item">
-                                    <span class="nav-icon">🌍</span>
-                                    <span class="nav-text">Monde</span>
-                                </a>
-                                <a href="#" onclick="navigateTo('province')" class="nav-item">
-                                    <span class="nav-icon">🏝️</span>
-                                    <span class="nav-text">Province</span>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="nav-section">
-                            <span class="nav-section-title">Social</span>
-                            <div class="nav-items">
-                                <a href="#" onclick="navigateTo('diplomatie')" class="nav-item">
-                                    <span class="nav-icon">🤝</span>
-                                    <span class="nav-text">Diplomatie</span>
-                                </a>
-                                <a href="#" onclick="navigateTo('alliance')" class="nav-item">
-                                    <span class="nav-icon">⚔️</span>
-                                    <span class="nav-text">Alliance</span>
-                                </a>
-                                <a href="#" onclick="navigateTo('messages')" class="nav-item">
-                                    <span class="nav-icon">📜</span>
-                                    <span class="nav-text">Messages</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-                <div class="user-info">
-                    <div class="resource-display">
-                        <span class="resource-item">
-                            <span class="resource-icon">🏛️</span>
-                            <span class="resource-value" id="population">1,250</span>
-                        </span>
-                        <span class="resource-item">
-                            <span class="resource-icon">💰</span>
-                            <span class="resource-value" id="gold">15,430</span>
-                        </span>
-                        <span class="resource-item">
-                            <span class="resource-icon">🌾</span>
-                            <span class="resource-value" id="food">8,920</span>
-                        </span>
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display">
+                    <!-- Généré par JS -->
+                </div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar"></div>
+                    <div class="player-details">
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Contenu principal -->
-        <main class="imperium-content">
-            <div class="city-container">
-                <!-- En-tête de la cité -->
-                <div class="city-header">
-                    <h1 class="city-title">🏛️ ROMA AETERNA 🏛️</h1>
-                    <p class="city-subtitle">Votre cité prospère sous votre sage gouvernance</p>
-                </div>
+        <div class="imperium-body">
+            <aside class="imperium-sidebar">
+                <!-- La navigation sera générée par JS -->
+            </aside>
 
-                <!-- Layout principal -->
-                <div class="city-layout">
-                    <!-- Section carte de la cité -->
-                    <div class="city-map-section">
-                        <div class="map-header">
-                            <h2 class="map-title">Plan de la Cité</h2>
-                            <p style="color: var(--roman-marble); opacity: 0.8; font-style: italic;">
-                                Cliquez sur un emplacement pour construire ou améliorer
-                            </p>
-                        </div>
-
-                        <div class="buildings-grid" id="buildingsGrid">
-                            <!-- Les bâtiments seront générés dynamiquement -->
-                        </div>
-                    </div>
-
-                    <!-- Panneau de contrôle -->
-                    <div class="city-control-panel">
-                        <!-- Statistiques de la cité -->
-                        <div class="panel-section">
-                            <h3 class="section-title">Statistiques</h3>
-                            <div class="city-stats">
-                                <div class="stat-item tooltip" data-tooltip="Population totale de votre cité">
-                                    <div class="stat-value">
-                                        <span class="stat-icon">👥</span>
-                                        <span id="statPopulation">1,250</span>
-                                    </div>
-                                    <div class="stat-label">Population</div>
-                                </div>
-                                <div class="stat-item tooltip" data-tooltip="Niveau de bonheur des citoyens">
-                                    <div class="stat-value">
-                                        <span class="stat-icon">😊</span>
-                                        <span id="statHappiness">85%</span>
-                                    </div>
-                                    <div class="stat-label">Bonheur</div>
-                                </div>
-                                <div class="stat-item tooltip" data-tooltip="Défense militaire de la cité">
-                                    <div class="stat-value">
-                                        <span class="stat-icon">🛡️</span>
-                                        <span id="statDefense">420</span>
-                                    </div>
-                                    <div class="stat-label">Défense</div>
-                                </div>
-                                <div class="stat-item tooltip" data-tooltip="Niveau culturel et prestige">
-                                    <div class="stat-value">
-                                        <span class="stat-icon">🎭</span>
-                                        <span id="statCulture">67</span>
-                                    </div>
-                                    <div class="stat-label">Culture</div>
-                                </div>
+            <main class="main-content">
+                <div class="view-container">
+                    <h2 class="view-title">🏛️ Ma Cité : Roma Aeterna</h2>
+                    
+                    <div class="city-layout">
+                        <!-- Section carte de la cité -->
+                        <div class="city-map-section">
+                            <div class="map-header">
+                                <h2 class="map-title">Plan de la Cité</h2>
+                                <p style="color: var(--text-muted); font-style: italic;">
+                                    Cliquez sur un emplacement pour construire ou améliorer
+                                </p>
+                            </div>
+                            <div class="buildings-grid" id="buildingsGrid">
+                                <!-- Les bâtiments seront générés dynamiquement par JS -->
                             </div>
                         </div>
 
-                        <!-- Production en temps réel -->
-                        <div class="panel-section">
-                            <h3 class="section-title">Production</h3>
-                            <div class="production-display">
-                                <div class="production-item">
-                                    <div class="production-resource">
-                                        <span>💰</span>
-                                        <span>Or</span>
+                        <!-- Panneau de contrôle -->
+                        <div class="city-control-panel">
+                            <div class="panel-section">
+                                <h3 class="section-title">Statistiques</h3>
+                                <div class="city-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-value"><span class="stat-icon">👥</span><span id="statPopulation">1,250</span></div>
+                                        <div class="stat-label">Population</div>
                                     </div>
-                                    <div class="production-rate positive">+245/h</div>
-                                </div>
-                                <div class="production-item">
-                                    <div class="production-resource">
-                                        <span>🌾</span>
-                                        <span>Nourriture</span>
+                                    <div class="stat-item">
+                                        <div class="stat-value"><span class="stat-icon">😊</span><span id="statHappiness">85%</span></div>
+                                        <div class="stat-label">Bonheur</div>
                                     </div>
-                                    <div class="production-rate positive">+180/h</div>
-                                </div>
-                                <div class="production-item">
-                                    <div class="production-resource">
-                                        <span>🏗️</span>
-                                        <span>Matériaux</span>
-                                    </div>
-                                    <div class="production-rate positive">+95/h</div>
-                                </div>
-                                <div class="production-item">
-                                    <div class="production-resource">
-                                        <span>⚡</span>
-                                        <span>Énergie</span>
-                                    </div>
-                                    <div class="production-rate negative">-45/h</div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Actions rapides -->
-                        <div class="panel-section">
-                            <h3 class="section-title">Actions Rapides</h3>
-                            <div class="quick-actions">
-                                <button class="quick-action-btn" onclick="collectTaxes()">
-                                    💰 Collecter Impôts
-                                </button>
-                                <button class="quick-action-btn" onclick="recruitCitizens()">
-                                    👥 Recruter Citoyens
-                                </button>
-                                <button class="quick-action-btn" onclick="organizeGames()">
-                                    🎪 Organiser Jeux
-                                </button>
-                                <button class="quick-action-btn" onclick="upgradeDefenses()">
-                                    🛡️ Améliorer Défenses
-                                </button>
+                            <div class="panel-section">
+                                <h3 class="section-title">Production (/h)</h3>
+                                <div class="production-display">
+                                    <div class="production-item">
+                                        <div class="production-resource"><span>💰</span> Or</div>
+                                        <div class="production-rate positive">+245</div>
+                                    </div>
+                                    <div class="production-item">
+                                        <div class="production-resource"><span>🌾</span> Nourriture</div>
+                                        <div class="production-rate positive">+180</div>
+                                    </div>
+                                    <div class="production-item">
+                                        <div class="production-resource"><span>🏛️</span> Marbre</div>
+                                        <div class="production-rate positive">+95</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel-section">
+                                <h3 class="section-title">Actions Rapides</h3>
+                                <div class="quick-actions">
+                                    <button class="quick-action-btn" onclick="collectTaxes()">💰 Collecter Impôts</button>
+                                    <button class="quick-action-btn" onclick="organizeGames()">🎪 Organiser Jeux</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 
-    <!-- Particules d'ambiance -->
-    <div class="particles" id="particles"></div>
-
     <script>
-        // Données des bâtiments
+        // ===============================================================
+        // SCRIPTS GLOBAUX (navigation, UI, etc.)
+        // ===============================================================
+        const NAVIGATION_CONFIG = {
+            'index':      { title: 'Accueil', file: 'index.html', section: 'Empire', icon: '🏛️' },
+            'cite':       { title: 'Ma Cité', file: 'Empire/Cite.html', section: 'Empire', icon: '🏘️' },
+            'monde':      { title: 'Monde', file: 'Empire/Monde.html', section: 'Empire', icon: '🌍' },
+            'province':   { title: 'Province', file: 'Empire/Province.html', section: 'Empire', icon: '🏝️' },
+            'academie':   { title: 'Académie', file: 'Developpement/Academie.html', section: 'Développement', icon: '📚' },
+            'commerce':   { title: 'Commerce', file: 'Developpement/Commerce.html', section: 'Développement', icon: '⚖️' },
+            'legions':    { title: 'Légions', file: 'Militaire/Légions.html', section: 'Militaire', icon: '⚔️' },
+            'flotte':     { title: 'Flotte', file: 'Militaire/Flotte.html', section: 'Militaire', icon: '🚢' },
+            'simulateur': { title: 'Simulateur', file: 'Militaire/Simulateur.html', section: 'Militaire', icon: '💥' },
+            'diplomatie': { title: 'Diplomatie', file: 'Social/Diplomatie.html', section: 'Social', icon: '🤝' },
+            'alliance':   { title: 'Alliance', file: 'Social/Alliance.html', section: 'Social', icon: '🛡️' },
+            'messages':   { title: 'Messages', file: 'Social/Messsages.html', section: 'Social', icon: '✉️' },
+            'premium':    { title: 'Premium', file: 'Premium/Premium.html', section: 'Premium', icon: '👑' }
+        };
+
+        function generateNavigationHTML() {
+            const sections = {};
+            Object.entries(NAVIGATION_CONFIG).forEach(([key, config]) => {
+                if (key === 'index') return;
+                if (!sections[config.section]) {
+                    sections[config.section] = [];
+                }
+                sections[config.section].push({ key, ...config });
+            });
+            
+            let html = '';
+            Object.entries(sections).forEach(([sectionName, pages]) => {
+                html += `<div class="nav-section"><h2 class="nav-title">${sectionName}</h2><ul class="nav-list">`;
+                pages.forEach(page => {
+                    html += `<li class="nav-item"><a href="#" data-page="${page.key}" onclick="navigateTo('${page.key}'); return false;"><span class="nav-icon">${page.icon}</span> ${page.title}</a></li>`;
+                });
+                html += `</ul></div>`;
+            });
+            return html;
+        }
+        
+        function navigateTo(pageKey) {
+            const config = NAVIGATION_CONFIG[pageKey];
+            console.log(`Navigation vers : ${config.title} (${config.file})`);
+            // Dans un vrai projet, ceci changerait l'URL : window.location.href = config.file;
+            alert(`Simulation de navigation vers : ${config.title}`);
+        }
+
+        function initializeGlobalUI() {
+            const sidebar = document.querySelector('.imperium-sidebar');
+            if (sidebar) {
+                sidebar.innerHTML = generateNavigationHTML();
+            }
+            
+            const currentPage = 'cite'; // <-- Page active est maintenant "cite"
+            const navLinks = document.querySelectorAll('.nav-item a');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-page') === currentPage) {
+                    link.classList.add('active');
+                }
+            });
+
+            document.getElementById('player-name').textContent = 'Marcus Aurelius';
+            document.getElementById('player-title-level').textContent = 'Consul - Niv. 12';
+            document.getElementById('player-avatar').textContent = 'M';
+
+            document.getElementById('resources-display').innerHTML = `
+                <div class="resource-item"><span class="resource-icon">🍇</span><span class="resource-value">4,560</span></div>
+                <div class="resource-item"><span class="resource-icon">🏛️</span><span class="resource-value">2,340</span></div>
+                <div class="resource-item"><span class="resource-icon">⚔️</span><span class="resource-value">8,900</span></div>
+                <div class="resource-item"><span class="resource-icon">💰</span><span class="resource-value">15,200</span></div>`;
+        }
+
+
+        // ===============================================================
+        // SCRIPTS SPÉCIFIQUES À LA PAGE "MA CITÉ"
+        // ===============================================================
         const BUILDINGS_DATA = [
             { id: 1, type: 'forum', name: 'Forum Romain', icon: '🏛️', level: 3, occupied: true },
             { id: 2, type: 'temple', name: 'Temple de Jupiter', icon: '⛪', level: 2, occupied: true },
@@ -769,21 +675,11 @@
             { id: 13, type: 'walls', name: 'Murailles', icon: '🏰', level: 2, occupied: true },
             { id: 14, type: 'granary', name: 'Grenier', icon: '🌾', level: 3, occupied: true },
             { id: 15, type: 'empty', name: 'Terrain Vide', icon: '🏗️', level: 0, occupied: false },
-            { id: 16, type: 'empty', name: 'Terrain Vide', icon: '🏗️', level: 0, occupied: false },
-            { id: 17, type: 'empty', name: 'Terrain Vide', icon: '🏗️', level: 0, occupied: false },
-            { id: 18, type: 'empty', name: 'Terrain Vide', icon: '🏗️', level: 0, occupied: false }
         ];
 
-        // Initialisation de la page
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeCityView();
-            createParticles();
-            startProductionUpdates();
-        });
-
-        // Initialiser la vue de la cité
         function initializeCityView() {
             const grid = document.getElementById('buildingsGrid');
+            if (!grid) return;
             grid.innerHTML = '';
 
             BUILDINGS_DATA.forEach(building => {
@@ -795,187 +691,37 @@
                     <div class="building-icon">${building.icon}</div>
                     <div class="building-name">${building.name}</div>
                     ${building.occupied ? `<div class="building-level">Niv. ${building.level}</div>` : ''}
-                    ${building.occupied && building.level < 5 ? '<div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>' : ''}
                 `;
-
                 grid.appendChild(slot);
             });
         }
 
-        // Gestion des clics sur les bâtiments
         function handleBuildingClick(building) {
             if (building.occupied) {
-                showBuildingDetails(building);
+                alert(`Détails pour : ${building.name} (Niv. ${building.level})\nOptions : Améliorer, Gérer.`);
             } else {
-                showBuildingOptions(building);
+                alert('Emplacement vide.\nOptions : Construire.');
             }
         }
 
-        // Afficher les détails d'un bâtiment
-        function showBuildingDetails(building) {
-            alert(`${building.name} - Niveau ${building.level}\n\nCliquez pour améliorer ou gérer ce bâtiment.`);
-        }
-
-        // Afficher les options de construction
-        function showBuildingOptions(building) {
-            const options = [
-                'Maison Romaine 🏠',
-                'Atelier d\'Artisan 🔨',
-                'Temple 🏛️',
-                'Marché 🏪',
-                'Caserne ⚔️'
-            ];
-            
-            const choice = prompt(`Que voulez-vous construire ?\n\n${options.map((opt, i) => `${i + 1}. ${opt}`).join('\n')}\n\nEntrez le numéro de votre choix :`);
-            
-            if (choice && choice >= 1 && choice <= options.length) {
-                startConstruction(building, options[choice - 1]);
-            }
-        }
-
-        // Démarrer une construction
-        function startConstruction(building, buildingType) {
-            alert(`Construction de ${buildingType} commencée !\n\nTemps estimé : 2h 30min`);
-            // Ici vous pourriez ajouter la logique de construction réelle
-        }
-
-        // Actions rapides
         function collectTaxes() {
-            const amount = Math.floor(Math.random() * 500) + 200;
-            updateResource('gold', amount);
-            showNotification(`💰 +${amount} pièces d'or collectées !`, 'success');
-        }
-
-        function recruitCitizens() {
-            const amount = Math.floor(Math.random() * 50) + 10;
-            updateResource('population', amount);
-            showNotification(`👥 +${amount} nouveaux citoyens recrutés !`, 'success');
+            alert("Impôts collectés ! +500 Or.");
         }
 
         function organizeGames() {
-            showNotification(`🎪 Jeux organisés ! Le bonheur de la population augmente !`, 'success');
-            // Augmenter le bonheur
-            const happinessElement = document.getElementById('statHappiness');
-            const currentHappiness = parseInt(happinessElement.textContent);
-            happinessElement.textContent = Math.min(100, currentHappiness + 5) + '%';
+            alert("Jeux organisés ! Le bonheur de la population augmente de 5%.");
+            const happinessEl = document.getElementById('statHappiness');
+            let currentHappiness = parseInt(happinessEl.textContent);
+            happinessEl.textContent = Math.min(100, currentHappiness + 5) + '%';
         }
 
-        function upgradeDefenses() {
-            const cost = 1000;
-            const currentGold = parseInt(document.getElementById('gold').textContent.replace(',', ''));
-            
-            if (currentGold >= cost) {
-                updateResource('gold', -cost);
-                const defenseElement = document.getElementById('statDefense');
-                const currentDefense = parseInt(defenseElement.textContent);
-                defenseElement.textContent = currentDefense + 25;
-                showNotification(`🛡️ Défenses améliorées ! (+25 points de défense)`, 'success');
-            } else {
-                showNotification(`❌ Pas assez d'or ! (${cost} requis)`, 'error');
-            }
-        }
-
-        // Mettre à jour les ressources
-        function updateResource(type, amount) {
-            const element = document.getElementById(type);
-            if (element) {
-                const current = parseInt(element.textContent.replace(',', ''));
-                const newValue = current + amount;
-                element.textContent = newValue.toLocaleString();
-                
-                // Animation de changement
-                element.style.transform = 'scale(1.2)';
-                element.style.color = amount > 0 ? '#22c55e' : '#dc2626';
-                
-                setTimeout(() => {
-                    element.style.transform = 'scale(1)';
-                    element.style.color = '';
-                }, 300);
-            }
-        }
-
-        // Afficher une notification
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${type === 'success' ? '#22c55e' : type === 'error' ? '#dc2626' : '#3b82f6'};
-                color: white;
-                padding: 1rem 1.5rem;
-                border-radius: 0.5rem;
-                font-weight: bold;
-                z-index: 10000;
-                animation: slideInRight 0.3s ease-out;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.style.animation = 'slideOutRight 0.3s ease-in forwards';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        // Créer des particules d'ambiance
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 20;
-
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 8 + 's';
-                particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
-                particlesContainer.appendChild(particle);
-            }
-        }
-
-        // Démarrer les mises à jour de production
-        function startProductionUpdates() {
-            setInterval(() => {
-                // Simuler la production en temps réel
-                const goldProduction = 245;
-                const foodProduction = 180;
-                const materialsProduction = 95;
-                
-                // Mettre à jour les ressources toutes les heures (simulé toutes les 10 secondes)
-                updateResource('gold', Math.floor(goldProduction / 360)); // /360 pour simuler 10s = 1min
-                updateResource('food', Math.floor(foodProduction / 360));
-            }, 10000); // Toutes les 10 secondes
-        }
-
-        // Navigation (fonction globale)
-        function navigateTo(page) {
-            // Cette fonction sera implémentée par le système de navigation commun
-            console.log('Navigation vers:', page);
-            
-            // Simulation de navigation
-            if (page === 'diplomatie') {
-                window.location.href = '../Social/Diplomatie.html';
-            } else if (page === 'index') {
-                window.location.href = '../../index.html';
-            }
-            // Ajouter d'autres navigations selon les besoins
-        }
-
-        // Animations CSS supplémentaires
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            
-            @keyframes slideOutRight {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
+        // ===============================================================
+        // INITIALISATION DE LA PAGE
+        // ===============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeGlobalUI();
+            initializeCityView();
+        });
     </script>
 </body>
 </html>
