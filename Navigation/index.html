@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Forge ton Empire Romain</title>
+    <meta name="description" content="Incarnez un patricien romain et bâtissez votre empire. Gérez vos provinces, vos légions et dominez la Méditerranée.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <style>
+        :root {
+            --gold-primary: #d97706;
+            --gold-secondary: #f59e0b;
+            --gold-light: #fbbf24;
+            --marble-white: #f8fafc;
+            --roman-red: #dc2626;
+            --roman-purple: #7c3aed;
+            --dark-stone: #1e293b;
+            --dark-marble: #334155;
+            --dark-bg: #0f172a;
+            --text-light: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-gold: rgba(217, 119, 6, 0.3);
+            --shadow-gold: rgba(217, 119, 6, 0.4);
+            --success-green: #22c55e;
+            --storage-full-red: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(217, 119, 6, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-stone) 100%);
+            color: var(--text-light);
+            overflow: hidden;
+            min-height: 100vh;
+        }
+        
+        /* --- NOUVEAU : Écran de démarrage --- */
+        #start-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark-bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+        
+        #start-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .start-title {
+            font-size: 8vw;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 4px 4px 10px rgba(0,0,0,0.7);
+            letter-spacing: 5px;
+            animation: title-appear 2s ease-out forwards;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        
+        @keyframes title-appear {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .start-button {
+            margin-top: 3rem;
+            padding: 1rem 2.5rem;
+            font-size: 1.5rem;
+            font-family: 'Times New Roman', serif;
+            color: white;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            border: 2px solid var(--gold-light);
+            border-radius: 1rem;
+            cursor: pointer;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            box-shadow: 0 5px 20px var(--shadow-gold);
+            transition: all 0.3s ease;
+            animation: button-appear 2s ease-out 1s forwards;
+            opacity: 0;
+        }
+        
+        .start-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow-gold);
+        }
+        
+        @keyframes button-appear {
+             to {
+                opacity: 1;
+            }
+        }
+        
+        .loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--border-gold);
+            border-top-color: var(--gold-light);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loader-text {
+            color: var(--gold-light);
+            font-style: italic;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* --- FIN NOUVEAU --- */
+
+
+        .particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: var(--gold-light);
+            border-radius: 50%;
+            animation: float 8s infinite linear;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        /* Layout principal */
+        .imperium-ui {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            z-index: 10;
+            opacity: 0; /* Caché au début */
+            visibility: hidden; /* Caché au début */
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+        
+        .imperium-ui.visible {
+             opacity: 1;
+             visibility: visible;
+        }
+
+        .imperium-header {
+            background: linear-gradient(135deg, var(--dark-marble) 0%, var(--dark-stone) 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--border-gold);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .imperium-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+        }
+
+        .resources-display {
+            display: flex;
+            gap: 1.5rem;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 0.75rem 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            font-size: 1rem;
+            position: relative;
+        }
+        
+        .resource-item .storage-full-indicator {
+            color: var(--storage-full-red);
+            font-weight: bold;
+        }
+
+        .resource-icon {
+            font-size: 1.2rem;
+            filter: drop-shadow(0 0 5px var(--shadow-gold));
+        }
+
+        .resource-value {
+            color: var(--gold-light);
+            min-width: 50px;
+            text-align: right;
+            transition: color 0.3s ease;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--roman-red), var(--roman-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 2px solid var(--gold-primary);
+        }
+
+        .player-details {
+            font-size: 0.9rem;
+        }
+
+        .player-name {
+            color: var(--gold-light);
+            font-weight: bold;
+        }
+
+        .player-level {
+            color: var(--text-muted);
+        }
+
+        /* Corps principal */
+        .imperium-body {
+            display: flex;
+            flex-grow: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            gap: 1.5rem;
+            padding: 1.5rem 2rem;
+            overflow: hidden;
+        }
+
+        /* Navigation latérale */
+        .imperium-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            overflow-y: auto;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-title {
+            color: var(--gold-primary);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item a:hover, .nav-item a.active {
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.2), rgba(245, 158, 11, 0.1));
+            border-color: var(--gold-primary);
+            transform: translateX(5px);
+            color: var(--gold-light);
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Vue principale */
+        .main-content {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .view-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            overflow-y: auto;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(50px);
+            transition: all 0.5s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .view-container.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .view-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--gold-primary);
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Vue Cité */
+        .city-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        .city-map {
+            background: 
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><pattern id="marble" patternUnits="userSpaceOnUse" width="20" height="20"><rect width="20" height="20" fill="%23f1f5f9"/><path d="M0,10 Q5,5 10,10 T20,10" stroke="%23cbd5e1" stroke-width="0.5" fill="none"/></pattern><rect width="100" height="100" fill="url(%23marble)" opacity="0.1"/></svg>'),
+                linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 1rem;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--gold-primary);
+            padding: 2rem;
+        }
+
+        .buildings-grid {
+            display: grid;
+            height: 100%;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .building-plot {
+            background: rgba(217, 119, 6, 0.1);
+            border: 2px dashed var(--gold-primary);
+            border-radius: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .building-plot::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="roman-pattern" patternUnits="userSpaceOnUse" width="10" height="10"><rect width="10" height="10" fill="none"/><path d="M0,0 L5,5 L10,0" stroke="%23d97706" stroke-width="0.5" opacity="0.2"/></pattern></defs><rect width="100" height="100" fill="url(%23roman-pattern)"/></svg>');
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .building-plot:hover::before {
+            opacity: 1;
+        }
+
+        .building-plot:hover {
+            background: rgba(217, 119, 6, 0.2);
+            border-color: var(--gold-light);
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow-gold);
+        }
+
+        .building-plot.built {
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.3), rgba(245, 158, 11, 0.2));
+            border: 2px solid var(--gold-primary);
+        }
+
+        .building-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 0 10px var(--shadow-gold));
+        }
+
+        .building-name {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--gold-primary);
+            text-align: center;
+        }
+
+        .building-level {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--gold-primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .city-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .section-title {
+            color: var(--gold-primary);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Vue Recherche */
+        .research-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        .research-branch {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .branch-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--gold-primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .tech-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tech-card:hover {
+            border-color: var(--gold-light);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .tech-card.researched {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.2));
+            border-color: var(--success-green);
+        }
+
+        .tech-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--gold-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .tech-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .tech-cost {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+
+        .cost-display {
+            color: var(--gold-light);
+        }
+
+        /* Vue Militaire */
+        .military-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        .military-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .unit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .unit-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .unit-card:hover {
+            border-color: var(--gold-light);
+            transform: translateY(-3px);
+        }
+
+        .unit-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .unit-name {
+            font-weight: bold;
+            color: var(--gold-light);
+            font-size: 1rem;
+        }
+        
+        .unit-count {
+            font-size: 1.2rem;
+            color: var(--text-light);
+        }
+        
+        .unit-stats {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Boutons d'action */
+        .action-btn {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--shadow-gold);
+        }
+
+        .action-btn:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--dark-marble), var(--dark-stone));
+            border: 2px solid var(--gold-primary);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--gold-primary);
+            margin-bottom: 1rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        #modal-body {
+            text-align: left;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .modal-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.confirm {
+            background: var(--gold-primary);
+            color: white;
+        }
+
+        .modal-btn.cancel {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .recruit-slider {
+            width: 100%;
+            margin: 1rem 0;
+        }
+        
+        .recruit-details {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        /* Footer */
+        .imperium-footer {
+            background: linear-gradient(135deg, var(--dark-marble) 0%, var(--dark-stone) 100%);
+            border-top: 2px solid var(--border-gold);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        .event-log {
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .game-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-btn {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border-gold);
+            color: var(--text-light);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .footer-btn:hover {
+            background: var(--gold-primary);
+            color: white;
+        }
+
+        /* Navigation mobile */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: linear-gradient(135deg, var(--dark-marble) 0%, var(--dark-stone) 100%);
+            backdrop-filter: blur(10px);
+            border-top: 2px solid var(--border-gold);
+            padding: 0.5rem 0;
+            z-index: 200;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            flex-grow: 1;
+            text-align: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.5rem;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .mobile-nav-item.active,
+        .mobile-nav-item:hover {
+            color: var(--gold-light);
+            transform: translateY(-2px);
+        }
+
+        /* Stats rapides */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.6);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-gold);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--gold-light);
+            transition: color 0.3s ease;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Animations pour les notifications */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .notification {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            animation: slideInRight 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
+        }
+        
+        .notification.success {
+             background: linear-gradient(135deg, var(--success-green), #16a34a);
+        }
+        
+        .notification.error {
+             background: linear-gradient(135deg, var(--roman-red), #ef4444);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .resources-display {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .imperium-body {
+                padding: 1rem;
+            }
+            
+            .imperium-sidebar {
+                display: none;
+            }
+            
+            .imperium-ui {
+                padding-bottom: 70px;
+            }
+            
+            .mobile-nav {
+                display: flex;
+            }
+            
+            .city-layout, .military-layout, .research-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                height: auto;
+            }
+             .city-map {
+                height: 50vh;
+             }
+        }
+
+        @media (max-width: 640px) {
+            .imperium-header {
+                padding: 0.75rem 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .imperium-logo {
+                font-size: 2rem;
+            }
+            
+            .player-info {
+                display: none;
+            }
+            
+            .buildings-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .building-icon {
+                font-size: 2rem;
+            }
+             .view-container {
+                 padding: 1rem;
+             }
+             .view-title {
+                 margin-bottom: 1rem;
+                 font-size: 1.8rem;
+             }
+        }
+
+        /* Effets spéciaux */
+        .resource-gain {
+            animation: resourcePulse 0.5s ease-in-out;
+        }
+
+        @keyframes resourcePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); color: var(--success-green); }
+        }
+
+        .building-completed {
+            animation: buildingComplete 0.8s ease-out;
+        }
+
+        @keyframes buildingComplete {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .progress-bar {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 0.5rem;
+            height: 8px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 0.5rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .grid-layout {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+    </style>
+</head>
+<body>
+    <div id="particles"></div>
+    <div id="notification-container"></div>
+
+    <!-- NOUVEL ÉCRAN DE DÉMARRAGE -->
+    <div id="start-screen">
+        <h1 class="start-title">IMPERIUM</h1>
+        <div id="start-content">
+            <button id="start-game-btn" class="start-button">Commencez à jouer</button>
+        </div>
+        <div id="loader" class="loader hidden">
+            <div class="loader-spinner"></div>
+            <p class="loader-text">Bâtiment de l'Empire...</p>
+        </div>
+    </div>
+
+    <!-- INTERFACE PRINCIPALE DU JEU (initialement cachée) -->
+    <div class="imperium-ui">
+        <!-- HEADER -->
+        <header class="imperium-header">
+            <div class="header-content">
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display">
+                    <!-- Les ressources seront injectées ici par JS -->
+                </div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar">M</div>
+                    <div>
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPS PRINCIPAL -->
+        <div class="imperium-body">
+            <!-- BARRE LATERALE (Desktop) -->
+            <aside class="imperium-sidebar">
+                <div class="nav-section">
+                    <h2 class="nav-title">Empire</h2>
+                    <ul class="nav-list">
+                        <li class="nav-item"><a data-view="city"><span class="nav-icon">🏛️</span> Ma Cité</a></li>
+                        <li class="nav-item"><a data-view="world"><span class="nav-icon">🌍</span> Monde</a></li>
+                        <li class="nav-item"><a data-view="island"><span class="nav-icon">🏝️</span> Province</a></li>
+                    </ul>
+                </div>
+                <div class="nav-section">
+                    <h2 class="nav-title">Développement</h2>
+                    <ul class="nav-list">
+                        <li class="nav-item"><a data-view="research"><span class="nav-icon">📚</span> Académie</a></li>
+                        <li class="nav-item"><a data-view="trade"><span class="nav-icon">⚖️</span> Commerce</a></li>
+                    </ul>
+                </div>
+                <div class="nav-section">
+                    <h2 class="nav-title">Militaire</h2>
+                    <ul class="nav-list">
+                        <li class="nav-item"><a data-view="military"><span class="nav-icon">⚔️</span> Légions</a></li>
+                        <li class="nav-item"><a data-view="navy"><span class="nav-icon">🚢</span> Flotte</a></li>
+                        <li class="nav-item"><a data-view="battle"><span class="nav-icon">💥</span> Simulateur</a></li>
+                    </ul>
+                </div>
+                 <div class="nav-section">
+                    <h2 class="nav-title">Social</h2>
+                    <ul class="nav-list">
+                        <li class="nav-item"><a data-view="diplomacy"><span class="nav-icon">🤝</span> Diplomatie</a></li>
+                        <li class="nav-item"><a data-view="alliance"><span class="nav-icon">🛡️</span> Alliance</a></li>
+                        <li class="nav-item"><a data-view="messages"><span class="nav-icon">✉️</span> Messages</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- CONTENU PRINCIPAL -->
+            <main class="main-content">
+                <!-- Vue Cité -->
+                <div id="view-city" class="view-container">
+                    <h2 class="view-title">Ma Cité</h2>
+                    <div class="city-layout">
+                        <div class="city-map">
+                            <div id="buildings-grid" class="buildings-grid"></div>
+                        </div>
+                        <div class="city-panel">
+                            <div class="panel-section" id="city-stats-panel">
+                                 <h3 class="section-title">Statistiques de la Cité</h3>
+                                 <div id="city-stats-content"></div>
+                            </div>
+                            <div class="panel-section" id="storage-panel">
+                                 <h3 class="section-title">Entrepôt</h3>
+                                 <div id="storage-content"></div>
+                            </div>
+                             <div class="panel-section" id="production-panel">
+                                 <h3 class="section-title">Production / heure</h3>
+                                 <div id="production-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Vue Militaire -->
+                <div id="view-military" class="view-container">
+                    <h2 class="view-title">Légions Romaines</h2>
+                    <div id="military-content-wrapper">
+                        <div class="military-layout">
+                            <div id="military-owned" class="military-section">
+                                <h3 class="section-title">Mes Troupes</h3>
+                                <div id="owned-units-grid" class="unit-grid"></div>
+                            </div>
+                            <div id="military-recruit" class="military-section">
+                                <h3 class="section-title">Recruter des Unités</h3>
+                                <div id="recruit-units-grid" class="unit-grid"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Autres vues -->
+                <div id="view-world" class="view-container"><h2 class="view-title">Carte du Monde</h2><p>Cette fonctionnalité n'est pas encore implémentée.</p></div>
+                <div id="view-island" class="view-container"><h2 class="view-title">Province</h2><p>Cette fonctionnalité n'est pas encore implémentée.</p></div>
+                <div id="view-research" class="view-container"><h2 class="view-title">Académie de Recherche</h2><div id="research-layout" class="research-layout"></div></div>
+                <div id="view-navy" class="view-container"><h2 class="view-title">Flotte Navale</h2><p>Cette fonctionnalité n'est pas encore implémentée.</p></div>
+                <div id="view-battle" class="view-container"><h2 class="view-title">Simulateur de Bataille</h2><p>Cette fonctionnalité n'est pas encore implémentée.</p></div>
+                <div id="view-trade" class="view-container"><h2 class="view-title">Commerce</h2><p>Cette fonctionnalité n'est pas encore implémentée.</p></div>
+                <div id="view-diplomacy" class="view-container"><h2 class="view-title">Diplomatie</h2><p>Cette fonctionnalité n'est pas encore implémentée.</p></div>
+                <div id="view-alliance" class="view-container"><h2 class="view-title">Alliance</h2><p>Cette fonctionnalité n'est pas encore implémentée.</p></div>
+                <div id="view-messages" class="view-container"><h2 class="view-title">Messagerie</h2><p>Cette fonctionnalité n'est pas encore implémentée.</p></div>
+            </main>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="imperium-footer">
+            <div id="event-log" class="event-log">Initialisation du jeu...</div>
+            <div class="game-actions">
+                <button id="save-btn" class="footer-btn">Sauvegarder</button>
+                <button id="load-btn" class="footer-btn">Charger</button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- NAVIGATION MOBILE -->
+    <nav class="mobile-nav">
+        <a class="mobile-nav-item" data-view="city">🏛️</a>
+        <a class="mobile-nav-item" data-view="world">🌍</a>
+        <a class="mobile-nav-item" data-view="research">📚</a>
+        <a class="mobile-nav-item" data-view="military">⚔️</a>
+        <a class="mobile-nav-item" data-view="alliance">🛡️</a>
+    </nav>
+
+    <!-- MODAL -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modal-title" class="modal-title">Titre de la modale</h3>
+            <div id="modal-body">Contenu de la modale...</div>
+            <div id="modal-actions" class="modal-actions">
+                 <button id="modal-cancel-btn" class="modal-btn cancel">Fermer</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration globale du jeu
+        const GAME_CONFIG = {
+            version: '3.0.0',
+            updateInterval: 5000, // Mise à jour des ressources toutes les 5 secondes
+        };
+
+        // État du jeu complet
+        let gameState = {
+            resources: { wood: 2450, stone: 1820, wine: 650, iron: 340, gold: 8750, research: 180 },
+            buildings: {
+                forum: { level: 5, x: 2, y: 1 },
+                warehouse: { level: 3, x: 0, y: 0 },
+                barracks: { level: 4, x: 4, y: 1 },
+                academy: { level: 2, x: 1, y: 3 },
+                lumbercamp: { level: 3, x: 0, y: 2 },
+                quarry: { level: 2, x: 3, y: 0 },
+                vineyard: { level: 1, x: 4, y: 3 }
+            },
+            technologies: ['aqueducs', 'phalanges', 'routes'],
+            units: { velites: 45, hastati: 32, legionnaires: 18, equites: 12, balistes: 3 },
+            navy: { triremes: 8, quinqueremes: 2, marchands: 15 },
+            provinces: [ { name: 'Roma Nova', type: 'capital', population: 120, happiness: 75, islandBonus: {} } ],
+            currentView: 'city',
+            player: {
+                name: 'Marcus Aurelius',
+                level: 12,
+                xp: 8750,
+                title: 'Patricien',
+                alliance: { name: 'SPQR Alliance', bonus: 0.1 }, // Bonus de 10%
+                rank: 145
+            },
+            lastUpdate: Date.now(),
+        };
+
+        // Configuration des bâtiments
+        const BUILDINGS_CONFIG = {
+            forum: { name: 'Forum', icon: '🏛️', description: 'Augmente la population maximale.' },
+            warehouse: { name: 'Entrepôt', icon: '📦', description: 'Augmente le stockage des ressources.' },
+            barracks: { name: 'Caserne', icon: '⚔️', description: 'Recrutement des légions.' },
+            academy: { name: 'Académie', icon: '📚', description: 'Recherche et enseignement.' },
+            lumbercamp: { name: 'Camp de Bûcherons', icon: '🌲', description: 'Production de bois.', production: { type: 'wood', base: 10 } },
+            quarry: { name: 'Carrière', icon: '🪨', description: 'Extraction de pierre.', production: { type: 'stone', base: 8 } },
+            vineyard: { name: 'Vignoble', icon: '🍇', description: 'Culture de la vigne.', production: { type: 'wine', base: 4 } },
+            ironmine: { name: 'Mine de Fer', icon: '⛏️', description: 'Extraction de fer.', production: { type: 'iron', base: 6 } },
+            mint: { name: 'Monnaie', icon: '💰', description: 'Frappe de monnaies.', production: { type: 'gold', base: 5 } },
+            tavern: { name: 'Taverne', icon: '🍺', description: 'Augmente le bonheur des citoyens.', happiness: 5 }, // +5 bonheur par niveau
+            temple: { name: 'Temple', icon: '⛩️', description: 'Culte des dieux romains.' },
+            library: { name: 'Bibliothèque', icon: '�', description: 'Conservation du savoir.' },
+            shipyard: { name: 'Chantier Naval', icon: '🚢', description: 'Construction de navires.' },
+            wall: { name: 'Muraille', icon: '🛡️', description: 'Défense de la cité.' },
+            amphitheater: { name: 'Amphithéâtre', icon: '🏟️', description: 'Jeux et spectacles.' }
+        };
+
+        // Configuration des technologies
+        const TECH_TREE = {
+            urbanisme: { name: 'Urbanisme', icon: '🏛️', techs: [ { id: 'aqueducs', name: 'Aqueducs', cost: { research: 250 }, description: 'Améliore la qualité de vie (+15% bonheur)' }, { id: 'forum_avance', name: 'Forums Avancés', cost: { research: 400 }, description: 'Augmente la capacité administrative' } ] },
+            militaire: { name: 'Art Militaire', icon: '⚔️', techs: [ { id: 'phalanges', name: 'Formations en Phalange', cost: { research: 300 }, description: 'Tactiques de base (+20% défense)' }, { id: 'legions', name: 'Légions', cost: { research: 500 }, description: 'Unités d\'élite débloquées' } ] },
+            economie: { name: 'Économie', icon: '💰', techs: [ { id: 'routes', name: 'Routes Commerciales', cost: { research: 200 }, description: 'Commerce plus efficace (+25% revenus)' }, { id: 'banques', name: 'Systèmes Bancaires', cost: { research: 450 }, description: 'Gestion financière avancée' } ] },
+            diplomatie: { name: 'Diplomatie', icon: '🤝', techs: [ { id: 'ambassades', name: 'Ambassades', cost: { research: 350 }, description: 'Relations diplomatiques stables' }, { id: 'espionnage', name: 'Réseaux d\'Espionnage', cost: { research: 550 }, description: 'Information sur les ennemis' } ] }
+        };
+
+        // Configuration des unités terrestres
+        const UNITS_CONFIG = {
+            velites: { name: 'Vélites', icon: '🏃', attack: 5, defense: 2, cost: { iron: 10, gold: 5 } },
+            hastati: { name: 'Hastati', icon: '🛡️', attack: 10, defense: 6, cost: { iron: 20, gold: 10 } },
+            legionnaires: { name: 'Légionnaires', icon: '⚔️', attack: 25, defense: 15, cost: { iron: 50, gold: 20 } },
+            equites: { name: 'Equites', icon: '🐎', attack: 20, defense: 8, cost: { iron: 40, gold: 15 } },
+            balistes: { name: 'Balistes', icon: '🏹', attack: 50, defense: 5, cost: { wood: 100, gold: 50 } }
+        };
+
+        // Fonctions utilitaires
+        function safeGetElement(id) {
+            const element = document.getElementById(id);
+            if (!element) console.warn(`Element with id '${id}' not found`);
+            return element;
+        }
+
+        function safeUpdateElement(id, content, isHTML = false) {
+            const element = safeGetElement(id);
+            if (element) {
+                if (isHTML) element.innerHTML = content;
+                else element.textContent = content;
+            }
+        }
+        
+        // --- NOUVELLE LOGIQUE DE DÉMARRAGE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const startBtn = safeGetElement('start-game-btn');
+            const startContent = safeGetElement('start-content');
+            const loader = safeGetElement('loader');
+            const startScreen = safeGetElement('start-screen');
+            const imperiumUI = document.querySelector('.imperium-ui');
+
+            if (startBtn) {
+                startBtn.addEventListener('click', () => {
+                    // Cacher le bouton et montrer le loader
+                    startContent.classList.add('hidden');
+                    loader.classList.remove('hidden');
+
+                    // Simuler un chargement
+                    setTimeout(() => {
+                        // Cacher l'écran de démarrage
+                        startScreen.classList.add('hidden');
+                        
+                        // Afficher l'interface du jeu
+                        imperiumUI.classList.add('visible');
+                        
+                        // Initialiser le jeu
+                        initGame();
+                    }, 2500); // 2.5 secondes de chargement
+                });
+            }
+            
+            // Créer les particules en arrière-plan dès le début
+            createParticles();
+        });
+
+        // Initialisation du jeu
+        function initGame() {
+            initNavigation();
+            loadGame();
+            startGameLoops();
+            switchView('city');
+            logEvent(`🏛️ Bienvenue dans IMPERIUM, ${gameState.player.name} !`);
+            updatePlayerInfo();
+            updateAllUI();
+        }
+        
+        // Boucle de jeu principale
+        function startGameLoops() {
+            setInterval(() => {
+                const now = Date.now();
+                const delta = (now - gameState.lastUpdate) / 1000; // secondes écoulées
+                
+                // 1. Mettre à jour le bonheur
+                gameState.provinces[0].happiness = calculateHappiness();
+
+                // 2. Gérer la croissance de la population
+                const popMax = calculatePopulationMax();
+                const currentPop = gameState.provinces[0].population;
+                if (currentPop < popMax) {
+                    // La croissance est plus rapide avec un bonheur élevé
+                    const growthRate = (gameState.provinces[0].happiness / 5000) * (delta / 60);
+                    gameState.provinces[0].population = Math.min(currentPop + growthRate, popMax);
+                }
+                
+                // 3. Calculer la production pour le delta de temps
+                const production = calculateHourlyProduction();
+                const capacity = calculateStorageCapacity();
+                
+                Object.keys(gameState.resources).forEach(res => {
+                    if (production[res]) {
+                        const producedAmount = production[res] * (delta / 3600);
+                        const currentAmount = gameState.resources[res];
+                        const maxAmount = capacity[res] || Infinity;
+                        
+                        gameState.resources[res] = Math.min(currentAmount + producedAmount, maxAmount);
+                    }
+                });
+                
+                gameState.lastUpdate = now;
+                updateAllUI();
+            }, GAME_CONFIG.updateInterval);
+        }
+
+        // Calculs basés sur les formules
+        function calculatePopulationMax() {
+            // PopulationMax = 50 + (25 * NiveauForum)
+            const forumLevel = gameState.buildings.forum?.level || 0;
+            return 50 + (25 * forumLevel);
+        }
+        
+        function calculateHappiness() {
+            let happiness = 50; // Base
+            
+            // Bonus de la taverne
+            if (gameState.buildings.tavern) {
+                happiness += BUILDINGS_CONFIG.tavern.happiness * gameState.buildings.tavern.level;
+            }
+            
+            // Malus de surpopulation
+            const popMax = calculatePopulationMax();
+            const currentPop = gameState.provinces[0].population;
+            const populationRatio = currentPop / popMax;
+            if (populationRatio > 0.9) {
+                happiness -= (populationRatio - 0.9) * 100; // Malus de plus en plus fort
+            }
+            
+            return Math.max(0, Math.min(100, Math.round(happiness)));
+        }
+
+        function calculateHourlyProduction() {
+            const production = { wood: 0, stone: 0, wine: 0, iron: 0, gold: 0, research: 0 };
+            const allianceBonus = gameState.player.alliance.bonus || 0;
+            const islandBonus = gameState.provinces[0].islandBonus || {};
+            
+            // Modificateur de productivité basé sur le bonheur
+            const happiness = gameState.provinces[0].happiness;
+            const productivityModifier = happiness < 50 ? 1 - ((50 - happiness) * 0.015) : 1; // Pénalité jusqu'à -75%
+            
+            for (const [buildingType, buildingData] of Object.entries(gameState.buildings)) {
+                const config = BUILDINGS_CONFIG[buildingType];
+                if (config && config.production) {
+                    const { type, base } = config.production;
+                    const level = buildingData.level;
+                    const hourlyProd = base * (1 + 0.1 * (level - 1)) * (1 + (islandBonus[type] || 0)) * (1 + allianceBonus) * productivityModifier;
+                    production[type] += hourlyProd;
+                }
+            }
+            production.research += (gameState.buildings.academy?.level || 0) * 10;
+            return production;
+        }
+
+        function calculateStorageCapacity() {
+            const warehouseLevel = gameState.buildings.warehouse?.level || 0;
+            if (warehouseLevel === 0) return { wood: 1000, stone: 1000, wine: 1000, iron: 1000, gold: Infinity, research: Infinity };
+            const capacity = Math.floor(500 * Math.pow(warehouseLevel, 1.2));
+            return { wood: capacity, stone: capacity, wine: capacity, iron: capacity, gold: Infinity, research: Infinity };
+        }
+
+        // Initialisation de la navigation
+        function initNavigation() {
+            document.querySelectorAll('.nav-item a, .mobile-nav-item').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const viewId = link.dataset.view;
+                    if (viewId) switchView(viewId);
+                });
+            });
+            safeGetElement('save-btn').addEventListener('click', saveGame);
+            safeGetElement('load-btn').addEventListener('click', loadGame);
+        }
+
+        // Gestion de la navigation entre vues
+        function switchView(viewId) {
+            document.querySelectorAll('.view-container').forEach(view => view.classList.remove('active'));
+            const targetView = safeGetElement(`view-${viewId}`);
+            if (targetView) targetView.classList.add('active');
+            
+            document.querySelectorAll('.nav-item a, .mobile-nav-item').forEach(link => link.classList.remove('active'));
+            document.querySelectorAll(`[data-view="${viewId}"]`).forEach(link => link.classList.add('active'));
+            
+            gameState.currentView = viewId;
+            
+            switch(viewId) {
+                case 'city': renderCityView(); break;
+                case 'research': renderResearchView(); break;
+                case 'military': renderMilitaryView(); break;
+            }
+            logEvent(`Navigation vers ${getViewTitle(viewId)}`);
+        }
+
+        function getViewTitle(viewId) {
+            const link = document.querySelector(`.nav-item a[data-view="${viewId}"]`);
+            return link ? link.textContent.trim() : viewId;
+        }
+
+        // Rendu de la vue Cité
+        function renderCityView() {
+            const grid = safeGetElement('buildings-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            
+            for (let y = 0; y < 4; y++) {
+                for (let x = 0; x < 5; x++) {
+                    const plot = document.createElement('div');
+                    plot.className = 'building-plot';
+                    plot.dataset.x = x; plot.dataset.y = y;
+                    const building = findBuildingAt(x, y);
+                    if (building) {
+                        plot.classList.add('built');
+                        const config = BUILDINGS_CONFIG[building.type];
+                        plot.innerHTML = `<div class="building-icon">${config.icon}</div><div class="building-name">${config.name}</div><div class="building-level">Niv. ${building.level}</div>`;
+                        plot.onclick = () => manageBuilding(building.type);
+                    } else {
+                        plot.innerHTML = `<div class="building-icon" style="opacity: 0.5;">➕</div><div class="building-name" style="color: var(--text-muted);">Construire</div>`;
+                        plot.onclick = () => showBuildingOptions(x, y);
+                    }
+                    grid.appendChild(plot);
+                }
+            }
+            updateCityPanel();
+        }
+        
+        function findBuildingAt(x, y) {
+            return Object.entries(gameState.buildings).map(([type, b]) => ({type, ...b})).find(b => b.x === x && b.y === y);
+        }
+
+        // Fonctions de gestion des bâtiments
+        function showBuildingOptions(x, y) {
+            const builtTypes = Object.keys(gameState.buildings);
+            const availableBuildings = Object.keys(BUILDINGS_CONFIG).filter(type => !builtTypes.includes(type));
+            let html = `<div style="display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1rem; max-height: 400px; overflow-y: auto;">`;
+            availableBuildings.forEach(type => {
+                const config = BUILDINGS_CONFIG[type];
+                const cost = calculateBuildingCost(type, 1);
+                const canAfford = canAffordCost(cost);
+                html += `<div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: rgba(30,41,59,0.6); border-radius: 0.5rem; border: 1px solid ${canAfford ? 'var(--border-gold)' : '#6b7280'}; ${canAfford ? 'cursor: pointer;' : 'opacity: 0.5;'}" ${canAfford ? `onclick="buildBuilding('${type}', ${x}, ${y})"` : ''}>
+                    <span style="font-size: 1.5rem;">${config.icon}</span>
+                    <div style="flex-grow: 1;">
+                        <div style="font-weight: bold; color: var(--gold-light);">${config.name}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">${config.description}</div>
+                        <div style="font-size: 0.8rem; color: var(--gold-primary);">Coût: ${formatCost(cost)}</div>
+                    </div></div>`;
+            });
+            html += '</div>';
+            showModal('Choisir un bâtiment', html);
+        }
+        
+        function calculateBuildingCost(type, level) {
+            const baseCosts = { forum: { wood: 500, stone: 200, gold: 300 }, warehouse: { wood: 200, stone: 100 }, barracks: { wood: 300, iron: 150, gold: 200 }, academy: { wood: 400, stone: 200, gold: 250 }, lumbercamp: { wood: 150, stone: 50 }, quarry: { wood: 100, stone: 150 }, vineyard: { wood: 200, gold: 100 }, ironmine: { wood: 150, stone: 100 }, mint: { wood: 300, stone: 150, gold: 100 }, tavern: { wood: 200, wine: 50 }, temple: { wood: 400, stone: 300, gold: 500 }, library: { wood: 300, stone: 200, gold: 200 }, shipyard: { wood: 600, iron: 200 }, wall: { wood: 400, stone: 500 }, amphitheater: { wood: 800, stone: 600, gold: 1000 } };
+            const baseCost = baseCosts[type] || {};
+            const multiplier = Math.pow(1.5, level - 1);
+            const result = {};
+            Object.entries(baseCost).forEach(([resource, amount]) => { result[resource] = Math.ceil(amount * multiplier); });
+            return result;
+        }
+
+        function formatCost(cost) {
+            const resourceIcons = { wood: '🌲', stone: '🪨', wine: '🍇', iron: '⚔️', gold: '💰', research: '📚' };
+            return Object.entries(cost).map(([res, amount]) => `${resourceIcons[res] || res} ${amount.toLocaleString()}`).join(' ');
+        }
+
+        function canAffordCost(cost) {
+            return Object.entries(cost).every(([res, amount]) => gameState.resources[res] >= amount);
+        }
+
+        function buildBuilding(type, x, y) {
+            const cost = calculateBuildingCost(type, 1);
+            if (!canAffordCost(cost)) {
+                showNotification('Ressources insuffisantes', 'error'); return;
+            }
+            Object.entries(cost).forEach(([res, amount]) => { gameState.resources[res] -= amount; });
+            gameState.buildings[type] = { level: 1, x: x, y: y };
+            const config = BUILDINGS_CONFIG[type];
+            logEvent(`🏗️ Construction de ${config.name} commencée`);
+            closeModal();
+            renderCityView();
+            updateAllUI();
+            setTimeout(() => {
+                const plot = document.querySelector(`[data-x="${x}"][data-y="${y}"]`);
+                if (plot) plot.classList.add('building-completed');
+                showNotification(`${config.name} (Niv. 1) construit !`, 'success');
+            }, 300);
+        }
+
+        function manageBuilding(type) {
+            const building = gameState.buildings[type];
+            const config = BUILDINGS_CONFIG[type];
+            const nextLevel = building.level + 1;
+            const cost = calculateBuildingCost(type, nextLevel);
+            const canAfford = canAffordCost(cost);
+
+            let html = `<p>${config.description}</p>
+                        <p>Niveau actuel : ${building.level}</p>
+                        <hr style="border-color: var(--border-gold); margin: 1rem 0;">
+                        <h4>Améliorer au niveau ${nextLevel}</h4>
+                        <p>Coût : ${formatCost(cost)}</p>
+                        <button class="action-btn" ${canAfford ? '' : 'disabled'} onclick="upgradeBuilding('${type}')">Améliorer</button>`;
+            
+            showModal(`Gérer ${config.name}`, html);
+        }
+
+        function upgradeBuilding(type) {
+            const building = gameState.buildings[type];
+            const nextLevel = building.level + 1;
+            const cost = calculateBuildingCost(type, nextLevel);
+            if (!canAffordCost(cost)) {
+                showNotification('Ressources insuffisantes', 'error'); return;
+            }
+            Object.entries(cost).forEach(([res, amount]) => { gameState.resources[res] -= amount; });
+            building.level++;
+            logEvent(`✅ ${BUILDINGS_CONFIG[type].name} amélioré au niveau ${building.level}`);
+            closeModal();
+            renderCityView();
+            updateAllUI();
+            const plot = document.querySelector(`[data-x="${building.x}"][data-y="${building.y}"]`);
+            if (plot) plot.classList.add('building-completed');
+            showNotification(`${BUILDINGS_CONFIG[type].name} (Niv. ${building.level}) amélioré !`, 'success');
+        }
+
+        // Rendu de la vue Recherche
+        function renderResearchView() {
+            const layout = safeGetElement('research-layout');
+            if (!layout) return;
+            layout.innerHTML = '';
+            for (const [branchKey, branchData] of Object.entries(TECH_TREE)) {
+                const branchEl = document.createElement('div');
+                branchEl.className = 'research-branch';
+                let techsHtml = '';
+                branchData.techs.forEach(tech => {
+                    const isResearched = gameState.technologies.includes(tech.id);
+                    const canAfford = canAffordCost(tech.cost);
+                    techsHtml += `
+                        <div class="tech-card ${isResearched ? 'researched' : ''}" ${!isResearched && canAfford ? `onclick="researchTech('${tech.id}')"` : ''} style="${!isResearched && !canAfford ? 'opacity:0.6; cursor:not-allowed;' : ''}">
+                            <div class="tech-name">${tech.name}</div>
+                            <div class="tech-description">${tech.description}</div>
+                            <div class="tech-cost">
+                                <span class="cost-display">${isResearched ? 'Recherché ✔️' : `Coût: ${formatCost(tech.cost)}`}</span>
+                            </div>
+                        </div>`;
+                });
+                branchEl.innerHTML = `<h3 class="branch-title">${branchData.icon} ${branchData.name}</h3>${techsHtml}`;
+                layout.appendChild(branchEl);
+            }
+        }
+
+        function researchTech(techId) {
+            const tech = Object.values(TECH_TREE).flatMap(b => b.techs).find(t => t.id === techId);
+            if (!tech || gameState.technologies.includes(techId) || !canAffordCost(tech.cost)) return;
+            Object.entries(tech.cost).forEach(([res, amount]) => { gameState.resources[res] -= amount; });
+            gameState.technologies.push(techId);
+            logEvent(`🔬 Technologie "${tech.name}" recherchée !`);
+            renderResearchView();
+            updateAllUI();
+            showNotification(`Technologie "${tech.name}" débloquée !`, 'success');
+        }
+
+        // Rendu de la vue Militaire
+        function renderMilitaryView() {
+            const ownedGrid = safeGetElement('owned-units-grid');
+            const recruitGrid = safeGetElement('recruit-units-grid');
+            if (!ownedGrid || !recruitGrid) return;
+
+            ownedGrid.innerHTML = '';
+            Object.entries(UNITS_CONFIG).forEach(([type, config]) => {
+                const count = gameState.units[type] || 0;
+                if (count > 0) {
+                    ownedGrid.innerHTML += `
+                        <div class="unit-card">
+                            <div class="unit-icon">${config.icon}</div>
+                            <div>
+                                <div class="unit-name">${config.name}</div>
+                                <div class="unit-count">${count.toLocaleString()}</div>
+                            </div>
+                        </div>`;
+                }
+            });
+            if (ownedGrid.innerHTML === '') {
+                ownedGrid.innerHTML = '<p>Aucune troupe. Recrutez-en dans la caserne.</p>';
+            }
+
+            recruitGrid.innerHTML = '';
+            Object.entries(UNITS_CONFIG).forEach(([type, config]) => {
+                const canAfford = canAffordCost(config.cost);
+                recruitGrid.innerHTML += `
+                    <div class="unit-card" onclick="showRecruitModal('${type}')">
+                        <div class="unit-icon">${config.icon}</div>
+                        <div>
+                            <div class="unit-name">${config.name}</div>
+                            <div class="unit-stats">⚔️${config.attack} 🛡️${config.defense}</div>
+                        </div>
+                    </div>`;
+            });
+        }
+        
+        function showRecruitModal(type) {
+            const config = UNITS_CONFIG[type];
+            const maxRecruits = calculateMaxRecruits(type);
+            
+            let html = `<h4>Recruter des ${config.name}</h4>
+                        <p>Coût unitaire: ${formatCost(config.cost)}</p>
+                        <input type="range" id="recruit-slider" class="recruit-slider" min="0" max="${maxRecruits}" value="0" oninput="updateRecruitDetails('${type}')">
+                        <div id="recruit-details" class="recruit-details">
+                            <span>Quantité: 0</span>
+                            <span>Coût total: -</span>
+                        </div>
+                        <button class="action-btn" id="recruit-confirm-btn" onclick="recruitUnits('${type}')" disabled>Recruter</button>`;
+            
+            showModal(`Recrutement`, html);
+            updateRecruitDetails(type); // Initial call
+        }
+
+        function calculateMaxRecruits(type) {
+            const cost = UNITS_CONFIG[type].cost;
+            let max = Infinity;
+            for (const [res, amount] of Object.entries(cost)) {
+                const affordable = Math.floor(gameState.resources[res] / amount);
+                if (affordable < max) {
+                    max = affordable;
+                }
+            }
+            return max;
+        }
+
+        function updateRecruitDetails(type) {
+            const slider = safeGetElement('recruit-slider');
+            const detailsDiv = safeGetElement('recruit-details');
+            const confirmBtn = safeGetElement('recruit-confirm-btn');
+            if (!slider || !detailsDiv || !confirmBtn) return;
+            
+            const quantity = parseInt(slider.value);
+            const unitCost = UNITS_CONFIG[type].cost;
+            const totalCost = {};
+            Object.entries(unitCost).forEach(([res, amount]) => {
+                totalCost[res] = amount * quantity;
+            });
+
+            detailsDiv.innerHTML = `<span>Quantité: ${quantity.toLocaleString()}</span><span>Coût: ${quantity > 0 ? formatCost(totalCost) : '-'}</span>`;
+            confirmBtn.disabled = quantity === 0;
+        }
+
+        function recruitUnits(type) {
+            const slider = safeGetElement('recruit-slider');
+            if (!slider) return;
+            const quantity = parseInt(slider.value);
+            if (quantity === 0) return;
+
+            const unitCost = UNITS_CONFIG[type].cost;
+            const totalCost = {};
+            Object.entries(unitCost).forEach(([res, amount]) => {
+                totalCost[res] = amount * quantity;
+            });
+
+            if (!canAffordCost(totalCost)) {
+                showNotification('Ressources insuffisantes', 'error');
+                return;
+            }
+
+            Object.entries(totalCost).forEach(([res, amount]) => {
+                gameState.resources[res] -= amount;
+            });
+
+            gameState.units[type] = (gameState.units[type] || 0) + quantity;
+            
+            logEvent(`⚔️ Recrutement de ${quantity.toLocaleString()} ${UNITS_CONFIG[type].name}`);
+            closeModal();
+            renderMilitaryView();
+            updateAllUI();
+            showNotification(`${quantity.toLocaleString()} ${UNITS_CONFIG[type].name} recrutés !`, 'success');
+        }
+
+        // Mise à jour de l'UI
+        function updateAllUI() {
+            updateResourcesDisplay();
+            if (gameState.currentView === 'city') {
+                updateCityPanel();
+            }
+        }
+
+        function updateResourcesDisplay() {
+            const container = safeGetElement('resources-display');
+            if (!container) return;
+            const capacity = calculateStorageCapacity();
+            const resourceIcons = { wood: '🌲', stone: '🪨', wine: '🍇', iron: '⛏️', gold: '💰', research: '📚' };
+            container.innerHTML = Object.entries(resourceIcons).map(([res, icon]) => {
+                const value = Math.floor(gameState.resources[res]);
+                const max = capacity[res];
+                const isFull = max && value >= max;
+                return `
+                    <div class="resource-item" title="${res.charAt(0).toUpperCase() + res.slice(1)}">
+                        <span class="resource-icon">${icon}</span>
+                        <span class="resource-value ${isFull ? 'storage-full-indicator' : ''}">${value.toLocaleString()}</span>
+                    </div>`;
+            }).join('');
+        }
+
+        function updatePlayerInfo() {
+            safeUpdateElement('player-name', gameState.player.name);
+            safeUpdateElement('player-title-level', `${gameState.player.title} - Niv. ${gameState.player.level}`);
+            safeUpdateElement('player-avatar', gameState.player.name.charAt(0));
+        }
+
+        function updateCityPanel() {
+            // Stats
+            const pop = Math.floor(gameState.provinces[0].population);
+            const popMax = calculatePopulationMax();
+            const happiness = calculateHappiness();
+            safeUpdateElement('city-stats-content', `
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">${pop.toLocaleString()} / ${popMax.toLocaleString()}</div>
+                        <div class="stat-label">Population</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${happiness}%</div>
+                        <div class="stat-label">Bonheur</div>
+                    </div>
+                </div>`, true);
+
+            // Stockage
+            const capacity = calculateStorageCapacity();
+            safeUpdateElement('storage-content', `
+                <p>Capacité de base: ${capacity.wood ? capacity.wood.toLocaleString() : 'Illimité'}</p>
+            `, true);
+            
+            // Production
+            const production = calculateHourlyProduction();
+            safeUpdateElement('production-content', Object.entries(production).map(([res, val]) => {
+                if (val > 0) {
+                    return `<p>${res.charAt(0).toUpperCase() + res.slice(1)}: +${val.toFixed(1)}/h</p>`;
+                }
+            }).filter(Boolean).join(''), true);
+        }
+
+        // Gestion de la modale
+        function showModal(title, bodyHTML, actionsHTML = '') {
+            const overlay = safeGetElement('modal-overlay');
+            if (!overlay) return;
+            safeUpdateElement('modal-title', title);
+            safeUpdateElement('modal-body', bodyHTML, true);
+            safeUpdateElement('modal-actions', `<button id="modal-cancel-btn" class="modal-btn cancel">Fermer</button>` + actionsHTML, true);
+            overlay.style.display = 'flex';
+            safeGetElement('modal-cancel-btn').onclick = closeModal;
+        }
+
+        function closeModal() {
+            const overlay = safeGetElement('modal-overlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
+        // Notifications et logs
+        function showNotification(message, type = 'info') {
+            const container = safeGetElement('notification-container');
+            if (!container) return;
+            const notif = document.createElement('div');
+            notif.className = `notification ${type}`;
+            notif.textContent = message;
+            container.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
+        }
+
+        function logEvent(message) {
+            safeUpdateElement('event-log', message);
+            console.log(message);
+        }
+
+        // Sauvegarde et chargement
+        function saveGame() {
+            try {
+                localStorage.setItem('imperiumGameState', JSON.stringify(gameState));
+                showNotification('Partie sauvegardée !', 'success');
+                logEvent('💾 Partie sauvegardée avec succès.');
+            } catch (e) {
+                showNotification('Erreur de sauvegarde', 'error');
+                console.error("Sauvegarde échouée:", e);
+            }
+        }
+
+        function loadGame() {
+            try {
+                const savedState = localStorage.getItem('imperiumGameState');
+                if (savedState) {
+                    gameState = JSON.parse(savedState);
+                    showNotification('Partie chargée !', 'success');
+                    logEvent('📂 Partie chargée avec succès.');
+                    updateAllUI();
+                    updatePlayerInfo();
+                    switchView(gameState.currentView || 'city');
+                } else {
+                    logEvent('Aucune sauvegarde trouvée.');
+                }
+            } catch (e) {
+                showNotification('Erreur de chargement', 'error');
+                console.error("Chargement échoué:", e);
+            }
+        }
+
+        // Création des particules
+        function createParticles() {
+            const container = safeGetElement('particles');
+            if (!container) return;
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.animationDelay = `${Math.random() * 8}s`;
+                particle.style.animationDuration = `${5 + Math.random() * 5}s`;
+                particle.style.transform = `scale(${0.5 + Math.random() * 0.5})`;
+                container.appendChild(particle);
+            }
+        }
+    </script>
+</body>
+</html>
