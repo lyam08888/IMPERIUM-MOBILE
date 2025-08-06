@@ -1,0 +1,493 @@
+/**
+ * 🏛️ IMPERIUM - Styles pour Header Commun
+ * Styles pour la barre du haut avec ressources et logs
+ */
+
+/* ===== HEADER PRINCIPAL ===== */
+.imperium-header {
+    background: linear-gradient(135deg, 
+        rgba(139, 0, 0, 0.95) 0%, 
+        rgba(0, 0, 0, 0.9) 50%, 
+        rgba(139, 0, 0, 0.95) 100%);
+    border-bottom: 2px solid var(--roman-gold);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    gap: 2rem;
+}
+
+.imperium-logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--roman-gold);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Times New Roman', serif;
+    letter-spacing: 2px;
+}
+
+.imperium-logo:hover {
+    color: #FFA500;
+    transform: scale(1.05);
+    text-shadow: 2px 2px 8px rgba(255, 215, 0, 0.6);
+}
+
+/* ===== AFFICHAGE DES RESSOURCES ===== */
+.resources-display {
+    display: flex;
+    gap: 1.5rem;
+    background: rgba(15, 23, 42, 0.8);
+    padding: 0.75rem 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--roman-bronze);
+    backdrop-filter: blur(5px);
+    flex: 1;
+    justify-content: center;
+    max-width: 600px;
+}
+
+.resource-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: bold;
+    font-size: 1rem;
+    color: var(--roman-marble);
+    transition: all 0.3s ease;
+    cursor: help;
+}
+
+.resource-item:hover {
+    color: var(--roman-gold);
+    transform: scale(1.05);
+}
+
+.resource-icon {
+    font-size: 1.2rem;
+    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.resource-value {
+    min-width: 3rem;
+    text-align: right;
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s ease;
+}
+
+.resource-value.resource-updated {
+    color: #22c55e;
+    transform: scale(1.1);
+    text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+/* ===== INFORMATIONS JOUEUR ===== */
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.log-button {
+    position: relative;
+    background: linear-gradient(135deg, var(--roman-bronze), #8B4513);
+    border: 2px solid var(--roman-gold);
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--roman-marble);
+    font-size: 1.2rem;
+}
+
+.log-button:hover {
+    background: linear-gradient(135deg, var(--roman-gold), #FFA500);
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.log-button.has-unread {
+    animation: pulse-log 2s infinite;
+}
+
+.log-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #dc2626;
+    color: white;
+    border-radius: 50%;
+    width: 1.2rem;
+    height: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+    border: 2px solid var(--roman-gold);
+}
+
+.player-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--roman-gold), #FFA500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--roman-dark);
+    border: 2px solid var(--roman-bronze);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.player-avatar:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.player-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.player-name {
+    font-weight: bold;
+    color: var(--roman-gold);
+    font-size: 1rem;
+}
+
+.player-level {
+    font-size: 0.85rem;
+    color: var(--roman-marble);
+    opacity: 0.9;
+}
+
+/* ===== POPUP DES LOGS ===== */
+.log-popup {
+    position: absolute;
+    top: 100%;
+    right: 1.5rem;
+    width: 400px;
+    max-height: 500px;
+    background: linear-gradient(135deg, 
+        rgba(15, 23, 42, 0.98) 0%, 
+        rgba(30, 41, 59, 0.98) 100%);
+    border: 2px solid var(--roman-gold);
+    border-radius: 1rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    z-index: 1001;
+    animation: slideInDown 0.3s ease-out;
+}
+
+.log-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--roman-bronze);
+    background: rgba(139, 0, 0, 0.3);
+}
+
+.log-popup-header h3 {
+    margin: 0;
+    color: var(--roman-gold);
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.log-popup-close {
+    background: none;
+    border: none;
+    color: var(--roman-marble);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.log-popup-close:hover {
+    background: rgba(220, 38, 38, 0.8);
+    color: white;
+}
+
+.log-popup-content {
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.log-popup-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.log-popup-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+}
+
+.log-popup-content::-webkit-scrollbar-thumb {
+    background: var(--roman-bronze);
+    border-radius: 3px;
+}
+
+.log-popup-content::-webkit-scrollbar-thumb:hover {
+    background: var(--roman-gold);
+}
+
+.log-entry {
+    padding: 0.75rem 1rem;
+    margin: 0.25rem;
+    border-radius: 0.5rem;
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.log-entry:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateX(2px);
+}
+
+.log-entry.log-unread {
+    background: rgba(255, 215, 0, 0.1);
+    border-left-color: var(--roman-gold);
+}
+
+.log-entry.log-info { border-left-color: #3b82f6; }
+.log-entry.log-success { border-left-color: #22c55e; }
+.log-entry.log-warning { border-left-color: #f59e0b; }
+.log-entry.log-error { border-left-color: #dc2626; }
+.log-entry.log-resource { border-left-color: #8b5cf6; }
+.log-entry.log-building { border-left-color: #f97316; }
+.log-entry.log-military { border-left-color: #dc2626; }
+
+.log-time {
+    font-size: 0.75rem;
+    color: var(--roman-marble);
+    opacity: 0.7;
+    margin-bottom: 0.25rem;
+}
+
+.log-message {
+    color: var(--roman-marble);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.log-empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--roman-marble);
+    opacity: 0.7;
+    font-style: italic;
+}
+
+.log-popup-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--roman-bronze);
+    background: rgba(139, 0, 0, 0.2);
+}
+
+.log-clear-btn {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    border: 1px solid #dc2626;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.log-clear-btn:hover {
+    background: linear-gradient(135deg, #b91c1c, #991b1b);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+/* ===== NOTIFICATIONS DE LOGS ===== */
+.log-notification {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: linear-gradient(135deg, 
+        rgba(15, 23, 42, 0.95) 0%, 
+        rgba(30, 41, 59, 0.95) 100%);
+    border: 1px solid var(--roman-bronze);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--roman-marble);
+    font-size: 0.9rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    z-index: 1002;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s ease;
+    max-width: 300px;
+}
+
+.log-notification.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.log-notification-icon {
+    font-size: 1rem;
+}
+
+.log-notification-message {
+    flex: 1;
+    line-height: 1.3;
+}
+
+.log-notification-info { border-left: 3px solid #3b82f6; }
+.log-notification-success { border-left: 3px solid #22c55e; }
+.log-notification-warning { border-left: 3px solid #f59e0b; }
+.log-notification-error { border-left: 3px solid #dc2626; }
+.log-notification-resource { border-left: 3px solid #8b5cf6; }
+.log-notification-building { border-left: 3px solid #f97316; }
+.log-notification-military { border-left: 3px solid #dc2626; }
+
+/* ===== ANIMATIONS ===== */
+@keyframes pulse-log {
+    0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+    }
+    50% { 
+        box-shadow: 0 0 0 10px rgba(255, 215, 0, 0);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .header-content {
+        gap: 1rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .resources-display {
+        gap: 1rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .resource-item {
+        font-size: 0.9rem;
+    }
+    
+    .log-popup {
+        width: 350px;
+        right: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+    
+    .resources-display {
+        gap: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .resource-item {
+        font-size: 0.85rem;
+    }
+    
+    .player-info {
+        gap: 0.75rem;
+    }
+    
+    .log-popup {
+        width: calc(100vw - 2rem);
+        right: 1rem;
+        left: 1rem;
+    }
+    
+    .log-notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .imperium-logo {
+        font-size: 1.5rem;
+    }
+    
+    .resources-display {
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+    
+    .resource-item {
+        font-size: 0.8rem;
+        gap: 0.25rem;
+    }
+    
+    .resource-icon {
+        font-size: 1rem;
+    }
+    
+    .log-button,
+    .player-avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1rem;
+    }
+    
+    .player-name {
+        font-size: 0.9rem;
+    }
+    
+    .player-level {
+        font-size: 0.75rem;
+    }
+}

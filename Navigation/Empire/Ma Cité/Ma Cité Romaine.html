@@ -1,2 +1,463 @@
 ﻿
-    <script src="../../../../../../../link-buttons-to-functions.js"></script>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Ma Cité Romaine</title>
+    <meta name="description" content="Vue d'ensemble de votre cité romaine - Gérez vos bâtiments, citoyens et ressources">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles communs -->
+    <link rel="stylesheet" href="../../common-styles.css">
+    <link rel="stylesheet" href="../../common-header.css">
+    <link rel="stylesheet" href="ma-cite-navigation.css">
+    
+    <!-- Scripts communs -->
+    <script src="../../common-navigation.js"></script>
+    <script src="../../common-header.js"></script>
+    <script src="ma-cite-navigation.js"></script>
+    <script src="../../game-engine.js"></script>
+    <script src="../../advanced-game-systems.js"></script>
+    <script src="../../save-system.js"></script>
+    <script src="../../ui-manager.js"></script>
+    <script src="../../global-console.js"></script>
+
+    <style>
+        /* Styles spécifiques à Ma Cité Romaine */
+        .page-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: calc(100vh - 200px);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .page-title {
+            color: var(--roman-gold);
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: bold;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+            font-family: 'Times New Roman', serif;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--roman-gold), #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            color: var(--roman-marble);
+            font-size: 1.3rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        /* Grille principale de la cité */
+        .city-overview {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .city-map-section {
+            background: linear-gradient(135deg, 
+                rgba(139, 0, 0, 0.1) 0%, 
+                rgba(0, 0, 0, 0.3) 100%);
+            border: 2px solid var(--roman-bronze);
+            border-radius: 1rem;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .city-map-section:hover {
+            border-color: var(--roman-gold);
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
+        }
+
+        .city-stats-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, 
+                rgba(30, 41, 59, 0.8) 0%, 
+                rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid var(--roman-bronze);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .stat-card:hover {
+            border-color: var(--roman-gold);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.2);
+        }
+
+        .stat-card-title {
+            color: var(--roman-gold);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-value {
+            color: var(--roman-marble);
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .stat-label {
+            color: var(--roman-marble);
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        /* Carte de la cité */
+        .city-map {
+            background: radial-gradient(circle at center, 
+                rgba(139, 0, 0, 0.2) 0%, 
+                rgba(0, 0, 0, 0.4) 100%);
+            border: 2px solid var(--roman-bronze);
+            border-radius: 1rem;
+            padding: 2rem;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .city-map::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23b45309" stroke-width="0.5" opacity="0.3"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .city-placeholder {
+            text-align: center;
+            color: var(--roman-marble);
+            z-index: 1;
+        }
+
+        .city-placeholder-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+            animation: pulse 2s infinite;
+        }
+
+        .city-placeholder-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--roman-gold);
+        }
+
+        .city-placeholder-desc {
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        /* Actions rapides */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .quick-action-btn {
+            background: linear-gradient(135deg, var(--roman-bronze), #8B4513);
+            border: 2px solid var(--roman-gold);
+            color: var(--roman-marble);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            text-align: center;
+        }
+
+        .quick-action-btn:hover {
+            background: linear-gradient(135deg, var(--roman-gold), #FFA500);
+            color: var(--roman-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .quick-action-icon {
+            font-size: 2rem;
+        }
+
+        .quick-action-text {
+            font-size: 0.9rem;
+            line-height: 1.2;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .city-overview {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .city-stats-section {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                display: grid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 1rem;
+            }
+
+            .city-map-section,
+            .stat-card {
+                padding: 1.5rem;
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .quick-action-btn {
+                padding: 0.75rem;
+            }
+
+            .quick-action-icon {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Le header commun sera injecté automatiquement par common-header.js -->
+    <!-- La navigation Ma Cité sera injectée automatiquement par ma-cite-navigation.js -->
+    
+    <!-- Particules d'ambiance -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Contenu principal -->
+    <main class="page-container">
+        <!-- En-tête de la page -->
+        <div class="page-header">
+            <h1 class="page-title">🏛️ Ma Cité Romaine 🏛️</h1>
+            <p class="page-subtitle">Roma Aeterna - Votre empire commence ici</p>
+        </div>
+
+        <!-- Vue d'ensemble de la cité -->
+        <div class="city-overview">
+            <!-- Carte de la cité -->
+            <div class="city-map-section">
+                <h2 class="section-title">Plan de la Cité</h2>
+                <div class="city-map">
+                    <div class="city-placeholder">
+                        <div class="city-placeholder-icon">🏛️</div>
+                        <div class="city-placeholder-text">Votre Cité Romaine</div>
+                        <div class="city-placeholder-desc">
+                            Cliquez sur "Bâtiments" pour commencer à construire votre empire
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiques de la cité -->
+            <div class="city-stats-section">
+                <div class="stat-card">
+                    <div class="stat-card-title">
+                        <span>👥</span>
+                        Population
+                    </div>
+                    <div class="stat-value" id="population-value">1,250</div>
+                    <div class="stat-label">Citoyens</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-title">
+                        <span>😊</span>
+                        Bonheur
+                    </div>
+                    <div class="stat-value" id="happiness-value">85%</div>
+                    <div class="stat-label">Moral</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-title">
+                        <span>🏗️</span>
+                        Bâtiments
+                    </div>
+                    <div class="stat-value" id="buildings-value">12</div>
+                    <div class="stat-label">Constructions</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-title">
+                        <span>⚔️</span>
+                        Armée
+                    </div>
+                    <div class="stat-value" id="army-value">450</div>
+                    <div class="stat-label">Soldats</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="quick-actions">
+            <a href="Bâtiments.html" class="quick-action-btn">
+                <span class="quick-action-icon">🏗️</span>
+                <span class="quick-action-text">Gérer les Bâtiments</span>
+            </a>
+            
+            <a href="Citoyens.html" class="quick-action-btn">
+                <span class="quick-action-icon">👥</span>
+                <span class="quick-action-text">Voir les Citoyens</span>
+            </a>
+            
+            <a href="Production par Heure.html" class="quick-action-btn">
+                <span class="quick-action-icon">⚡</span>
+                <span class="quick-action-text">Production</span>
+            </a>
+            
+            <a href="Collecter Impôts.html" class="quick-action-btn">
+                <span class="quick-action-icon">💰</span>
+                <span class="quick-action-text">Collecter Impôts</span>
+            </a>
+            
+            <a href="Recruter Soldats.html" class="quick-action-btn">
+                <span class="quick-action-icon">⚔️</span>
+                <span class="quick-action-text">Recruter Soldats</span>
+            </a>
+            
+            <a href="Organiser Festival.html" class="quick-action-btn">
+                <span class="quick-action-icon">🎭</span>
+                <span class="quick-action-text">Organiser Festival</span>
+            </a>
+        </div>
+    </main>
+
+    <script>
+        // Initialisation de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            initializePage();
+            
+            // Ajouter un log de bienvenue
+            setTimeout(() => {
+                if (window.addImperiumLog) {
+                    window.addImperiumLog('Bienvenue dans votre Cité Romaine !', 'success');
+                    window.addImperiumLog('Vos citoyens travaillent dur pour l\'empire', 'info');
+                }
+            }, 1000);
+        });
+
+        function initializePage() {
+            console.log('Ma Cité Romaine initialisée');
+            
+            // Simulation de mise à jour des statistiques
+            updateCityStats();
+            
+            // Mettre à jour les stats toutes les 30 secondes
+            setInterval(updateCityStats, 30000);
+        }
+
+        function updateCityStats() {
+            // Simulation de croissance de la population
+            const populationEl = document.getElementById('population-value');
+            if (populationEl) {
+                let currentPop = parseInt(populationEl.textContent.replace(',', ''));
+                currentPop += Math.floor(Math.random() * 5) + 1;
+                populationEl.textContent = currentPop.toLocaleString();
+                
+                // Animation de mise à jour
+                populationEl.style.color = '#22c55e';
+                setTimeout(() => {
+                    populationEl.style.color = 'var(--roman-marble)';
+                }, 1000);
+            }
+            
+            // Simulation de variation du bonheur
+            const happinessEl = document.getElementById('happiness-value');
+            if (happinessEl) {
+                let currentHappiness = parseInt(happinessEl.textContent.replace('%', ''));
+                const change = Math.floor(Math.random() * 3) - 1; // -1, 0, ou 1
+                currentHappiness = Math.max(0, Math.min(100, currentHappiness + change));
+                happinessEl.textContent = currentHappiness + '%';
+                
+                // Couleur selon le niveau de bonheur
+                if (currentHappiness >= 80) {
+                    happinessEl.style.color = '#22c55e';
+                } else if (currentHappiness >= 60) {
+                    happinessEl.style.color = '#f59e0b';
+                } else {
+                    happinessEl.style.color = '#dc2626';
+                }
+            }
+        }
+
+        // Particules d'ambiance
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
+            
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+    </script>
+</body>
+</html>
