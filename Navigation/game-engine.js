@@ -47,19 +47,19 @@ const FORMULAS = {
 
 // ===== CONFIGURATION DES RESSOURCES =====
 const RESOURCES_CONFIG = {
-    wood: { name: 'Bois', icon: '🪵', description: 'Bâtiments de base, navires, machines de siège' },
-    stone: { name: 'Pierre', icon: '🗿', description: 'Bâtiments avancés, fortifications' },
-    iron: { name: 'Fer', icon: '⚔️', description: 'Armement, armures, outils avancés' },
-    wine: { name: 'Vin', icon: '🍇', description: 'Bonheur, festivités' },
-    gold: { name: 'Or', icon: '💰', description: 'Entretien, commerce, espionnage' },
-    research: { name: 'Recherche', icon: '📚', description: 'Technologies et innovations' }
+    wood: { name: 'Lignum (Bois)', icon: '🌳', description: 'Bâtiments de base, navires, machines de siège' },
+    stone: { name: 'Lapis (Pierre)', icon: '🏔️', description: 'Bâtiments avancés, fortifications' },
+    iron: { name: 'Ferrum (Fer)', icon: '⚒️', description: 'Armement, armures, outils avancés' },
+    wine: { name: 'Vinum (Vin)', icon: '🍷', description: 'Bonheur, festivités, commerce de luxe' },
+    gold: { name: 'Aurum (Or)', icon: '🪙', description: 'Entretien, commerce, espionnage, corruption' },
+    research: { name: 'Scientia (Savoir)', icon: '📜', description: 'Technologies et innovations' }
 };
 
 // ===== CONFIGURATION COMPLÈTE DES BÂTIMENTS =====
 const BUILDINGS_CONFIG = {
     // Centre-ville
     forum: {
-        name: 'Forum', icon: '🏛️', category: 'center',
+        name: 'Forum Romanum', icon: '🏛️', category: 'center',
         description: 'Cœur administratif de la cité. Augmente la population maximale.',
         maxLevel: 20,
         costs: level => ({ stone: 100 * level * 1.5, gold: 50 * level * 1.2 }),
@@ -69,7 +69,7 @@ const BUILDINGS_CONFIG = {
     },
     
     warehouse: {
-        name: 'Entrepôt', icon: '📦', category: 'center',
+        name: 'Horrea (Entrepôts)', icon: '🏪', category: 'center',
         description: 'Stockage sécurisé des ressources. Protège contre le pillage.',
         maxLevel: 20,
         costs: level => ({ wood: 80 * level * 1.3, stone: 40 * level * 1.2 }),
@@ -79,7 +79,7 @@ const BUILDINGS_CONFIG = {
     },
     
     tavern: {
-        name: 'Taverne', icon: '🍺', category: 'center',
+        name: 'Taberna (Taverne)', icon: '🍷', category: 'center',
         description: 'Lieu de détente. Augmente le bonheur des citoyens.',
         maxLevel: 15,
         costs: level => ({ wood: 60 * level * 1.2, wine: 20 * level }),
@@ -89,7 +89,7 @@ const BUILDINGS_CONFIG = {
     },
     
     amphitheater: {
-        name: 'Amphithéâtre', icon: '🏟️', category: 'center',
+        name: 'Amphitheatrum', icon: '🏟️', category: 'center',
         description: 'Jeux et spectacles. Bonheur et événements culturels.',
         maxLevel: 10,
         costs: level => ({ stone: 200 * level * 1.8, gold: 100 * level * 1.5 }),
@@ -100,7 +100,7 @@ const BUILDINGS_CONFIG = {
     
     // Production
     lumbercamp: {
-        name: 'Camp de Bûcherons', icon: '🌲', category: 'production',
+        name: 'Silva (Forêt)', icon: '🌲', category: 'production',
         description: 'Exploitation forestière. Produit du bois.',
         maxLevel: 20,
         costs: level => ({ wood: 50 * level, gold: 25 * level }),
@@ -110,7 +110,7 @@ const BUILDINGS_CONFIG = {
     },
     
     quarry: {
-        name: 'Carrière', icon: '🪨', category: 'production',
+        name: 'Lapicidina (Carrière)', icon: '⛏️', category: 'production',
         description: 'Extraction de pierre. Produit de la pierre.',
         maxLevel: 20,
         costs: level => ({ wood: 40 * level, iron: 20 * level }),
@@ -140,7 +140,7 @@ const BUILDINGS_CONFIG = {
     },
     
     mint: {
-        name: 'Monnaie Impériale', icon: '💰', category: 'production',
+        name: 'Moneta (Monnaie)', icon: '🪙', category: 'production',
         description: 'Frappe de monnaies. Produit de l\'or.',
         maxLevel: 15,
         costs: level => ({ stone: 80 * level * 1.4, iron: 40 * level }),
@@ -151,7 +151,7 @@ const BUILDINGS_CONFIG = {
     
     // Recherche
     academy: {
-        name: 'Académie', icon: '📚', category: 'research',
+        name: 'Academia (Académie)', icon: '🎓', category: 'research',
         description: 'Centre de recherche. Débloque les technologies.',
         maxLevel: 15,
         costs: level => ({ stone: 150 * level * 1.6, gold: 100 * level * 1.4 }),
@@ -161,7 +161,7 @@ const BUILDINGS_CONFIG = {
     },
     
     library: {
-        name: 'Bibliothèque', icon: '📖', category: 'research',
+        name: 'Bibliotheca', icon: '📜', category: 'research',
         description: 'Conservation du savoir. Accélère la recherche.',
         maxLevel: 10,
         costs: level => ({ wood: 100 * level * 1.3, stone: 60 * level }),
@@ -172,7 +172,7 @@ const BUILDINGS_CONFIG = {
     
     // Militaire
     barracks: {
-        name: 'Caserne', icon: '⚔️', category: 'military',
+        name: 'Castra (Caserne)', icon: '🏺', category: 'military',
         description: 'Recrutement des légions terrestres.',
         maxLevel: 15,
         costs: level => ({ wood: 120 * level * 1.4, iron: 80 * level * 1.2 }),
@@ -305,7 +305,7 @@ const TECH_TREE = {
 const UNITS_CONFIG = {
     // Unités terrestres
     velites: {
-        name: 'Vélites', icon: '🏃', type: 'land',
+        name: 'Velites', icon: '🏃‍♂️', type: 'land',
         attack: 5, defense: 2, speed: 5,
         cost: { iron: 10, gold: 5 },
         recruitTime: 30, // 30 secondes
@@ -320,7 +320,7 @@ const UNITS_CONFIG = {
         requirements: { tech: 'phalanges' }
     },
     legionnaires: {
-        name: 'Légionnaires', icon: '⚔️', type: 'land',
+        name: 'Legionarii', icon: '🏛️', type: 'land',
         attack: 25, defense: 15, speed: 2,
         cost: { iron: 50, gold: 20 },
         recruitTime: 300, // 5 minutes
@@ -335,7 +335,7 @@ const UNITS_CONFIG = {
         description: 'Cavalerie rapide et mobile'
     },
     balistes: {
-        name: 'Balistes', icon: '🏹', type: 'siege',
+        name: 'Ballistae', icon: '🏹', type: 'siege',
         attack: 50, defense: 5, speed: 1,
         cost: { wood: 100, gold: 50 },
         recruitTime: 600, // 10 minutes
