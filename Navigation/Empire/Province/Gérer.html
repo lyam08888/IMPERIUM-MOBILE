@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Gérer la Province</title>
+    <meta name="description" content="Administrez et développez votre province romaine.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles et scripts communs -->
+    <link rel="stylesheet" href="../common-styles.css">
+    <script src="../common-navigation.js"></script>
+    <script src="../game-engine.js"></script>
+    <script src="../advanced-game-systems.js"></script>
+    <script src="../save-system.js"></script>
+    <script src="../ui-manager.js"></script>
+    <script src="../global-console.js"></script>
+
+    <style>
+        .province-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        .province-main {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .province-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .province-header {
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.2), rgba(124, 58, 237, 0.2));
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            border: 2px solid var(--border-gold);
+            margin-bottom: 1.5rem;
+        }
+
+        .province-name {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--gold-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .province-type {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .province-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border-gold);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--gold-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .buildings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .building-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .building-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--gold-light);
+        }
+
+        .building-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .building-icon {
+            font-size: 2.5rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            border-radius: 50%;
+            color: white;
+        }
+
+        .building-info {
+            flex: 1;
+        }
+
+        .building-name {
+            color: var(--gold-light);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .building-level {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .building-production {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-gold);
+        }
+
+        .production-item {
+            text-align: center;
+        }
+
+        .production-value {
+            color: var(--success-green);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .production-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .governors-section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .governor-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-gold);
+            margin-bottom: 1rem;
+        }
+
+        .governor-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--roman-red), var(--roman-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .governor-info {
+            flex: 1;
+        }
+
+        .governor-name {
+            color: var(--gold-light);
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .governor-role {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .governor-bonus {
+            color: var(--success-green);
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        .province-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border: none;
+            border-radius: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow-gold);
+        }
+
+        .action-btn.secondary {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+
+        .action-btn.secondary:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .action-btn.danger {
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+            border: 1px solid #dc2626;
+        }
+
+        .action-btn.danger:hover {
+            background: rgba(220, 38, 38, 0.3);
+        }
+
+        .events-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .event-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-icon {
+            font-size: 1.5rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        .event-content {
+            flex: 1;
+        }
+
+        .event-title {
+            color: var(--gold-light);
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .event-description {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .event-time {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+            transition: width 0.3s ease;
+        }
+
+        .taxes-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .tax-item {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .tax-value {
+            color: var(--gold-light);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .tax-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .province-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+            
+            .province-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particules d'arrière-plan -->
+    <div class="particles"></div>
+
+    <!-- INTERFACE PRINCIPALE DU JEU -->
+    <div class="imperium-ui">
+        <!-- HEADER -->
+        <header class="imperium-header">
+            <div class="header-content">
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display">
+                    <!-- Les ressources seront injectées ici par JS -->
+                </div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar">M</div>
+                    <div>
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPS PRINCIPAL -->
+        <div class="imperium-body">
+            <!-- BARRE LATERALE (Desktop) -->
+            <aside class="imperium-sidebar">
+                <!-- Navigation générée dynamiquement par common-navigation.js -->
+            </aside>
+
+            <!-- CONTENU PRINCIPAL -->
+            <main class="main-content">
+                <div class="view-container">
+                    <h2 class="view-title">Gérer la Province</h2>
+                    <div class="province-layout">
+                        <div class="province-main">
+                            <!-- En-tête de la province -->
+                            <div class="province-header">
+                                <div class="province-name">Provincia Romana</div>
+                                <div class="province-type">🏛️ Province Impériale</div>
+                                <div class="province-stats">
+                                    <div class="stat-card">
+                                        <div class="stat-value">12,450</div>
+                                        <div class="stat-label">Population</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-value">85%</div>
+                                        <div class="stat-label">Bonheur</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-value">3,250</div>
+                                        <div class="stat-label">Revenus/h</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-value">Level 8</div>
+                                        <div class="stat-label">Développement</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Gouverneurs -->
+                            <div class="province-section">
+                                <h3 class="section-title">👑 Gouverneurs Provinciaux</h3>
+                                <div class="governors-section">
+                                    <div class="governor-card">
+                                        <div class="governor-avatar">M</div>
+                                        <div class="governor-info">
+                                            <div class="governor-name">Marcus Tullius</div>
+                                            <div class="governor-role">Gouverneur Principal</div>
+                                            <div class="governor-bonus">+15% Production, +10% Bonheur</div>
+                                        </div>
+                                    </div>
+                                    <div class="governor-card">
+                                        <div class="governor-avatar">G</div>
+                                        <div class="governor-info">
+                                            <div class="governor-name">Gaius Maximus</div>
+                                            <div class="governor-role">Commandant Militaire</div>
+                                            <div class="governor-bonus">+20% Défense, +5% Recrutement</div>
+                                        </div>
+                                    </div>
+                                    <div class="governor-card">
+                                        <div class="governor-avatar">L</div>
+                                        <div class="governor-info">
+                                            <div class="governor-name">Lucius Mercator</div>
+                                            <div class="governor-role">Intendant Commercial</div>
+                                            <div class="governor-bonus">+25% Commerce, +10% Impôts</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bâtiments de la province -->
+                            <div class="province-section">
+                                <h3 class="section-title">🏛️ Infrastructures Provinciales</h3>
+                                <div class="buildings-grid">
+                                    <div class="building-card" onclick="manageBuilding('forum')">
+                                        <div class="building-header">
+                                            <div class="building-icon">🏛️</div>
+                                            <div class="building-info">
+                                                <div class="building-name">Forum Provincial</div>
+                                                <div class="building-level">Niveau 5</div>
+                                            </div>
+                                        </div>
+                                        <div class="building-production">
+                                            <div class="production-item">
+                                                <div class="production-value">+250</div>
+                                                <div class="production-label">Influence/h</div>
+                                            </div>
+                                            <div class="production-item">
+                                                <div class="production-value">+15%</div>
+                                                <div class="production-label">Bonheur</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="building-card" onclick="manageBuilding('aqueduct')">
+                                        <div class="building-header">
+                                            <div class="building-icon">🌊</div>
+                                            <div class="building-info">
+                                                <div class="building-name">Aqueduc</div>
+                                                <div class="building-level">Niveau 3</div>
+                                            </div>
+                                        </div>
+                                        <div class="building-production">
+                                            <div class="production-item">
+                                                <div class="production-value">+500</div>
+                                                <div class="production-label">Population Max</div>
+                                            </div>
+                                            <div class="production-item">
+                                                <div class="production-value">+10%</div>
+                                                <div class="production-label">Santé</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="building-card" onclick="manageBuilding('roads')">
+                                        <div class="building-header">
+                                            <div class="building-icon">🛣️</div>
+                                            <div class="building-info">
+                                                <div class="building-name">Réseau Routier</div>
+                                                <div class="building-level">Niveau 4</div>
+                                            </div>
+                                        </div>
+                                        <div class="building-production">
+                                            <div class="production-item">
+                                                <div class="production-value">+20%</div>
+                                                <div class="production-label">Commerce</div>
+                                            </div>
+                                            <div class="production-item">
+                                                <div class="production-value">+15%</div>
+                                                <div class="production-label">Mobilité</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="building-card" onclick="manageBuilding('granary')">
+                                        <div class="building-header">
+                                            <div class="building-icon">🌾</div>
+                                            <div class="building-info">
+                                                <div class="building-name">Greniers Publics</div>
+                                                <div class="building-level">Niveau 6</div>
+                                            </div>
+                                        </div>
+                                        <div class="building-production">
+                                            <div class="production-item">
+                                                <div class="production-value">+1000</div>
+                                                <div class="production-label">Stockage</div>
+                                            </div>
+                                            <div class="production-item">
+                                                <div class="production-value">+5%</div>
+                                                <div class="production-label">Sécurité</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panneau de contrôle -->
+                        <div class="province-panel">
+                            <!-- Collecte d'impôts -->
+                            <div class="panel-section">
+                                <h3 class="section-title">💰 Impôts Provinciaux</h3>
+                                <div class="taxes-section">
+                                    <div class="tax-item">
+                                        <div class="tax-value">2,450</div>
+                                        <div class="tax-label">Or collecté</div>
+                                    </div>
+                                    <div class="tax-item">
+                                        <div class="tax-value">85%</div>
+                                        <div class="tax-label">Taux de collecte</div>
+                                    </div>
+                                </div>
+                                <button class="action-btn" onclick="collectTaxes()">
+                                    💰 Collecter les Impôts
+                                </button>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 75%;"></div>
+                                </div>
+                                <small style="color: var(--text-muted);">Prochaine collecte dans 2h 15min</small>
+                            </div>
+
+                            <!-- Actions administratives -->
+                            <div class="panel-section">
+                                <h3 class="section-title">⚙️ Administration</h3>
+                                <button class="action-btn secondary" onclick="appointGovernor()">
+                                    👑 Nommer un Gouverneur
+                                </button>
+                                <button class="action-btn secondary" onclick="adjustTaxes()">
+                                    📊 Ajuster les Impôts
+                                </button>
+                                <button class="action-btn secondary" onclick="organizeEvent()">
+                                    🎭 Organiser un Événement
+                                </button>
+                                <button class="action-btn secondary" onclick="viewReports()">
+                                    📋 Rapports Détaillés
+                                </button>
+                            </div>
+
+                            <!-- Événements récents -->
+                            <div class="panel-section">
+                                <h3 class="section-title">📰 Événements Récents</h3>
+                                <div class="events-list">
+                                    <div class="event-item">
+                                        <div class="event-icon">💰</div>
+                                        <div class="event-content">
+                                            <div class="event-title">Impôts Collectés</div>
+                                            <div class="event-description">2,450 or collectés avec succès</div>
+                                            <div class="event-time">Il y a 2 heures</div>
+                                        </div>
+                                    </div>
+                                    <div class="event-item">
+                                        <div class="event-icon">🏛️</div>
+                                        <div class="event-content">
+                                            <div class="event-title">Forum Amélioré</div>
+                                            <div class="event-description">Le Forum a été amélioré au niveau 5</div>
+                                            <div class="event-time">Il y a 4 heures</div>
+                                        </div>
+                                    </div>
+                                    <div class="event-item">
+                                        <div class="event-icon">👑</div>
+                                        <div class="event-content">
+                                            <div class="event-title">Nouveau Gouverneur</div>
+                                            <div class="event-description">Lucius Mercator nommé Intendant</div>
+                                            <div class="event-time">Il y a 1 jour</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions d'urgence -->
+                            <div class="panel-section">
+                                <h3 class="section-title">🚨 Actions d'Urgence</h3>
+                                <button class="action-btn danger" onclick="declareEmergency()">
+                                    ⚠️ Déclarer l'État d'Urgence
+                                </button>
+                                <button class="action-btn danger" onclick="evacuateProvince()">
+                                    🏃 Évacuation d'Urgence
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page Gérer Province chargée');
+            initializeProvinceManagement();
+        });
+
+        function initializeProvinceManagement() {
+            // Simulation de données de province
+            updateProvinceStats();
+            startProvinceUpdates();
+        }
+
+        function updateProvinceStats() {
+            // Mise à jour des statistiques en temps réel
+            // Cette fonction serait connectée au moteur de jeu
+        }
+
+        function startProvinceUpdates() {
+            // Démarrer les mises à jour automatiques
+            setInterval(updateProvinceStats, 5000);
+        }
+
+        // Actions de gestion
+        function collectTaxes() {
+            alert('💰 Collecte des impôts en cours...\n\n+2,450 or ajoutés à votre trésor !\nBonheur de la population : -2%');
+        }
+
+        function manageBuilding(buildingType) {
+            const buildings = {
+                forum: 'Forum Provincial - Centre administratif de la province',
+                aqueduct: 'Aqueduc - Système d\'approvisionnement en eau',
+                roads: 'Réseau Routier - Infrastructure de transport',
+                granary: 'Greniers Publics - Stockage des ressources alimentaires'
+            };
+            
+            alert(`Gestion du bâtiment :\n\n${buildings[buildingType]}\n\nOptions :\n• Améliorer\n• Réparer\n• Voir détails`);
+        }
+
+        function appointGovernor() {
+            alert('👑 Nomination d\'un Gouverneur\n\nChoisissez parmi les candidats disponibles :\n\n• Quintus Fabius (Spécialiste Militaire)\n• Julia Mercatrix (Experte Commerce)\n• Titus Architectus (Maître Bâtisseur)');
+        }
+
+        function adjustTaxes() {
+            alert('📊 Ajustement des Impôts\n\nTaux actuel : 15%\n\nOptions :\n• Augmenter (+revenus, -bonheur)\n• Diminuer (-revenus, +bonheur)\n• Maintenir (équilibre)');
+        }
+
+        function organizeEvent() {
+            alert('🎭 Organisation d\'Événement\n\nÉvénements disponibles :\n\n• Jeux du Cirque (Coût: 1000 or, +20% bonheur)\n• Festival de Bacchus (Coût: 500 or, +10% bonheur)\n• Parade Militaire (Coût: 800 or, +15% moral)');
+        }
+
+        function viewReports() {
+            alert('📋 Rapports Détaillés\n\n• Rapport Économique\n• Rapport Démographique\n• Rapport Militaire\n• Rapport d\'Infrastructure\n• Analyse des Tendances');
+        }
+
+        function declareEmergency() {
+            if (confirm('⚠️ Êtes-vous sûr de vouloir déclarer l\'état d\'urgence ?\n\nCela mobilisera toutes les ressources mais coûtera cher.')) {
+                alert('🚨 État d\'urgence déclaré !\n\n• Toutes les productions accélérées\n• Coût : 5000 or\n• Durée : 24 heures');
+            }
+        }
+
+        function evacuateProvince() {
+            if (confirm('🏃 Évacuation d\'urgence ?\n\nCette action est irréversible et très coûteuse !')) {
+                alert('🚨 Évacuation en cours...\n\nLa population est mise en sécurité.\nLa province sera temporairement abandonnée.');
+            }
+        }
+    </script>
+</body>
+</html>

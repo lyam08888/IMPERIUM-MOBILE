@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Attaquer une Province</title>
+    <meta name="description" content="Lancez des attaques militaires contre les provinces ennemies.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles et scripts communs -->
+    <link rel="stylesheet" href="../common-styles.css">
+    <script src="../common-navigation.js"></script>
+    <script src="../game-engine.js"></script>
+    <script src="../advanced-game-systems.js"></script>
+    <script src="../save-system.js"></script>
+    <script src="../ui-manager.js"></script>
+    <script src="../global-console.js"></script>
+
+    <style>
+        .attack-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        .attack-main {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .attack-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .target-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .target-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .target-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border-color: var(--roman-red);
+        }
+
+        .target-card.selected {
+            border-color: var(--roman-red);
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        .target-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .target-flag {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--roman-red), var(--roman-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            border: 2px solid var(--gold-primary);
+        }
+
+        .target-info {
+            flex: 1;
+        }
+
+        .target-name {
+            color: var(--gold-light);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .target-ruler {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .target-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .target-stat {
+            text-align: center;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+        }
+
+        .stat-value {
+            color: var(--gold-light);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .difficulty-indicator {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .difficulty-easy {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid #22c55e;
+        }
+
+        .difficulty-medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid #f59e0b;
+        }
+
+        .difficulty-hard {
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+            border: 1px solid #dc2626;
+        }
+
+        .army-composition {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .unit-selector {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+        }
+
+        .unit-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .unit-icon {
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--roman-red), var(--roman-purple));
+            border-radius: 50%;
+            color: white;
+        }
+
+        .unit-info {
+            flex: 1;
+        }
+
+        .unit-name {
+            color: var(--gold-light);
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .unit-available {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .unit-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .unit-input {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            padding: 0.8rem;
+            color: var(--text-light);
+            font-family: 'Times New Roman', serif;
+            text-align: center;
+        }
+
+        .unit-input:focus {
+            border-color: var(--gold-light);
+            outline: none;
+        }
+
+        .unit-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(217, 119, 6, 0.2);
+            color: var(--gold-primary);
+            border: 1px solid var(--gold-primary);
+            border-radius: 0.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .unit-btn:hover {
+            background: rgba(217, 119, 6, 0.3);
+        }
+
+        .battle-preview {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .preview-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .army-stats {
+            text-align: center;
+        }
+
+        .army-title {
+            color: var(--gold-primary);
+            font-weight: bold;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .army-power {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .army-power.attacker {
+            color: var(--roman-red);
+        }
+
+        .army-power.defender {
+            color: var(--roman-purple);
+        }
+
+        .victory-chance {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .chance-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .chance-high {
+            color: var(--success-green);
+        }
+
+        .chance-medium {
+            color: #f59e0b;
+        }
+
+        .chance-low {
+            color: var(--roman-red);
+        }
+
+        .attack-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .attack-btn {
+            width: 100%;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--roman-red), #b91c1c);
+            color: white;
+            border: none;
+            border-radius: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .attack-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+        }
+
+        .attack-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .quick-btn {
+            padding: 0.8rem;
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--text-light);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--gold-light);
+            background: rgba(217, 119, 6, 0.1);
+        }
+
+        .ongoing-attacks {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .attack-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .attack-icon {
+            font-size: 1.5rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        .attack-info {
+            flex: 1;
+        }
+
+        .attack-target {
+            color: var(--gold-light);
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .attack-progress {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .attack-eta {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--roman-red), #dc2626);
+            transition: width 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .attack-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particules d'arrière-plan -->
+    <div class="particles"></div>
+
+    <!-- INTERFACE PRINCIPALE DU JEU -->
+    <div class="imperium-ui">
+        <!-- HEADER -->
+        <header class="imperium-header">
+            <div class="header-content">
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display">
+                    <!-- Les ressources seront injectées ici par JS -->
+                </div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar">M</div>
+                    <div>
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPS PRINCIPAL -->
+        <div class="imperium-body">
+            <!-- BARRE LATERALE (Desktop) -->
+            <aside class="imperium-sidebar">
+                <!-- Navigation générée dynamiquement par common-navigation.js -->
+            </aside>
+
+            <!-- CONTENU PRINCIPAL -->
+            <main class="main-content">
+                <div class="view-container">
+                    <h2 class="view-title">⚔️ Attaquer une Province</h2>
+                    <div class="attack-layout">
+                        <div class="attack-main">
+                            <!-- Sélection de la cible -->
+                            <div class="attack-section">
+                                <h3 class="section-title">🎯 Sélectionner une Cible</h3>
+                                <div class="target-selection">
+                                    <div class="target-card" onclick="selectTarget(1)">
+                                        <div class="difficulty-indicator difficulty-easy">Facile</div>
+                                        <div class="target-header">
+                                            <div class="target-flag">B</div>
+                                            <div class="target-info">
+                                                <div class="target-name">Barbares du Nord</div>
+                                                <div class="target-ruler">Chef Brutus</div>
+                                            </div>
+                                        </div>
+                                        <div class="target-stats">
+                                            <div class="target-stat">
+                                                <div class="stat-value">1,200</div>
+                                                <div class="stat-label">Soldats</div>
+                                            </div>
+                                            <div class="target-stat">
+                                                <div class="stat-value">2,500</div>
+                                                <div class="stat-label">Puissance</div>
+                                            </div>
+                                            <div class="target-stat">
+                                                <div class="stat-value">3,200</div>
+                                                <div class="stat-label">Richesses</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="target-card" onclick="selectTarget(2)">
+                                        <div class="difficulty-indicator difficulty-medium">Moyen</div>
+                                        <div class="target-header">
+                                            <div class="target-flag">G</div>
+                                            <div class="target-info">
+                                                <div class="target-name">Tribus Gauloises</div>
+                                                <div class="target-ruler">Vercingétorix</div>
+                                            </div>
+                                        </div>
+                                        <div class="target-stats">
+                                            <div class="target-stat">
+                                                <div class="stat-value">2,800</div>
+                                                <div class="stat-label">Soldats</div>
+                                            </div>
+                                            <div class="target-stat">
+                                                <div class="stat-value">4,200</div>
+                                                <div class="stat-label">Puissance</div>
+                                            </div>
+                                            <div class="target-stat">
+                                                <div class="stat-value">6,500</div>
+                                                <div class="stat-label">Richesses</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="target-card" onclick="selectTarget(3)">
+                                        <div class="difficulty-indicator difficulty-hard">Difficile</div>
+                                        <div class="target-header">
+                                            <div class="target-flag">C</div>
+                                            <div class="target-info">
+                                                <div class="target-name">Carthage</div>
+                                                <div class="target-ruler">Hannibal Barca</div>
+                                            </div>
+                                        </div>
+                                        <div class="target-stats">
+                                            <div class="target-stat">
+                                                <div class="stat-value">5,500</div>
+                                                <div class="stat-label">Soldats</div>
+                                            </div>
+                                            <div class="target-stat">
+                                                <div class="stat-value">8,900</div>
+                                                <div class="stat-label">Puissance</div>
+                                            </div>
+                                            <div class="target-stat">
+                                                <div class="stat-value">12,000</div>
+                                                <div class="stat-label">Richesses</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Composition de l'armée -->
+                            <div class="attack-section">
+                                <h3 class="section-title">🏛️ Composer votre Armée</h3>
+                                <div class="army-composition">
+                                    <div class="unit-selector">
+                                        <div class="unit-header">
+                                            <div class="unit-icon">⚔️</div>
+                                            <div class="unit-info">
+                                                <div class="unit-name">Légionnaires</div>
+                                                <div class="unit-available">Disponibles: 1,500</div>
+                                            </div>
+                                        </div>
+                                        <div class="unit-controls">
+                                            <button class="unit-btn" onclick="adjustUnits('legionnaires', -100)">-100</button>
+                                            <input type="number" class="unit-input" id="legionnaires" value="0" min="0" max="1500">
+                                            <button class="unit-btn" onclick="adjustUnits('legionnaires', 100)">+100</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="unit-selector">
+                                        <div class="unit-header">
+                                            <div class="unit-icon">🏹</div>
+                                            <div class="unit-info">
+                                                <div class="unit-name">Archers</div>
+                                                <div class="unit-available">Disponibles: 800</div>
+                                            </div>
+                                        </div>
+                                        <div class="unit-controls">
+                                            <button class="unit-btn" onclick="adjustUnits('archers', -50)">-50</button>
+                                            <input type="number" class="unit-input" id="archers" value="0" min="0" max="800">
+                                            <button class="unit-btn" onclick="adjustUnits('archers', 50)">+50</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="unit-selector">
+                                        <div class="unit-header">
+                                            <div class="unit-icon">🐎</div>
+                                            <div class="unit-info">
+                                                <div class="unit-name">Cavalerie</div>
+                                                <div class="unit-available">Disponibles: 300</div>
+                                            </div>
+                                        </div>
+                                        <div class="unit-controls">
+                                            <button class="unit-btn" onclick="adjustUnits('cavalry', -25)">-25</button>
+                                            <input type="number" class="unit-input" id="cavalry" value="0" min="0" max="300">
+                                            <button class="unit-btn" onclick="adjustUnits('cavalry', 25)">+25</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="unit-selector">
+                                        <div class="unit-header">
+                                            <div class="unit-icon">🏰</div>
+                                            <div class="unit-info">
+                                                <div class="unit-name">Machines de Siège</div>
+                                                <div class="unit-available">Disponibles: 50</div>
+                                            </div>
+                                        </div>
+                                        <div class="unit-controls">
+                                            <button class="unit-btn" onclick="adjustUnits('siege', -5)">-5</button>
+                                            <input type="number" class="unit-input" id="siege" value="0" min="0" max="50">
+                                            <button class="unit-btn" onclick="adjustUnits('siege', 5)">+5</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Aperçu de la bataille -->
+                                <div class="battle-preview" id="battle-preview" style="display: none;">
+                                    <h4 style="color: var(--gold-primary); text-align: center; margin-bottom: 1rem;">Aperçu de la Bataille</h4>
+                                    <div class="preview-stats">
+                                        <div class="army-stats">
+                                            <div class="army-title">Votre Armée</div>
+                                            <div class="army-power attacker" id="attacker-power">0</div>
+                                            <div style="color: var(--text-muted); font-size: 0.9rem;">Puissance d'Attaque</div>
+                                        </div>
+                                        <div class="army-stats">
+                                            <div class="army-title">Défenseur</div>
+                                            <div class="army-power defender" id="defender-power">0</div>
+                                            <div style="color: var(--text-muted); font-size: 0.9rem;">Puissance de Défense</div>
+                                        </div>
+                                    </div>
+                                    <div class="victory-chance">
+                                        <div class="chance-value" id="victory-chance">0%</div>
+                                        <div style="color: var(--text-muted);">Chances de Victoire</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panneau d'attaque -->
+                        <div class="attack-panel">
+                            <!-- Lancer l'attaque -->
+                            <div class="panel-section">
+                                <h3 class="section-title">⚔️ Lancer l'Attaque</h3>
+                                <button class="attack-btn" id="launch-attack-btn" onclick="launchAttack()" disabled>
+                                    ⚔️ ATTAQUER !
+                                </button>
+                                <div style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">
+                                    Sélectionnez une cible et composez votre armée
+                                </div>
+                            </div>
+
+                            <!-- Actions rapides -->
+                            <div class="panel-section">
+                                <h3 class="section-title">⚡ Actions Rapides</h3>
+                                <div class="quick-actions">
+                                    <button class="quick-btn" onclick="selectAllUnits()">Toute l'Armée</button>
+                                    <button class="quick-btn" onclick="clearArmy()">Vider</button>
+                                    <button class="quick-btn" onclick="balancedArmy()">Équilibrée</button>
+                                    <button class="quick-btn" onclick="eliteArmy()">Élite</button>
+                                </div>
+                            </div>
+
+                            <!-- Attaques en cours -->
+                            <div class="panel-section">
+                                <h3 class="section-title">🏃 Attaques en Cours</h3>
+                                <div class="ongoing-attacks">
+                                    <div class="attack-item">
+                                        <div class="attack-icon">⚔️</div>
+                                        <div class="attack-info">
+                                            <div class="attack-target">Barbares du Nord</div>
+                                            <div class="attack-progress">En route vers la cible</div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 65%;"></div>
+                                            </div>
+                                            <div class="attack-eta">Arrivée dans 1h 25min</div>
+                                        </div>
+                                    </div>
+                                    <div class="attack-item">
+                                        <div class="attack-icon">🏹</div>
+                                        <div class="attack-info">
+                                            <div class="attack-target">Village Gaulois</div>
+                                            <div class="attack-progress">Bataille en cours</div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 90%;"></div>
+                                            </div>
+                                            <div class="attack-eta">Résultat dans 15min</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stratégies recommandées -->
+                            <div class="panel-section">
+                                <h3 class="section-title">📋 Conseils Stratégiques</h3>
+                                <div style="color: var(--text-light); font-size: 0.9rem; line-height: 1.5;">
+                                    <p><strong>🏹 Contre les Barbares :</strong> Utilisez beaucoup d'archers</p>
+                                    <p><strong>🐎 Contre les Gaulois :</strong> La cavalerie est efficace</p>
+                                    <p><strong>🏰 Contre les Cités :</strong> Machines de siège nécessaires</p>
+                                    <p><strong>⚔️ Conseil :</strong> Équilibrez vos forces selon l'ennemi</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        let selectedTarget = null;
+        let currentArmy = {
+            legionnaires: 0,
+            archers: 0,
+            cavalry: 0,
+            siege: 0
+        };
+
+        const targets = {
+            1: { name: 'Barbares du Nord', power: 2500, difficulty: 'easy' },
+            2: { name: 'Tribus Gauloises', power: 4200, difficulty: 'medium' },
+            3: { name: 'Carthage', power: 8900, difficulty: 'hard' }
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page Attaquer Province chargée');
+            initializeAttackInterface();
+        });
+
+        function initializeAttackInterface() {
+            // Ajouter des écouteurs d'événements aux inputs
+            ['legionnaires', 'archers', 'cavalry', 'siege'].forEach(unit => {
+                const input = document.getElementById(unit);
+                input.addEventListener('input', () => updateArmy(unit, parseInt(input.value) || 0));
+            });
+        }
+
+        function selectTarget(targetId) {
+            // Désélectionner l'ancienne cible
+            document.querySelectorAll('.target-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Sélectionner la nouvelle cible
+            event.currentTarget.classList.add('selected');
+            selectedTarget = targetId;
+            
+            updateBattlePreview();
+            updateAttackButton();
+        }
+
+        function adjustUnits(unitType, amount) {
+            const input = document.getElementById(unitType);
+            const currentValue = parseInt(input.value) || 0;
+            const maxValue = parseInt(input.max);
+            const newValue = Math.max(0, Math.min(maxValue, currentValue + amount));
+            
+            input.value = newValue;
+            updateArmy(unitType, newValue);
+        }
+
+        function updateArmy(unitType, count) {
+            currentArmy[unitType] = count;
+            updateBattlePreview();
+            updateAttackButton();
+        }
+
+        function updateBattlePreview() {
+            if (!selectedTarget) {
+                document.getElementById('battle-preview').style.display = 'none';
+                return;
+            }
+
+            const preview = document.getElementById('battle-preview');
+            preview.style.display = 'block';
+
+            // Calculer la puissance d'attaque
+            const attackPower = 
+                currentArmy.legionnaires * 10 +
+                currentArmy.archers * 8 +
+                currentArmy.cavalry * 15 +
+                currentArmy.siege * 25;
+
+            const defenderPower = targets[selectedTarget].power;
+
+            // Calculer les chances de victoire
+            const ratio = attackPower / defenderPower;
+            let victoryChance = Math.min(95, Math.max(5, Math.round(ratio * 50)));
+
+            // Mettre à jour l'affichage
+            document.getElementById('attacker-power').textContent = attackPower.toLocaleString();
+            document.getElementById('defender-power').textContent = defenderPower.toLocaleString();
+            
+            const chanceElement = document.getElementById('victory-chance');
+            chanceElement.textContent = victoryChance + '%';
+            
+            // Couleur selon les chances
+            chanceElement.className = 'chance-value';
+            if (victoryChance >= 70) {
+                chanceElement.classList.add('chance-high');
+            } else if (victoryChance >= 40) {
+                chanceElement.classList.add('chance-medium');
+            } else {
+                chanceElement.classList.add('chance-low');
+            }
+        }
+
+        function updateAttackButton() {
+            const btn = document.getElementById('launch-attack-btn');
+            const hasTarget = selectedTarget !== null;
+            const hasArmy = Object.values(currentArmy).some(count => count > 0);
+            
+            btn.disabled = !(hasTarget && hasArmy);
+            
+            if (btn.disabled) {
+                btn.textContent = hasTarget ? 'Sélectionnez des unités' : 'Sélectionnez une cible';
+            } else {
+                btn.textContent = '⚔️ ATTAQUER !';
+            }
+        }
+
+        function selectAllUnits() {
+            document.getElementById('legionnaires').value = 1500;
+            document.getElementById('archers').value = 800;
+            document.getElementById('cavalry').value = 300;
+            document.getElementById('siege').value = 50;
+            
+            currentArmy = { legionnaires: 1500, archers: 800, cavalry: 300, siege: 50 };
+            updateBattlePreview();
+            updateAttackButton();
+        }
+
+        function clearArmy() {
+            ['legionnaires', 'archers', 'cavalry', 'siege'].forEach(unit => {
+                document.getElementById(unit).value = 0;
+                currentArmy[unit] = 0;
+            });
+            updateBattlePreview();
+            updateAttackButton();
+        }
+
+        function balancedArmy() {
+            document.getElementById('legionnaires').value = 600;
+            document.getElementById('archers').value = 300;
+            document.getElementById('cavalry').value = 100;
+            document.getElementById('siege').value = 20;
+            
+            currentArmy = { legionnaires: 600, archers: 300, cavalry: 100, siege: 20 };
+            updateBattlePreview();
+            updateAttackButton();
+        }
+
+        function eliteArmy() {
+            document.getElementById('legionnaires').value = 300;
+            document.getElementById('archers').value = 200;
+            document.getElementById('cavalry').value = 150;
+            document.getElementById('siege').value = 30;
+            
+            currentArmy = { legionnaires: 300, archers: 200, cavalry: 150, siege: 30 };
+            updateBattlePreview();
+            updateAttackButton();
+        }
+
+        function launchAttack() {
+            if (!selectedTarget || Object.values(currentArmy).every(count => count === 0)) {
+                return;
+            }
+
+            const target = targets[selectedTarget];
+            const totalUnits = Object.values(currentArmy).reduce((sum, count) => sum + count, 0);
+            
+            const confirmMessage = `⚔️ Confirmer l'attaque ?\n\nCible: ${target.name}\nTroupes: ${totalUnits} unités\nDifficulté: ${target.difficulty}\n\nL'attaque prendra environ 2-4 heures.`;
+            
+            if (confirm(confirmMessage)) {
+                alert(`🏃 Attaque lancée !\n\nVos troupes marchent vers ${target.name}.\nVous recevrez un rapport de bataille à leur arrivée.\n\nBonne chance, Général !`);
+                
+                // Réinitialiser l'interface
+                clearArmy();
+                selectedTarget = null;
+                document.querySelectorAll('.target-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                updateBattlePreview();
+                updateAttackButton();
+            }
+        }
+    </script>
+</body>
+</html>
