@@ -247,55 +247,21 @@
         };
 
         // ===============================================================
-        // SCRIPT DE NAVIGATION ET UI GLOBALE
+        // Les fonctions de navigation sont maintenant fournies par common-navigation.js
         // ===============================================================
-        const NAVIGATION_CONFIG = {
-            'index':      { title: 'Accueil', file: 'index.html', section: 'Empire', icon: '🏛️' },
-            'cite':       { title: 'Ma Cité', file: 'Empire/Cite.html', section: 'Empire', icon: '🏘️' },
-            'monde':      { title: 'Monde', file: 'Empire/Monde.html', section: 'Empire', icon: '🌍' },
-            'province':   { title: 'Province', file: 'Empire/Province.html', section: 'Empire', icon: '🏝️' },
-            'academie':   { title: 'Académie', file: 'Developpement/Academie.html', section: 'Développement', icon: '📚' },
-            'commerce':   { title: 'Commerce', file: 'Developpement/Commerce.html', section: 'Développement', icon: '⚖️' },
-            'legions':    { title: 'Légions', file: 'Militaire/Légions.html', section: 'Militaire', icon: '⚔️' },
-            'flotte':     { title: 'Flotte', file: 'Militaire/Flotte.html', section: 'Militaire', icon: '🚢' },
-            'simulateur': { title: 'Simulateur', file: 'Militaire/Simulateur.html', section: 'Militaire', icon: '💥' },
-            'diplomatie': { title: 'Diplomatie', file: 'Social/Diplomatie.html', section: 'Social', icon: '🤝' },
-            'alliance':   { title: 'Alliance', file: 'Social/Alliance.html', section: 'Social', icon: '🛡️' },
-            'messages':   { title: 'Messages', file: 'Social/Messsages.html', section: 'Social', icon: '✉️' },
-            'premium':    { title: 'Premium', file: 'Premium/Premium.html', section: 'Premium', icon: '👑' }
-        };
         
         function initializeGlobalUI() {
-            const sidebar = document.querySelector('.imperium-sidebar');
-            if (sidebar) sidebar.innerHTML = generateNavigationHTML();
+            // La navigation est maintenant gérée par common-navigation.js via initializeNavigation()
+            // On met juste à jour les informations spécifiques à cette page
             
-            const currentPage = 'academie';
-            document.querySelectorAll('.nav-item a').forEach(link => {
-                link.classList.toggle('active', link.getAttribute('data-page') === currentPage);
-            });
+            const playerName = document.querySelector('.player-name');
+            const playerLevel = document.querySelector('.player-level');
+            const playerAvatar = document.querySelector('.player-avatar');
 
-            document.querySelector('.player-name').textContent = 'Marcus Aurelius';
-            document.querySelector('.player-level').textContent = 'Consul - Niv. 12';
-            document.querySelector('.player-avatar').textContent = 'M';
+            if (playerName) playerName.textContent = 'Marcus Aurelius';
+            if (playerLevel) playerLevel.textContent = 'Consul - Niv. 12';
+            if (playerAvatar) playerAvatar.textContent = 'M';
             updateResourcesDisplay();
-        }
-
-        function generateNavigationHTML() {
-            const sections = {};
-            Object.entries(NAVIGATION_CONFIG).forEach(([key, conf]) => {
-                if (key === 'index') return;
-                if (!sections[conf.section]) sections[conf.section] = [];
-                sections[conf.section].push({ key, ...conf });
-            });
-            let html = '';
-            Object.entries(sections).forEach(([sectionName, pages]) => {
-                html += `<div class="nav-section"><h2 class="nav-title">${sectionName}</h2><ul class="nav-list">`;
-                pages.forEach(page => {
-                    html += `<li class="nav-item"><a href="#" data-page="${page.key}"><span class="nav-icon">${page.icon}</span> ${page.title}</a></li>`;
-                });
-                html += `</ul></div>`;
-            });
-            return html;
         }
 
         function updateResourcesDisplay() {

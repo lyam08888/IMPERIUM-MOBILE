@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -7,6 +7,9 @@
     <meta name="description" content="Simulez vos batailles avant de lancer vos attaques dans IMPERIUM.">
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+    
+    <!-- Scripts de navigation communs -->
+    <script src="../common-navigation.js"></script>
 
     <style>
         /* =============================================================== */
@@ -516,11 +519,7 @@
             return html;
         }
         
-        function navigateTo(pageKey) {
-            const config = NAVIGATION_CONFIG[pageKey];
-            console.log(`Navigation vers : ${config.title} (${config.file})`);
-            alert(`Simulation de navigation vers : ${config.title}`);
-        }
+        // La fonction navigateTo est maintenant fournie par common-navigation.js
 
         function initializeGlobalUI() {
             document.querySelector('.imperium-sidebar').innerHTML = generateNavigationHTML();
