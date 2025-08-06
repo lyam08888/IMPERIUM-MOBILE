@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -8,131 +8,330 @@
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
 
-    <!-- Styles et scripts communs -->
-    <link rel="stylesheet" href="../common-styles.css">
-    <script src="../common-navigation.js"></script>
-    <script src="../game-engine.js"></script>
-    <script src="../advanced-game-systems.js"></script>
-    <script src="../save-system.js"></script>
-    <script src="../ui-manager.js"></script>
-    <script src="../global-console.js"></script>
-
     <style>
-        /* Styles spécifiques au simulateur */
+        /* =============================================================== */
+        /* STYLES COMMUNS DE L'APPLICATION (common-style.css)            */
+        /* =============================================================== */
+        :root {
+            --gold-primary: #d97706;
+            --gold-secondary: #f59e0b;
+            --gold-light: #fbbf24;
+            --marble-white: #f8fafc;
+            --roman-red: #dc2626;
+            --roman-purple: #7c3aed;
+            --dark-stone: #1e293b;
+            --dark-marble: #334155;
+            --dark-bg: #0f172a;
+            --text-light: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-gold: rgba(217, 119, 6, 0.3);
+            --shadow-gold: rgba(217, 119, 6, 0.4);
+            --success-green: #22c55e;
+            --storage-full-red: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(217, 119, 6, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-stone) 100%);
+            color: var(--text-light);
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: var(--gold-light);
+            border-radius: 50%;
+            animation: float 8s infinite linear;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        .imperium-ui {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+
+        .imperium-header {
+            background: linear-gradient(135deg, var(--dark-marble) 0%, var(--dark-stone) 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--border-gold);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .imperium-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .imperium-logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 10px var(--shadow-gold));
+        }
+
+        .resources-display {
+            display: flex;
+            gap: 1.5rem;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 0.75rem 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            font-size: 1rem;
+            position: relative;
+        }
+
+        .resource-icon {
+            font-size: 1.2rem;
+            filter: drop-shadow(0 0 5px var(--shadow-gold));
+        }
+
+        .resource-value {
+            color: var(--gold-light);
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--roman-red), var(--roman-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 2px solid var(--gold-primary);
+        }
+
+        .player-details {
+            font-size: 0.9rem;
+        }
+
+        .player-name {
+            color: var(--gold-light);
+            font-weight: bold;
+        }
+
+        .player-level {
+            color: var(--text-muted);
+        }
+
+        .imperium-body {
+            display: flex;
+            flex-grow: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            gap: 1.5rem;
+            padding: 1.5rem 2rem;
+            overflow: hidden;
+        }
+
+        .imperium-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            overflow-y: auto;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-title {
+            color: var(--gold-primary);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item a:hover, .nav-item a.active {
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.2), rgba(245, 158, 11, 0.1));
+            border-color: var(--gold-primary);
+            transform: translateX(5px);
+            color: var(--gold-light);
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .view-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            overflow-y: auto;
+            padding: 2rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .view-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--gold-primary);
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* =============================================================== */
+        /* STYLES SPÉCIFIQUES AU SIMULATEUR                              */
+        /* =============================================================== */
         .simulator-layout {
-            display: grid;
-            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 2rem;
         }
 
         .battle-setup {
             display: grid;
-            grid-template-columns: 1fr auto 1fr;
+            grid-template-columns: 1fr;
             gap: 2rem;
             align-items: start;
+        }
+
+        @media (min-width: 1200px) {
+            .battle-setup {
+                grid-template-columns: 1fr auto 1fr;
+            }
         }
 
         .army-setup {
             background: rgba(15, 23, 42, 0.8);
             border-radius: 1rem;
             border: 2px solid var(--border-gold);
-            padding: 2rem;
+            padding: 1.5rem;
         }
 
-        .army-setup.attacker {
-            border-color: #dc2626;
-        }
-
-        .army-setup.defender {
-            border-color: #16a34a;
-        }
+        .army-setup.attacker { border-color: var(--roman-red); }
+        .army-setup.defender { border-color: var(--success-green); }
 
         .army-title {
-            color: var(--gold-primary);
             font-size: 1.5rem;
             font-weight: bold;
             margin-bottom: 1.5rem;
             text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
         }
-
-        .army-title.attacker {
-            color: #dc2626;
-        }
-
-        .army-title.defender {
-            color: #16a34a;
-        }
+        .army-title.attacker { color: var(--roman-red); }
+        .army-title.defender { color: var(--success-green); }
 
         .unit-selection {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 1rem;
-            margin-bottom: 2rem;
         }
 
         .unit-selector {
             background: rgba(30, 41, 59, 0.6);
             border-radius: 0.8rem;
             border: 1px solid var(--border-gold);
-            padding: 1.5rem;
+            padding: 1rem;
             text-align: center;
         }
-
-        .unit-selector:hover {
-            border-color: var(--gold-light);
-            transform: translateY(-2px);
-        }
-
-        .unit-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        .unit-name {
-            color: var(--gold-light);
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .unit-stats {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-            line-height: 1.4;
-        }
-
-        .unit-input-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
+        
+        .unit-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .unit-name { color: var(--gold-light); font-weight: bold; margin-bottom: 0.5rem; }
         .unit-input {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.3);
+            width: 100%;
+            background: rgba(0,0,0,0.3);
             border: 1px solid var(--border-gold);
-            border-radius: 0.3rem;
-            padding: 0.5rem;
             color: var(--text-light);
             text-align: center;
-            font-weight: bold;
-        }
-
-        .unit-input:focus {
-            border-color: var(--gold-light);
-            outline: none;
-        }
-
-        .unit-available {
-            color: var(--text-muted);
-            font-size: 0.8rem;
+            padding: 0.5rem;
+            border-radius: 0.3rem;
         }
 
         .vs-section {
@@ -140,74 +339,27 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2rem;
+            gap: 1rem;
+            padding: 1rem 0;
         }
 
         .vs-icon {
-            font-size: 4rem;
+            font-size: 3rem;
             color: var(--gold-primary);
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
         .simulate-btn {
-            padding: 1.5rem 3rem;
+            padding: 1rem 2rem;
             background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
             color: white;
             border: none;
             border-radius: 1rem;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-family: 'Times New Roman', serif;
-            box-shadow: 0 5px 15px var(--shadow-gold);
         }
-
-        .simulate-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px var(--shadow-gold);
-        }
-
-        .simulate-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .army-summary {
-            background: rgba(30, 41, 59, 0.6);
-            border-radius: 0.8rem;
-            border: 1px solid var(--border-gold);
-            padding: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .summary-title {
-            color: var(--gold-light);
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .summary-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .summary-stat {
-            text-align: center;
-        }
-
-        .summary-stat-value {
-            color: var(--gold-primary);
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .summary-stat-label {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-        }
+        .simulate-btn:hover { transform: translateY(-3px); }
 
         .battle-result {
             background: rgba(15, 23, 42, 0.9);
@@ -215,221 +367,58 @@
             border: 2px solid var(--gold-primary);
             padding: 2rem;
             margin-top: 2rem;
-            display: none;
+            display: none; /* Caché par défaut */
         }
+        .battle-result.show { display: block; animation: slideInUp 0.5s ease; }
+        .battle-result.victory { border-color: var(--success-green); }
+        .battle-result.defeat { border-color: var(--roman-red); }
 
-        .battle-result.show {
-            display: block;
-            animation: slideInUp 0.5s ease;
-        }
-
-        .battle-result.victory {
-            border-color: #22c55e;
-            background: rgba(34, 197, 94, 0.1);
-        }
-
-        .battle-result.defeat {
-            border-color: #dc2626;
-            background: rgba(220, 38, 38, 0.1);
-        }
-
-        .result-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .result-title {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .result-title.victory {
-            color: #22c55e;
-        }
-
-        .result-title.defeat {
-            color: #dc2626;
-        }
-
-        .result-subtitle {
-            color: var(--text-light);
-            font-size: 1.1rem;
-        }
+        .result-header { text-align: center; margin-bottom: 2rem; }
+        .result-title { font-size: 2rem; font-weight: bold; }
+        .result-title.victory { color: var(--success-green); }
+        .result-title.defeat { color: var(--roman-red); }
 
         .result-details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
         }
+        @media (min-width: 768px) { .result-details { grid-template-columns: 1fr 1fr; } }
 
-        .result-section {
-            background: rgba(30, 41, 59, 0.6);
-            border-radius: 0.8rem;
-            border: 1px solid var(--border-gold);
-            padding: 1.5rem;
-        }
-
-        .result-section-title {
-            color: var(--gold-primary);
-            font-weight: bold;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .losses-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .loss-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 0.3rem;
-        }
-
-        .loss-unit {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .loss-count {
-            color: #dc2626;
-            font-weight: bold;
-        }
-
-        .loot-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .loot-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem;
-            background: rgba(34, 197, 94, 0.1);
-            border-radius: 0.3rem;
-            border: 1px solid #22c55e;
-        }
-
-        .loot-resource {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .loot-amount {
-            color: #22c55e;
-            font-weight: bold;
-        }
+        .result-section-title { color: var(--gold-primary); font-weight: bold; margin-bottom: 1rem; }
+        .losses-list, .loot-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .loss-item, .loot-item { display: flex; justify-content: space-between; padding: 0.5rem; background: rgba(0,0,0,0.2); border-radius: 0.3rem; }
+        .loss-count { color: var(--roman-red); font-weight: bold; }
+        .loot-amount { color: var(--success-green); font-weight: bold; }
 
         .battle-report {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0,0,0,0.3);
             border-radius: 0.5rem;
-            padding: 1.5rem;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: var(--text-light);
-            white-space: pre-line;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .defender-settings {
+            padding: 1rem;
             margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-gold);
-        }
-
-        .settings-title {
-            color: var(--gold-light);
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .setting-label {
-            color: var(--text-light);
-        }
-
-        .setting-input {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-gold);
-            border-radius: 0.3rem;
-            padding: 0.5rem;
-            color: var(--text-light);
-            width: 80px;
-            text-align: center;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: monospace;
         }
 
         @keyframes slideInUp {
-            from {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .battle-setup {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            .vs-section {
-                order: -1;
-                flex-direction: row;
-                gap: 1rem;
-            }
-            
-            .vs-icon {
-                font-size: 2rem;
-            }
-            
-            .simulate-btn {
-                padding: 1rem 2rem;
-                font-size: 1.1rem;
-            }
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <!-- Particules d'arrière-plan -->
     <div class="particles"></div>
 
-    <!-- INTERFACE PRINCIPALE DU JEU -->
     <div class="imperium-ui">
-        <!-- HEADER -->
         <header class="imperium-header">
             <div class="header-content">
                 <h1 class="imperium-logo">IMPERIUM</h1>
-                <div id="resources-display" class="resources-display">
-                    <!-- Les ressources seront injectées ici par JS -->
-                </div>
+                <div id="resources-display" class="resources-display"></div>
                 <div class="player-info">
-                    <div class="player-avatar" id="player-avatar">M</div>
-                    <div>
+                    <div class="player-avatar" id="player-avatar"></div>
+                    <div class="player-details">
                         <div class="player-name" id="player-name"></div>
                         <div class="player-level" id="player-title-level"></div>
                     </div>
@@ -437,131 +426,50 @@
             </div>
         </header>
 
-        <!-- CORPS PRINCIPAL -->
         <div class="imperium-body">
-            <!-- BARRE LATERALE (Desktop) -->
-            <aside class="imperium-sidebar">
-                <!-- Navigation générée dynamiquement par common-navigation.js -->
-            </aside>
+            <aside class="imperium-sidebar"></aside>
 
-            <!-- CONTENU PRINCIPAL -->
             <main class="main-content">
                 <div class="view-container">
-                    <h2 class="view-title">Simulateur de Combat</h2>
+                    <h2 class="view-title">⚔️ Simulateur de Combat</h2>
                     
                     <div class="simulator-layout">
-                        <!-- Configuration de la bataille -->
                         <div class="battle-setup">
-                            <!-- Armée attaquante -->
                             <div class="army-setup attacker">
-                                <h3 class="army-title attacker">⚔️ Armée Attaquante</h3>
-                                
-                                <div class="unit-selection" id="attacker-units">
-                                    <!-- Généré par JavaScript -->
-                                </div>
-                                
-                                <div class="army-summary">
-                                    <div class="summary-title">Résumé de l'armée</div>
-                                    <div class="summary-stats">
-                                        <div class="summary-stat">
-                                            <div class="summary-stat-value" id="attacker-power">0</div>
-                                            <div class="summary-stat-label">Puissance d'attaque</div>
-                                        </div>
-                                        <div class="summary-stat">
-                                            <div class="summary-stat-value" id="attacker-units-count">0</div>
-                                            <div class="summary-stat-label">Total unités</div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <h3 class="army-title attacker">Armée Attaquante</h3>
+                                <div class="unit-selection" id="attacker-units"></div>
                             </div>
 
-                            <!-- Section VS -->
                             <div class="vs-section">
-                                <div class="vs-icon">⚔️</div>
-                                <button class="simulate-btn" id="simulate-battle">
-                                    🎯 SIMULER LA BATAILLE
-                                </button>
+                                <div class="vs-icon">VS</div>
+                                <button class="simulate-btn" id="simulate-battle">SIMULER</button>
                             </div>
 
-                            <!-- Armée défenseure -->
                             <div class="army-setup defender">
-                                <h3 class="army-title defender">🛡️ Armée Défenseure</h3>
-                                
-                                <div class="unit-selection" id="defender-units">
-                                    <!-- Généré par JavaScript -->
-                                </div>
-                                
-                                <div class="defender-settings">
-                                    <div class="settings-title">Paramètres de défense</div>
-                                    <div class="setting-item">
-                                        <span class="setting-label">Niveau de muraille:</span>
-                                        <input type="number" class="setting-input" id="wall-level" value="0" min="0" max="20">
-                                    </div>
-                                    <div class="setting-item">
-                                        <span class="setting-label">Bonheur (moral):</span>
-                                        <input type="number" class="setting-input" id="defender-happiness" value="60" min="0" max="100">
-                                    </div>
-                                </div>
-                                
-                                <div class="army-summary">
-                                    <div class="summary-title">Résumé de la défense</div>
-                                    <div class="summary-stats">
-                                        <div class="summary-stat">
-                                            <div class="summary-stat-value" id="defender-power">0</div>
-                                            <div class="summary-stat-label">Puissance défensive</div>
-                                        </div>
-                                        <div class="summary-stat">
-                                            <div class="summary-stat-value" id="defender-units-count">0</div>
-                                            <div class="summary-stat-label">Total unités</div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <h3 class="army-title defender">Armée Défenseure</h3>
+                                <div class="unit-selection" id="defender-units"></div>
                             </div>
                         </div>
 
-                        <!-- Résultat de la bataille -->
                         <div class="battle-result" id="battle-result">
                             <div class="result-header">
-                                <div class="result-title" id="result-title">VICTOIRE!</div>
-                                <div class="result-subtitle" id="result-subtitle">L'attaquant remporte la bataille</div>
+                                <div class="result-title" id="result-title"></div>
                             </div>
-
                             <div class="result-details">
-                                <div class="result-section">
-                                    <div class="result-section-title">💀 Pertes de l'attaquant</div>
-                                    <div class="losses-list" id="attacker-losses">
-                                        <!-- Généré par JavaScript -->
-                                    </div>
+                                <div>
+                                    <h4 class="result-section-title">Pertes de l'attaquant</h4>
+                                    <div class="losses-list" id="attacker-losses"></div>
                                 </div>
-
-                                <div class="result-section">
-                                    <div class="result-section-title">💀 Pertes du défenseur</div>
-                                    <div class="losses-list" id="defender-losses">
-                                        <!-- Généré par JavaScript -->
-                                    </div>
+                                <div>
+                                    <h4 class="result-section-title">Pertes du défenseur</h4>
+                                    <div class="losses-list" id="defender-losses"></div>
                                 </div>
-
-                                <div class="result-section">
-                                    <div class="result-section-title">💰 Butin pillé</div>
-                                    <div class="loot-list" id="battle-loot">
-                                        <!-- Généré par JavaScript -->
-                                    </div>
-                                </div>
-
-                                <div class="result-section">
-                                    <div class="result-section-title">📊 Statistiques</div>
-                                    <div id="battle-stats">
-                                        <!-- Généré par JavaScript -->
-                                    </div>
+                                <div style="grid-column: 1 / -1;">
+                                    <h4 class="result-section-title">Butin</h4>
+                                    <div class="loot-list" id="battle-loot"></div>
                                 </div>
                             </div>
-
-                            <div class="result-section">
-                                <div class="result-section-title">📜 Rapport de bataille</div>
-                                <div class="battle-report" id="battle-report">
-                                    <!-- Généré par JavaScript -->
-                                </div>
-                            </div>
+                            <div class="battle-report" id="battle-report"></div>
                         </div>
                     </div>
                 </div>
@@ -570,432 +478,164 @@
     </div>
 
     <script>
-        // Variables globales
-        let uiManager;
-        let attackerArmy = {};
-        let defenderArmy = {};
-        
-        // Initialisation
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialiser le moteur de jeu s'il n'est pas déjà initialisé
-            if (!gameEngine.isRunning) {
-                gameEngine.init();
-            }
-            
-            // Initialiser le gestionnaire d'interface
-            uiManager = new ImperiumUIManager(gameEngine);
-            
-            // Générer les sélecteurs d'unités
-            generateUnitSelectors();
-            
-            // Configurer les événements
-            setupEventListeners();
-            
-            // Charger les armées par défaut
-            loadDefaultArmies();
-            
-            console.log('⚔️ Simulateur de combat initialisé!');
-        });
-        
-        // Génération des sélecteurs d'unités
-        function generateUnitSelectors() {
-            const attackerContainer = document.getElementById('attacker-units');
-            const defenderContainer = document.getElementById('defender-units');
-            
-            // Unités terrestres seulement pour le simulateur
-            const landUnits = Object.keys(UNITS_CONFIG).filter(unitType => 
-                UNITS_CONFIG[unitType].type === 'land' || UNITS_CONFIG[unitType].type === 'siege'
-            );
-            
-            landUnits.forEach(unitType => {
-                const config = UNITS_CONFIG[unitType];
-                
-                // Sélecteur pour l'attaquant
-                const attackerSelector = createUnitSelector(unitType, config, 'attacker');
-                attackerContainer.appendChild(attackerSelector);
-                
-                // Sélecteur pour le défenseur
-                const defenderSelector = createUnitSelector(unitType, config, 'defender');
-                defenderContainer.appendChild(defenderSelector);
+        // ===============================================================
+        // SCRIPTS GLOBAUX (navigation, UI, etc.)
+        // ===============================================================
+        const NAVIGATION_CONFIG = {
+            'index':      { title: 'Accueil', file: 'index.html', section: 'Empire', icon: '🏛️' },
+            'cite':       { title: 'Ma Cité', file: 'Empire/Cite.html', section: 'Empire', icon: '🏘️' },
+            'monde':      { title: 'Monde', file: 'Empire/Monde.html', section: 'Empire', icon: '🌍' },
+            'province':   { title: 'Province', file: 'Empire/Province.html', section: 'Empire', icon: '🏝️' },
+            'academie':   { title: 'Académie', file: 'Developpement/Academie.html', section: 'Développement', icon: '📚' },
+            'commerce':   { title: 'Commerce', file: 'Developpement/Commerce.html', section: 'Développement', icon: '⚖️' },
+            'legions':    { title: 'Légions', file: 'Militaire/Légions.html', section: 'Militaire', icon: '⚔️' },
+            'flotte':     { title: 'Flotte', file: 'Militaire/Flotte.html', section: 'Militaire', icon: '🚢' },
+            'simulateur': { title: 'Simulateur', file: 'Militaire/Simulateur.html', section: 'Militaire', icon: '💥' },
+            'diplomatie': { title: 'Diplomatie', file: 'Social/Diplomatie.html', section: 'Social', icon: '🤝' },
+            'alliance':   { title: 'Alliance', file: 'Social/Alliance.html', section: 'Social', icon: '🛡️' },
+            'messages':   { title: 'Messages', file: 'Social/Messsages.html', section: 'Social', icon: '✉️' },
+            'premium':    { title: 'Premium', file: 'Premium/Premium.html', section: 'Premium', icon: '👑' }
+        };
+
+        function generateNavigationHTML() {
+            const sections = {};
+            Object.entries(NAVIGATION_CONFIG).forEach(([key, config]) => {
+                if (key === 'index') return;
+                if (!sections[config.section]) sections[config.section] = [];
+                sections[config.section].push({ key, ...config });
             });
+            
+            let html = '';
+            Object.entries(sections).forEach(([sectionName, pages]) => {
+                html += `<div class="nav-section"><h2 class="nav-title">${sectionName}</h2><ul class="nav-list">`;
+                pages.forEach(page => {
+                    html += `<li class="nav-item"><a href="#" data-page="${page.key}" onclick="navigateTo('${page.key}'); return false;"><span class="nav-icon">${page.icon}</span> ${page.title}</a></li>`;
+                });
+                html += `</ul></div>`;
+            });
+            return html;
         }
         
-        function createUnitSelector(unitType, config, side) {
-            const gameState = gameEngine.getGameState();
-            const city = gameState.cities.main;
-            const available = city.units[unitType] || 0;
+        function navigateTo(pageKey) {
+            const config = NAVIGATION_CONFIG[pageKey];
+            console.log(`Navigation vers : ${config.title} (${config.file})`);
+            alert(`Simulation de navigation vers : ${config.title}`);
+        }
+
+        function initializeGlobalUI() {
+            document.querySelector('.imperium-sidebar').innerHTML = generateNavigationHTML();
             
+            const currentPage = 'simulateur'; // Page active
+            document.querySelectorAll('.nav-item a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-page') === currentPage) {
+                    link.classList.add('active');
+                }
+            });
+
+            document.getElementById('player-name').textContent = 'Marcus Aurelius';
+            document.getElementById('player-title-level').textContent = 'Consul - Niv. 12';
+            document.getElementById('player-avatar').textContent = 'M';
+            document.getElementById('resources-display').innerHTML = `
+                <div class="resource-item"><span class="resource-icon">🍇</span><span class="resource-value">4,560</span></div>
+                <div class="resource-item"><span class="resource-icon">🏛️</span><span class="resource-value">2,340</span></div>
+                <div class="resource-item"><span class="resource-icon">⚔️</span><span class="resource-value">8,900</span></div>
+                <div class="resource-item"><span class="resource-icon">💰</span><span class="resource-value">15,200</span></div>`;
+        }
+
+        // ===============================================================
+        // SCRIPTS SPÉCIFIQUES AU SIMULATEUR
+        // ===============================================================
+        const UNITS_CONFIG = {
+            legionnaire: { name: 'Légionnaire', icon: '🛡️', attack: 50, defense: 70 },
+            archer: { name: 'Archer', icon: '🏹', attack: 60, defense: 40 },
+            cavalier: { name: 'Cavalier', icon: '🐎', attack: 80, defense: 60 },
+            catapulte: { name: 'Catapulte', icon: '💥', attack: 120, defense: 20 }
+        };
+
+        function createUnitSelector(unitType, side) {
+            const config = UNITS_CONFIG[unitType];
             const selector = document.createElement('div');
             selector.className = 'unit-selector';
-            
             selector.innerHTML = `
                 <div class="unit-icon">${config.icon}</div>
                 <div class="unit-name">${config.name}</div>
-                <div class="unit-stats">
-                    ⚔️ Attaque: ${config.attack}<br>
-                    🛡️ Défense: ${config.defense}<br>
-                    💨 Vitesse: ${config.speed}
-                </div>
-                <div class="unit-input-group">
-                    <input type="number" 
-                           class="unit-input" 
-                           id="${side}-${unitType}" 
-                           value="0" 
-                           min="0" 
-                           max="${side === 'attacker' ? available : 999}"
-                           placeholder="0">
-                </div>
-                <div class="unit-available">
-                    ${side === 'attacker' ? `Disponible: ${available}` : 'Simulation'}
-                </div>
+                <input type="number" class="unit-input" id="${side}-${unitType}" value="0" min="0" placeholder="0">
             `;
-            
             return selector;
         }
-        
-        // Configuration des événements
-        function setupEventListeners() {
-            // Bouton de simulation
-            document.getElementById('simulate-battle').addEventListener('click', simulateBattle);
-            
-            // Mise à jour en temps réel des statistiques
-            document.addEventListener('input', (e) => {
-                if (e.target.classList.contains('unit-input') || e.target.classList.contains('setting-input')) {
-                    updateArmyStats();
-                }
-            });
-            
-            // Raccourcis clavier
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && e.ctrlKey) {
-                    simulateBattle();
-                }
-            });
-        }
-        
-        // Chargement des armées par défaut
-        function loadDefaultArmies() {
-            // Armée attaquante par défaut (basée sur les unités du joueur)
-            const gameState = gameEngine.getGameState();
-            const city = gameState.cities.main;
-            
-            Object.keys(city.units || {}).forEach(unitType => {
-                const input = document.getElementById(`attacker-${unitType}`);
-                if (input && city.units[unitType] > 0) {
-                    input.value = Math.min(10, city.units[unitType]); // Max 10 par défaut
-                }
-            });
-            
-            // Armée défenseure par défaut (exemple)
-            const defaultDefender = {
-                velites: 20,
-                hastati: 15,
-                legionnaires: 10,
-                equites: 8,
-                balistes: 2
-            };
-            
-            Object.keys(defaultDefender).forEach(unitType => {
-                const input = document.getElementById(`defender-${unitType}`);
-                if (input) {
-                    input.value = defaultDefender[unitType];
-                }
-            });
-            
-            updateArmyStats();
-        }
-        
-        // Mise à jour des statistiques des armées
-        function updateArmyStats() {
-            // Collecter les données des armées
-            attackerArmy = collectArmyData('attacker');
-            defenderArmy = collectArmyData('defender');
-            
-            // Calculer les statistiques
-            const attackerStats = calculateArmyStats(attackerArmy, 100); // Moral de base pour l'attaquant
-            const defenderStats = calculateArmyStats(defenderArmy, getDefenderMoral());
-            
-            // Mettre à jour l'affichage
-            document.getElementById('attacker-power').textContent = Math.floor(attackerStats.power);
-            document.getElementById('attacker-units-count').textContent = attackerStats.totalUnits;
-            
-            document.getElementById('defender-power').textContent = Math.floor(defenderStats.power + getWallBonus());
-            document.getElementById('defender-units-count').textContent = defenderStats.totalUnits;
-            
-            // Activer/désactiver le bouton de simulation
-            const simulateBtn = document.getElementById('simulate-battle');
-            simulateBtn.disabled = attackerStats.totalUnits === 0 && defenderStats.totalUnits === 0;
-        }
-        
-        function collectArmyData(side) {
-            const army = [];
+
+        function generateUnitSelectors() {
+            const attackerContainer = document.getElementById('attacker-units');
+            const defenderContainer = document.getElementById('defender-units');
+            attackerContainer.innerHTML = '';
+            defenderContainer.innerHTML = '';
             
             Object.keys(UNITS_CONFIG).forEach(unitType => {
-                const input = document.getElementById(`${side}-${unitType}`);
-                if (input) {
-                    const count = parseInt(input.value) || 0;
-                    if (count > 0) {
-                        army.push({
-                            type: unitType,
-                            count: count
-                        });
-                    }
-                }
+                attackerContainer.appendChild(createUnitSelector(unitType, 'attacker'));
+                defenderContainer.appendChild(createUnitSelector(unitType, 'defender'));
             });
-            
-            return army;
         }
-        
-        function calculateArmyStats(army, moral) {
-            let totalPower = 0;
-            let totalUnits = 0;
-            
-            army.forEach(unit => {
-                const config = UNITS_CONFIG[unit.type];
-                totalPower += unit.count * config.attack * (moral / 100);
-                totalUnits += unit.count;
-            });
-            
-            return {
-                power: totalPower,
-                totalUnits: totalUnits
-            };
-        }
-        
-        function getDefenderMoral() {
-            const happinessInput = document.getElementById('defender-happiness');
-            return parseInt(happinessInput.value) || 60;
-        }
-        
-        function getWallBonus() {
-            const wallInput = document.getElementById('wall-level');
-            const wallLevel = parseInt(wallInput.value) || 0;
-            return wallLevel * 100;
-        }
-        
-        // Simulation de la bataille
+
         function simulateBattle() {
-            if (attackerArmy.length === 0 && defenderArmy.length === 0) {
-                uiManager.showNotification('Erreur', 'Configurez au moins une armée pour simuler', 'error');
-                return;
-            }
-            
-            // Créer une cité défenseure simulée
-            const defenderCity = {
-                happiness: getDefenderMoral(),
-                buildings: {
-                    wall: { level: parseInt(document.getElementById('wall-level').value) || 0 }
-                }
-            };
-            
-            // Obtenir les bonus technologiques du joueur
-            const technologies = {
-                attackBonus: gameEngine.calculateTechBonus('attack'),
-                defenseBonus: gameEngine.calculateTechBonus('defense'),
-                siegeBonus: gameEngine.calculateTechBonus('siege') || 0
-            };
-            
-            // Simuler le combat
-            const result = CombatSystem.calculateCombatOutcome(
-                attackerArmy,
-                defenderArmy,
-                defenderCity,
-                technologies
-            );
-            
-            // Afficher les résultats
-            displayBattleResult(result);
-            
-            // Ajouter des statistiques
-            if (!gameState.statistics) gameState.statistics = {};
-            if (result.victory) {
-                gameState.statistics.battlesWon = (gameState.statistics.battlesWon || 0) + 1;
-            } else {
-                gameState.statistics.battlesLost = (gameState.statistics.battlesLost || 0) + 1;
-            }
-        }
-        
-        // Affichage des résultats de bataille
-        function displayBattleResult(result) {
+            let attackerPower = 0;
+            let defenderPower = 0;
+
+            // Calcul simple de puissance
+            Object.keys(UNITS_CONFIG).forEach(unitType => {
+                const attackerCount = parseInt(document.getElementById(`attacker-${unitType}`).value) || 0;
+                const defenderCount = parseInt(document.getElementById(`defender-${unitType}`).value) || 0;
+                attackerPower += attackerCount * UNITS_CONFIG[unitType].attack;
+                defenderPower += defenderCount * UNITS_CONFIG[unitType].defense;
+            });
+
             const resultContainer = document.getElementById('battle-result');
             const resultTitle = document.getElementById('result-title');
-            const resultSubtitle = document.getElementById('result-subtitle');
+            const attackerLossesEl = document.getElementById('attacker-losses');
+            const defenderLossesEl = document.getElementById('defender-losses');
+            const lootEl = document.getElementById('battle-loot');
+            const reportEl = document.getElementById('battle-report');
+
+            resultContainer.classList.remove('victory', 'defeat');
             
-            // Configurer le titre
-            if (result.victory) {
-                resultContainer.className = 'battle-result victory show';
+            let battleReport = `Rapport de bataille :\nPuissance Attaquant: ${attackerPower}\nPuissance Défenseur: ${defenderPower}\n\n`;
+
+            if (attackerPower > defenderPower) {
+                resultContainer.classList.add('victory');
+                resultTitle.textContent = 'VICTOIRE !';
                 resultTitle.className = 'result-title victory';
-                resultTitle.textContent = '🏆 VICTOIRE!';
-                resultSubtitle.textContent = 'L\'attaquant remporte la bataille';
+
+                const lossRatio = defenderPower / attackerPower;
+                attackerLossesEl.innerHTML = `<div class="loss-item"><span>Total Pertes</span><span class="loss-count">~${Math.round(lossRatio * 100)}%</span></div>`;
+                defenderLossesEl.innerHTML = `<div class="loss-item"><span>Total Pertes</span><span class="loss-count">100%</span></div>`;
+                lootEl.innerHTML = `<div class="loot-item"><span>💰 Or</span><span class="loot-amount">+${Math.floor(Math.random() * 5000)}</span></div>`;
+                battleReport += "L'attaquant a submergé les défenses.";
+
             } else {
-                resultContainer.className = 'battle-result defeat show';
+                resultContainer.classList.add('defeat');
+                resultTitle.textContent = 'DÉFAITE !';
                 resultTitle.className = 'result-title defeat';
-                resultTitle.textContent = '💀 DÉFAITE!';
-                resultSubtitle.textContent = 'Le défenseur repousse l\'attaque';
+                
+                const lossRatio = attackerPower / defenderPower;
+                attackerLossesEl.innerHTML = `<div class="loss-item"><span>Total Pertes</span><span class="loss-count">100%</span></div>`;
+                defenderLossesEl.innerHTML = `<div class="loss-item"><span>Total Pertes</span><span class="loss-count">~${Math.round(lossRatio * 100)}%</span></div>`;
+                lootEl.innerHTML = `<div class="loot-item"><span>Aucun butin</span></div>`;
+                battleReport += "Le défenseur a tenu bon.";
             }
             
-            // Afficher les pertes
-            displayLosses('attacker-losses', result.attackerLosses);
-            displayLosses('defender-losses', result.defenderLosses);
-            
-            // Afficher le butin
-            displayLoot(result.lootedResources);
-            
-            // Afficher les statistiques
-            displayBattleStats(result);
-            
-            // Afficher le rapport
-            document.getElementById('battle-report').textContent = result.battleReport.join('\n');
-            
-            // Faire défiler vers les résultats
+            reportEl.textContent = battleReport;
+            resultContainer.classList.add('show');
             resultContainer.scrollIntoView({ behavior: 'smooth' });
         }
-        
-        function displayLosses(containerId, losses) {
-            const container = document.getElementById(containerId);
-            
-            if (Object.keys(losses).length === 0) {
-                container.innerHTML = '<div class="loss-item">Aucune perte</div>';
-                return;
-            }
-            
-            container.innerHTML = Object.keys(losses).map(unitType => {
-                const count = losses[unitType];
-                if (count === 0) return '';
-                
-                const config = UNITS_CONFIG[unitType];
-                return `
-                    <div class="loss-item">
-                        <div class="loss-unit">
-                            <span>${config.icon}</span>
-                            <span>${config.name}</span>
-                        </div>
-                        <div class="loss-count">-${count}</div>
-                    </div>
-                `;
-            }).filter(html => html).join('');
-        }
-        
-        function displayLoot(loot) {
-            const container = document.getElementById('battle-loot');
-            
-            const totalLoot = Object.values(loot).reduce((sum, amount) => sum + amount, 0);
-            if (totalLoot === 0) {
-                container.innerHTML = '<div class="loot-item">Aucun butin</div>';
-                return;
-            }
-            
-            container.innerHTML = Object.keys(loot).map(resource => {
-                const amount = loot[resource];
-                if (amount === 0) return '';
-                
-                const config = RESOURCES_CONFIG[resource];
-                return `
-                    <div class="loot-item">
-                        <div class="loot-resource">
-                            <span>${config.icon}</span>
-                            <span>${config.name}</span>
-                        </div>
-                        <div class="loot-amount">+${amount}</div>
-                    </div>
-                `;
-            }).filter(html => html).join('');
-        }
-        
-        function displayBattleStats(result) {
-            const container = document.getElementById('battle-stats');
-            
-            container.innerHTML = `
-                <div class="loss-item">
-                    <span>Ratio de puissance:</span>
-                    <span style="color: var(--gold-light); font-weight: bold;">${result.powerRatio.toFixed(2)}</span>
-                </div>
-                <div class="loss-item">
-                    <span>Puissance attaquant:</span>
-                    <span style="color: var(--gold-light); font-weight: bold;">${Math.floor(result.attackerPower)}</span>
-                </div>
-                <div class="loss-item">
-                    <span>Puissance défenseur:</span>
-                    <span style="color: var(--gold-light); font-weight: bold;">${Math.floor(result.defenderPower)}</span>
-                </div>
-                ${result.wallDamage > 0 ? `
-                    <div class="loss-item">
-                        <span>Dégâts aux murailles:</span>
-                        <span style="color: #dc2626; font-weight: bold;">-${result.wallDamage} niveaux</span>
-                    </div>
-                ` : ''}
-            `;
-        }
-        
-        // Fonctions utilitaires
-        function resetSimulator() {
-            // Réinitialiser tous les champs
-            document.querySelectorAll('.unit-input').forEach(input => {
-                input.value = 0;
-            });
-            
-            document.getElementById('wall-level').value = 0;
-            document.getElementById('defender-happiness').value = 60;
-            
-            // Masquer les résultats
-            document.getElementById('battle-result').classList.remove('show');
-            
-            updateArmyStats();
-        }
-        
-        function loadPlayerArmy() {
-            const gameState = gameEngine.getGameState();
-            const city = gameState.cities.main;
-            
-            Object.keys(city.units || {}).forEach(unitType => {
-                const input = document.getElementById(`attacker-${unitType}`);
-                if (input) {
-                    input.value = city.units[unitType] || 0;
-                }
-            });
-            
-            updateArmyStats();
-        }
-        
-        // Raccourcis et fonctions d'aide
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.shiftKey) {
-                switch(e.key) {
-                    case 'R':
-                        e.preventDefault();
-                        resetSimulator();
-                        break;
-                    case 'L':
-                        e.preventDefault();
-                        loadPlayerArmy();
-                        break;
-                    case 'S':
-                        e.preventDefault();
-                        simulateBattle();
-                        break;
-                }
-            }
-        });
-        
-        // Conseils tactiques
-        function showTacticalAdvice() {
-            const advice = [
-                "⚔️ Les Légionnaires sont excellents contre l'infanterie ennemie",
-                "🏹 Les Balistes sont très efficaces contre les murailles",
-                "🐎 Les Equites peuvent contourner les défenses lourdes",
-                "🛡️ Un moral élevé améliore significativement les performances",
-                "🏰 Les murailles offrent un bonus défensif considérable",
-                "📊 Un ratio de puissance > 1.5 garantit généralement la victoire"
-            ];
-            
-            const randomAdvice = advice[Math.floor(Math.random() * advice.length)];
-            uiManager.showNotification('Conseil tactique', randomAdvice, 'info', 8000);
-        }
-        
-        // Afficher un conseil au chargement
-        setTimeout(showTacticalAdvice, 2000);
-    </script>
 
-    <script src="../../../../../../link-buttons-to-functions.js"></script>
+        // ===============================================================
+        // INITIALISATION DE LA PAGE
+        // ===============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeGlobalUI();
+            generateUnitSelectors();
+            document.getElementById('simulate-battle').addEventListener('click', simulateBattle);
+        });
+    </script>
 </body>
 </html>
