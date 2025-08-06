@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Légions</title>
+    <meta name="description" content="Gérez vos légions romaines, recrutez des soldats et préparez vos armées pour la conquête.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles et scripts communs -->
+    <link rel="stylesheet" href="../common-styles.css">
+    <script src="../common-navigation.js"></script>
+
+    <style>
+        /* Styles spécifiques aux Légions */
+        .military-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        .military-main {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .military-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            flex: 1;
+        }
+
+        .section-title {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .unit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .unit-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .unit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow-gold);
+            border-color: var(--gold-light);
+        }
+
+        .unit-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 10px var(--shadow-gold));
+        }
+
+        .unit-name {
+            color: var(--gold-primary);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .unit-count {
+            color: var(--gold-light);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .unit-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            color: var(--text-light);
+            font-weight: bold;
+        }
+
+        .recruit-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .recruit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--shadow-gold);
+        }
+
+        .recruit-btn:disabled {
+            background: rgba(30, 41, 59, 0.8);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .unit-cost {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .cost-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: var(--text-muted);
+        }
+
+        .military-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .army-summary {
+            text-align: center;
+        }
+
+        .total-power {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--gold-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .power-label {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .army-composition {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .composition-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+        }
+
+        .composition-label {
+            color: var(--text-muted);
+        }
+
+        .composition-value {
+            color: var(--text-light);
+            font-weight: bold;
+        }
+
+        .campaign-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .campaign-item {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .campaign-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .campaign-name {
+            color: var(--gold-light);
+            font-weight: bold;
+        }
+
+        .campaign-status {
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success-green);
+        }
+
+        .status-preparing {
+            background: rgba(217, 119, 6, 0.2);
+            color: var(--gold-light);
+        }
+
+        .campaign-details {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .quick-btn {
+            padding: 0.6rem;
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--text-light);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-size: 0.9rem;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--gold-light);
+            transform: translateY(-2px);
+        }
+
+        .training-queue {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .training-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+        }
+
+        .training-icon {
+            font-size: 1.5rem;
+        }
+
+        .training-info {
+            flex: 1;
+        }
+
+        .training-name {
+            color: var(--gold-light);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .training-time {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .training-progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 0.3rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Particules d'arrière-plan -->
+    <div class="particles"></div>
+
+    <!-- INTERFACE PRINCIPALE DU JEU -->
+    <div class="imperium-ui">
+        <!-- HEADER -->
+        <header class="imperium-header">
+            <div class="header-content">
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display">
+                    <!-- Les ressources seront injectées ici par JS -->
+                </div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar">M</div>
+                    <div>
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPS PRINCIPAL -->
+        <div class="imperium-body">
+            <!-- BARRE LATERALE (Desktop) -->
+            <aside class="imperium-sidebar">
+                <!-- Navigation générée dynamiquement par common-navigation.js -->
+            </aside>
+
+            <!-- CONTENU PRINCIPAL -->
+            <main class="main-content">
+                <div class="view-container">
+                    <h2 class="view-title">Légions Romaines</h2>
+                    <div class="military-layout">
+                        <div class="military-main">
+                            <!-- Mes troupes -->
+                            <div class="military-section">
+                                <h3 class="section-title">⚔️ Mes Troupes</h3>
+                                <div class="unit-grid">
+                                    <div class="unit-card">
+                                        <div class="unit-icon">🛡️</div>
+                                        <div class="unit-name">Légionnaires</div>
+                                        <div class="unit-count">1,250</div>
+                                        <div class="unit-stats">
+                                            <div class="stat-item">Attaque: <span class="stat-value">45</span></div>
+                                            <div class="stat-item">Défense: <span class="stat-value">60</span></div>
+                                            <div class="stat-item">Vitesse: <span class="stat-value">25</span></div>
+                                            <div class="stat-item">Portée: <span class="stat-value">1</span></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="unit-card">
+                                        <div class="unit-icon">🏹</div>
+                                        <div class="unit-name">Archers</div>
+                                        <div class="unit-count">680</div>
+                                        <div class="unit-stats">
+                                            <div class="stat-item">Attaque: <span class="stat-value">35</span></div>
+                                            <div class="stat-item">Défense: <span class="stat-value">20</span></div>
+                                            <div class="stat-item">Vitesse: <span class="stat-value">30</span></div>
+                                            <div class="stat-item">Portée: <span class="stat-value">4</span></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="unit-card">
+                                        <div class="unit-icon">🐎</div>
+                                        <div class="unit-name">Cavalerie</div>
+                                        <div class="unit-count">320</div>
+                                        <div class="unit-stats">
+                                            <div class="stat-item">Attaque: <span class="stat-value">55</span></div>
+                                            <div class="stat-item">Défense: <span class="stat-value">35</span></div>
+                                            <div class="stat-item">Vitesse: <span class="stat-value">60</span></div>
+                                            <div class="stat-item">Portée: <span class="stat-value">1</span></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="unit-card">
+                                        <div class="unit-icon">⚡</div>
+                                        <div class="unit-name">Catapultes</div>
+                                        <div class="unit-count">45</div>
+                                        <div class="unit-stats">
+                                            <div class="stat-item">Attaque: <span class="stat-value">120</span></div>
+                                            <div class="stat-item">Défense: <span class="stat-value">15</span></div>
+                                            <div class="stat-item">Vitesse: <span class="stat-value">10</span></div>
+                                            <div class="stat-item">Portée: <span class="stat-value">8</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recrutement -->
+                            <div class="military-section">
+                                <h3 class="section-title">🏛️ Recrutement</h3>
+                                <div class="unit-grid">
+                                    <div class="unit-card">
+                                        <div class="unit-icon">🛡️</div>
+                                        <div class="unit-name">Légionnaires</div>
+                                        <div class="unit-cost">
+                                            <div class="cost-item">💰 50</div>
+                                            <div class="cost-item">⛏️ 25</div>
+                                        </div>
+                                        <div class="unit-stats">
+                                            <div class="stat-item">Temps: <span class="stat-value">2h</span></div>
+                                            <div class="stat-item">Caserne: <span class="stat-value">Niv. 3</span></div>
+                                        </div>
+                                        <button class="recruit-btn">Recruter</button>
+                                    </div>
+
+                                    <div class="unit-card">
+                                        <div class="unit-icon">🏹</div>
+                                        <div class="unit-name">Archers</div>
+                                        <div class="unit-cost">
+                                            <div class="cost-item">💰 35</div>
+                                            <div class="cost-item">🌲 40</div>
+                                        </div>
+                                        <div class="unit-stats">
+                                            <div class="stat-item">Temps: <span class="stat-value">1h 30min</span></div>
+                                            <div class="stat-item">Champ de tir: <span class="stat-value">Niv. 2</span></div>
+                                        </div>
+                                        <button class="recruit-btn">Recruter</button>
+                                    </div>
+
+                                    <div class="unit-card">
+                                        <div class="unit-icon">🐎</div>
+                                        <div class="unit-name">Cavalerie</div>
+                                        <div class="unit-cost">
+                                            <div class="cost-item">💰 120</div>
+                                            <div class="cost-item">🌾 60</div>
+                                        </div>
+                                        <div class="unit-stats">
+                                            <div class="stat-item">Temps: <span class="stat-value">4h</span></div>
+                                            <div class="stat-item">Écuries: <span class="stat-value">Niv. 2</span></div>
+                                        </div>
+                                        <button class="recruit-btn">Recruter</button>
+                                    </div>
+
+                                    <div class="unit-card">
+                                        <div class="unit-icon">⚡</div>
+                                        <div class="unit-name">Catapultes</div>
+                                        <div class="unit-cost">
+                                            <div class="cost-item">💰 300</div>
+                                            <div class="cost-item">🌲 200</div>
+                                            <div class="cost-item">⛏️ 150</div>
+                                        </div>
+                                        <div class="unit-stats">
+                                            <div class="stat-item">Temps: <span class="stat-value">8h</span></div>
+                                            <div class="stat-item">Atelier: <span class="stat-value">Niv. 3</span></div>
+                                        </div>
+                                        <button class="recruit-btn" disabled>Bâtiment requis</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panneau de droite -->
+                        <div class="military-panel">
+                            <!-- Résumé de l'armée -->
+                            <div class="panel-section">
+                                <h3 class="section-title">📊 Résumé de l'Armée</h3>
+                                <div class="army-summary">
+                                    <div class="total-power">15,420</div>
+                                    <div class="power-label">Puissance Totale</div>
+                                    <div class="army-composition">
+                                        <div class="composition-item">
+                                            <span class="composition-label">Infanterie:</span>
+                                            <span class="composition-value">1,250</span>
+                                        </div>
+                                        <div class="composition-item">
+                                            <span class="composition-label">Archers:</span>
+                                            <span class="composition-value">680</span>
+                                        </div>
+                                        <div class="composition-item">
+                                            <span class="composition-label">Cavalerie:</span>
+                                            <span class="composition-value">320</span>
+                                        </div>
+                                        <div class="composition-item">
+                                            <span class="composition-label">Siège:</span>
+                                            <span class="composition-value">45</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- File d'entraînement -->
+                            <div class="panel-section">
+                                <h3 class="section-title">⏱️ Entraînement</h3>
+                                <div class="training-queue">
+                                    <div class="training-item">
+                                        <div class="training-icon">🛡️</div>
+                                        <div class="training-info">
+                                            <div class="training-name">50 Légionnaires</div>
+                                            <div class="training-time">1h 23min restantes</div>
+                                            <div class="training-progress">
+                                                <div class="progress-bar" style="width: 65%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="training-item">
+                                        <div class="training-icon">🏹</div>
+                                        <div class="training-info">
+                                            <div class="training-name">30 Archers</div>
+                                            <div class="training-time">2h 45min restantes</div>
+                                            <div class="training-progress">
+                                                <div class="progress-bar" style="width: 25%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Campagnes actives -->
+                            <div class="panel-section">
+                                <h3 class="section-title">🗺️ Campagnes</h3>
+                                <div class="campaign-list">
+                                    <div class="campaign-item">
+                                        <div class="campaign-header">
+                                            <div class="campaign-name">Siège de Carthage</div>
+                                            <div class="campaign-status status-active">Active</div>
+                                        </div>
+                                        <div class="campaign-details">
+                                            800 légionnaires, 200 archers<br>
+                                            Retour dans 4h 12min
+                                        </div>
+                                    </div>
+                                    <div class="campaign-item">
+                                        <div class="campaign-header">
+                                            <div class="campaign-name">Raid en Gaule</div>
+                                            <div class="campaign-status status-preparing">Préparation</div>
+                                        </div>
+                                        <div class="campaign-details">
+                                            500 cavaliers<br>
+                                            Départ dans 1h 30min
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions rapides -->
+                            <div class="panel-section">
+                                <h3 class="section-title">⚡ Actions Rapides</h3>
+                                <div class="quick-actions">
+                                    <button class="quick-btn">Nouvelle Campagne</button>
+                                    <button class="quick-btn">Défendre Cité</button>
+                                    <button class="quick-btn">Entraînement Rapide</button>
+                                    <button class="quick-btn">Rapport de Bataille</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Diplomatie</title>
+    <meta name="description" content="Gérez vos relations diplomatiques avec les autres empires romains.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles et scripts communs -->
+    <link rel="stylesheet" href="../common-styles.css">
+    <script src="../common-navigation.js"></script>
+</head>
+<body>
+    <!-- Particules d'arrière-plan -->
+    <div class="particles"></div>
+
+    <!-- INTERFACE PRINCIPALE DU JEU -->
+    <div class="imperium-ui">
+        <!-- HEADER -->
+        <header class="imperium-header">
+            <div class="header-content">
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display">
+                    <!-- Les ressources seront injectées ici par JS -->
+                </div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar">M</div>
+                    <div>
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPS PRINCIPAL -->
+        <div class="imperium-body">
+            <!-- BARRE LATERALE (Desktop) -->
+            <aside class="imperium-sidebar">
+                <!-- Navigation générée dynamiquement par common-navigation.js -->
+            </aside>
+
+            <!-- CONTENU PRINCIPAL -->
+            <main class="main-content">
+                <div class="view-container">
+                    <h2 class="view-title">Diplomatie</h2>
+                    <div class="page-content">
+                        <div class="feature-grid">
+                            <div class="feature-card">
+                                <div class="feature-icon">🤝</div>
+                                <div class="feature-title">Traités de Paix</div>
+                                <div class="feature-description">
+                                    Négociez des accords de non-agression avec vos voisins 
+                                    pour sécuriser vos frontières.
+                                </div>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">💰</div>
+                                <div class="feature-title">Accords Commerciaux</div>
+                                <div class="feature-description">
+                                    Établissez des routes commerciales privilégiées 
+                                    avec d'autres empires pour des bonus économiques.
+                                </div>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">⚔️</div>
+                                <div class="feature-title">Pactes Militaires</div>
+                                <div class="feature-description">
+                                    Formez des alliances défensives ou offensives 
+                                    pour des campagnes coordonnées.
+                                </div>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">👑</div>
+                                <div class="feature-title">Relations Impériales</div>
+                                <div class="feature-description">
+                                    Gérez votre réputation et votre influence 
+                                    auprès des autres dirigeants romains.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

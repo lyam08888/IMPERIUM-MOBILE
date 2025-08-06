@@ -8,6 +8,10 @@
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
 
+    <!-- Styles et scripts communs -->
+    <link rel="stylesheet" href="common-styles.css">
+    <script src="common-navigation.js"></script>
+
     <style>
         :root {
             --gold-primary: #d97706;
@@ -1027,37 +1031,7 @@
         <div class="imperium-body">
             <!-- BARRE LATERALE (Desktop) -->
             <aside class="imperium-sidebar">
-                <div class="nav-section">
-                    <h2 class="nav-title">Empire</h2>
-                    <ul class="nav-list">
-                        <li class="nav-item"><a data-view="city"><span class="nav-icon">🏛️</span> Ma Cité</a></li>
-                        <li class="nav-item"><a data-view="world"><span class="nav-icon">🌍</span> Monde</a></li>
-                        <li class="nav-item"><a data-view="island"><span class="nav-icon">🏝️</span> Province</a></li>
-                    </ul>
-                </div>
-                <div class="nav-section">
-                    <h2 class="nav-title">Développement</h2>
-                    <ul class="nav-list">
-                        <li class="nav-item"><a data-view="research"><span class="nav-icon">📚</span> Académie</a></li>
-                        <li class="nav-item"><a data-view="trade"><span class="nav-icon">⚖️</span> Commerce</a></li>
-                    </ul>
-                </div>
-                <div class="nav-section">
-                    <h2 class="nav-title">Militaire</h2>
-                    <ul class="nav-list">
-                        <li class="nav-item"><a data-view="military"><span class="nav-icon">⚔️</span> Légions</a></li>
-                        <li class="nav-item"><a data-view="navy"><span class="nav-icon">🚢</span> Flotte</a></li>
-                        <li class="nav-item"><a data-view="battle"><span class="nav-icon">💥</span> Simulateur</a></li>
-                    </ul>
-                </div>
-                 <div class="nav-section">
-                    <h2 class="nav-title">Social</h2>
-                    <ul class="nav-list">
-                        <li class="nav-item"><a data-view="diplomacy"><span class="nav-icon">🤝</span> Diplomatie</a></li>
-                        <li class="nav-item"><a data-view="alliance"><span class="nav-icon">🛡️</span> Alliance</a></li>
-                        <li class="nav-item"><a data-view="messages"><span class="nav-icon">✉️</span> Messages</a></li>
-                    </ul>
-                </div>
+                <!-- Navigation générée dynamiquement par common-navigation.js -->
             </aside>
 
             <!-- CONTENU PRINCIPAL -->

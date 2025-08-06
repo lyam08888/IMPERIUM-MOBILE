@@ -1,0 +1,336 @@
+:root {
+    --gold-primary: #d97706;
+    --gold-secondary: #f59e0b;
+    --gold-light: #fbbf24;
+    --marble-white: #f8fafc;
+    --roman-red: #dc2626;
+    --roman-purple: #7c3aed;
+    --dark-stone: #1e293b;
+    --dark-marble: #334155;
+    --dark-bg: #0f172a;
+    --text-light: #e2e8f0;
+    --text-muted: #94a3b8;
+    --border-gold: rgba(217, 119, 6, 0.3);
+    --shadow-gold: rgba(217, 119, 6, 0.4);
+    --success-green: #22c55e;
+    --storage-full-red: #ef4444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    font-family: 'Times New Roman', serif;
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(217, 119, 6, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-stone) 100%);
+    color: var(--text-light);
+    overflow: hidden;
+    min-height: 100vh;
+}
+
+.particles {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 1;
+}
+
+.particle {
+    position: absolute;
+    width: 3px; height: 3px;
+    background: var(--gold-light);
+    border-radius: 50%;
+    animation: float 8s infinite linear;
+    opacity: 0.6;
+}
+
+@keyframes float {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+}
+
+/* Layout principal */
+.imperium-ui {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+    z-index: 10;
+}
+
+.imperium-header {
+    background: linear-gradient(135deg, var(--dark-marble) 0%, var(--dark-stone) 100%);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--border-gold);
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 100;
+}
+
+.header-content {
+    max-width: 1600px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.imperium-logo {
+    font-size: 2.5rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.imperium-logo:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 10px var(--shadow-gold));
+}
+
+.resources-display {
+    display: flex;
+    gap: 1.5rem;
+    background: rgba(15, 23, 42, 0.7);
+    padding: 0.75rem 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border-gold);
+}
+
+.resource-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: bold;
+    font-size: 1rem;
+    position: relative;
+}
+
+.resource-item .storage-full-indicator {
+    color: var(--storage-full-red);
+    font-weight: bold;
+}
+
+.resource-icon {
+    font-size: 1.2rem;
+    filter: drop-shadow(0 0 5px var(--shadow-gold));
+}
+
+.resource-value {
+    color: var(--gold-light);
+    min-width: 50px;
+    text-align: right;
+    transition: color 0.3s ease;
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.player-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--roman-red), var(--roman-purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    border: 2px solid var(--gold-primary);
+}
+
+.player-details {
+    font-size: 0.9rem;
+}
+
+.player-name {
+    color: var(--gold-light);
+    font-weight: bold;
+}
+
+.player-level {
+    color: var(--text-muted);
+}
+
+/* Corps principal */
+.imperium-body {
+    display: flex;
+    flex-grow: 1;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+    overflow: hidden;
+}
+
+/* Navigation latérale */
+.imperium-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+    border-radius: 1rem;
+    border: 1px solid var(--border-gold);
+    padding: 1.5rem;
+    overflow-y: auto;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.nav-section {
+    margin-bottom: 2rem;
+}
+
+.nav-title {
+    color: var(--gold-primary);
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border-gold);
+    padding-bottom: 0.5rem;
+}
+
+.nav-list {
+    list-style: none;
+}
+
+.nav-item a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-light);
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.nav-item a:hover, .nav-item a.active {
+    background: linear-gradient(135deg, rgba(217, 119, 6, 0.2), rgba(245, 158, 11, 0.1));
+    border-color: var(--gold-primary);
+    transform: translateX(5px);
+    color: var(--gold-light);
+}
+
+.nav-icon {
+    font-size: 1.3rem;
+    width: 24px;
+    text-align: center;
+}
+
+/* Vue principale */
+.main-content {
+    flex-grow: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.view-container {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+    border-radius: 1rem;
+    border: 1px solid var(--border-gold);
+    overflow-y: auto;
+    padding: 2rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.view-title {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: var(--gold-primary);
+    margin-bottom: 2rem;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+/* Styles pour les pages spécifiques */
+.page-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.feature-card {
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 1rem;
+    border: 1px solid var(--border-gold);
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px var(--shadow-gold);
+    border-color: var(--gold-light);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+    text-align: center;
+}
+
+.feature-title {
+    color: var(--gold-primary);
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.feature-description {
+    color: var(--text-light);
+    line-height: 1.6;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .imperium-body {
+        flex-direction: column;
+        padding: 1rem;
+    }
+    
+    .imperium-sidebar {
+        width: 100%;
+        order: 2;
+        max-height: 200px;
+    }
+    
+    .main-content {
+        order: 1;
+        min-height: 400px;
+    }
+    
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+}

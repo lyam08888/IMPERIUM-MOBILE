@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Messages</title>
+    <meta name="description" content="Consultez vos messages, rapports de bataille et communications diplomatiques.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles et scripts communs -->
+    <link rel="stylesheet" href="../common-styles.css">
+    <script src="../common-navigation.js"></script>
+</head>
+<body>
+    <!-- Particules d'arrière-plan -->
+    <div class="particles"></div>
+
+    <!-- INTERFACE PRINCIPALE DU JEU -->
+    <div class="imperium-ui">
+        <!-- HEADER -->
+        <header class="imperium-header">
+            <div class="header-content">
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display">
+                    <!-- Les ressources seront injectées ici par JS -->
+                </div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar">M</div>
+                    <div>
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPS PRINCIPAL -->
+        <div class="imperium-body">
+            <!-- BARRE LATERALE (Desktop) -->
+            <aside class="imperium-sidebar">
+                <!-- Navigation générée dynamiquement par common-navigation.js -->
+            </aside>
+
+            <!-- CONTENU PRINCIPAL -->
+            <main class="main-content">
+                <div class="view-container">
+                    <h2 class="view-title">Messages</h2>
+                    <div class="page-content">
+                        <div class="feature-grid">
+                            <div class="feature-card">
+                                <div class="feature-icon">✉️</div>
+                                <div class="feature-title">Boîte de Réception</div>
+                                <div class="feature-description">
+                                    Consultez tous vos messages reçus des autres 
+                                    joueurs et des événements du jeu.
+                                </div>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">📜</div>
+                                <div class="feature-title">Rapports de Bataille</div>
+                                <div class="feature-description">
+                                    Analysez les détails de vos combats, victoires 
+                                    et défaites pour améliorer vos stratégies.
+                                </div>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">🏛️</div>
+                                <div class="feature-title">Messages Diplomatiques</div>
+                                <div class="feature-description">
+                                    Gérez vos négociations et accords avec les 
+                                    autres empires romains.
+                                </div>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">📢</div>
+                                <div class="feature-title">Annonces</div>
+                                <div class="feature-description">
+                                    Restez informé des mises à jour du jeu, 
+                                    événements spéciaux et nouvelles fonctionnalités.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
