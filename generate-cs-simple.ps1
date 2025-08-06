@@ -73,7 +73,7 @@ function $functionName() {
         return true;
 
     } catch (error) {
-        console.error('Erreur lors de $description:', error);
+        console.error('Erreur lors de ${description}:', error);
         showNotification('Erreur: ' + error.message, 'error');
         return false;
     }
