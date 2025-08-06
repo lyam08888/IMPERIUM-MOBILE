@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMPERIUM - Flotte</title>
+    <title>IMPERIUM - Flotte Navale</title>
     <meta name="description" content="Gérez votre flotte romaine, construisez des navires et dominez les mers Méditerranéennes.">
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
@@ -11,6 +11,417 @@
     <!-- Styles et scripts communs -->
     <link rel="stylesheet" href="../common-styles.css">
     <script src="../common-navigation.js"></script>
+    <script src="../game-engine.js"></script>
+    <script src="../advanced-game-systems.js"></script>
+    <script src="../save-system.js"></script>
+    <script src="../ui-manager.js"></script>
+    <script src="../global-console.js"></script>
+
+    <style>
+        /* Styles spécifiques à la flotte navale */
+        .naval-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        .naval-main {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .naval-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            flex: 1;
+        }
+
+        .section-title {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .ship-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .ship-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ship-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow-gold);
+            border-color: var(--gold-light);
+        }
+
+        .ship-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #06b6d4);
+        }
+
+        .ship-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
+        }
+
+        .ship-name {
+            color: var(--gold-primary);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .ship-count {
+            color: var(--gold-light);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .ship-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            color: var(--text-light);
+            font-weight: bold;
+        }
+
+        .build-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .build-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .build-btn:disabled {
+            background: rgba(30, 41, 59, 0.8);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .ship-cost {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .cost-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: var(--text-muted);
+        }
+
+        .naval-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .fleet-summary {
+            text-align: center;
+        }
+
+        .total-ships {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--gold-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .ships-label {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .fleet-composition {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .composition-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+        }
+
+        .composition-label {
+            color: var(--text-muted);
+        }
+
+        .composition-value {
+            color: var(--text-light);
+            font-weight: bold;
+        }
+
+        .expedition-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .expedition-item {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .expedition-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .expedition-name {
+            color: var(--gold-light);
+            font-weight: bold;
+        }
+
+        .expedition-status {
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .status-sailing {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .status-docked {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success-green);
+        }
+
+        .status-combat {
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+        }
+
+        .expedition-details {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .expedition-progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #06b6d4);
+            transition: width 0.3s ease;
+        }
+
+        .port-facilities {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .facility-item {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid var(--border-gold);
+        }
+
+        .facility-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .facility-name {
+            color: var(--gold-light);
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+        }
+
+        .facility-level {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .quick-btn {
+            padding: 0.6rem;
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--text-light);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-size: 0.9rem;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--gold-light);
+            transform: translateY(-2px);
+        }
+
+        .construction-queue {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .construction-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+        }
+
+        .construction-icon {
+            font-size: 1.5rem;
+        }
+
+        .construction-info {
+            flex: 1;
+        }
+
+        .construction-name {
+            color: var(--gold-light);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .construction-time {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .trade-routes {
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .route-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .route-icon {
+            font-size: 1.5rem;
+        }
+
+        .route-info {
+            flex: 1;
+        }
+
+        .route-name {
+            color: var(--gold-light);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .route-profit {
+            color: var(--success-green);
+            font-size: 0.8rem;
+        }
+
+        .route-status {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .naval-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Particules d'arrière-plan -->
@@ -45,39 +456,239 @@
             <!-- CONTENU PRINCIPAL -->
             <main class="main-content">
                 <div class="view-container">
-                    <h2 class="view-title">Flotte Romaine</h2>
-                    <div class="page-content">
-                        <div class="feature-grid">
-                            <div class="feature-card">
-                                <div class="feature-icon">🚢</div>
-                                <div class="feature-title">Mes Navires</div>
-                                <div class="feature-description">
-                                    Gérez votre flotte de guerre et vos navires marchands. 
-                                    Actuellement: 25 trirèmes, 12 navires de transport.
+                    <h2 class="view-title">Flotte Navale Impériale</h2>
+                    <div class="naval-layout">
+                        <div class="naval-main">
+                            <!-- Ma flotte -->
+                            <div class="naval-section">
+                                <h3 class="section-title">🚢 Ma Flotte</h3>
+                                <div class="ship-grid">
+                                    <div class="ship-card">
+                                        <div class="ship-icon">⛵</div>
+                                        <div class="ship-name">Trirèmes</div>
+                                        <div class="ship-count">8</div>
+                                        <div class="ship-stats">
+                                            <div class="stat-item">Attaque: <span class="stat-value">65</span></div>
+                                            <div class="stat-item">Défense: <span class="stat-value">45</span></div>
+                                            <div class="stat-item">Vitesse: <span class="stat-value">35</span></div>
+                                            <div class="stat-item">Capacité: <span class="stat-value">120</span></div>
+                                        </div>
+                                        <div class="ship-cost">
+                                            <div class="cost-item">🌲 <span>800</span></div>
+                                            <div class="cost-item">💰 <span>1200</span></div>
+                                        </div>
+                                        <button class="build-btn">Construire Trirème</button>
+                                    </div>
+
+                                    <div class="ship-card">
+                                        <div class="ship-icon">🚢</div>
+                                        <div class="ship-name">Navires Marchands</div>
+                                        <div class="ship-count">12</div>
+                                        <div class="ship-stats">
+                                            <div class="stat-item">Attaque: <span class="stat-value">15</span></div>
+                                            <div class="stat-item">Défense: <span class="stat-value">25</span></div>
+                                            <div class="stat-item">Vitesse: <span class="stat-value">25</span></div>
+                                            <div class="stat-item">Capacité: <span class="stat-value">500</span></div>
+                                        </div>
+                                        <div class="ship-cost">
+                                            <div class="cost-item">🌲 <span>400</span></div>
+                                            <div class="cost-item">💰 <span>600</span></div>
+                                        </div>
+                                        <button class="build-btn">Construire Marchand</button>
+                                    </div>
+
+                                    <div class="ship-card">
+                                        <div class="ship-icon">🛡️</div>
+                                        <div class="ship-name">Galères de Guerre</div>
+                                        <div class="ship-count">5</div>
+                                        <div class="ship-stats">
+                                            <div class="stat-item">Attaque: <span class="stat-value">85</span></div>
+                                            <div class="stat-item">Défense: <span class="stat-value">70</span></div>
+                                            <div class="stat-item">Vitesse: <span class="stat-value">30</span></div>
+                                            <div class="stat-item">Capacité: <span class="stat-value">200</span></div>
+                                        </div>
+                                        <div class="ship-cost">
+                                            <div class="cost-item">🌲 <span>1200</span></div>
+                                            <div class="cost-item">💰 <span>2000</span></div>
+                                            <div class="cost-item">⛏️ <span>300</span></div>
+                                        </div>
+                                        <button class="build-btn">Construire Galère</button>
+                                    </div>
+
+                                    <div class="ship-card">
+                                        <div class="ship-icon">🏴‍☠️</div>
+                                        <div class="ship-name">Navires d'Exploration</div>
+                                        <div class="ship-count">3</div>
+                                        <div class="ship-stats">
+                                            <div class="stat-item">Attaque: <span class="stat-value">25</span></div>
+                                            <div class="stat-item">Défense: <span class="stat-value">35</span></div>
+                                            <div class="stat-item">Vitesse: <span class="stat-value">45</span></div>
+                                            <div class="stat-item">Capacité: <span class="stat-value">150</span></div>
+                                        </div>
+                                        <div class="ship-cost">
+                                            <div class="cost-item">🌲 <span>600</span></div>
+                                            <div class="cost-item">💰 <span>900</span></div>
+                                            <div class="cost-item">📚 <span>50</span></div>
+                                        </div>
+                                        <button class="build-btn">Construire Explorateur</button>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">⚓</div>
-                                <div class="feature-title">Port</div>
-                                <div class="feature-description">
-                                    Construisez et améliorez vos installations portuaires 
-                                    pour accueillir une flotte plus importante.
+                        </div>
+
+                        <!-- Panneau de contrôle naval -->
+                        <div class="naval-panel">
+                            <!-- Résumé de la flotte -->
+                            <div class="panel-section">
+                                <h3 class="section-title">📊 Résumé de la Flotte</h3>
+                                <div class="fleet-summary">
+                                    <div class="total-ships">28</div>
+                                    <div class="ships-label">Navires Total</div>
+                                    <div class="fleet-composition">
+                                        <div class="composition-item">
+                                            <span class="composition-label">Guerre:</span>
+                                            <span class="composition-value">13</span>
+                                        </div>
+                                        <div class="composition-item">
+                                            <span class="composition-label">Commerce:</span>
+                                            <span class="composition-value">12</span>
+                                        </div>
+                                        <div class="composition-item">
+                                            <span class="composition-label">Exploration:</span>
+                                            <span class="composition-value">3</span>
+                                        </div>
+                                        <div class="composition-item">
+                                            <span class="composition-label">Puissance:</span>
+                                            <span class="composition-value">1,845</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">🗺️</div>
-                                <div class="feature-title">Expéditions Navales</div>
-                                <div class="feature-description">
-                                    Lancez des expéditions pour découvrir de nouvelles îles 
-                                    et établir des routes commerciales.
+
+                            <!-- Installations portuaires -->
+                            <div class="panel-section">
+                                <h3 class="section-title">⚓ Installations Portuaires</h3>
+                                <div class="port-facilities">
+                                    <div class="facility-item">
+                                        <div class="facility-icon">🏗️</div>
+                                        <div class="facility-name">Chantier Naval</div>
+                                        <div class="facility-level">Niveau 3</div>
+                                    </div>
+                                    <div class="facility-item">
+                                        <div class="facility-icon">⚓</div>
+                                        <div class="facility-name">Port</div>
+                                        <div class="facility-level">Niveau 4</div>
+                                    </div>
+                                    <div class="facility-item">
+                                        <div class="facility-icon">🏪</div>
+                                        <div class="facility-name">Entrepôt Naval</div>
+                                        <div class="facility-level">Niveau 2</div>
+                                    </div>
+                                    <div class="facility-item">
+                                        <div class="facility-icon">🔧</div>
+                                        <div class="facility-name">Arsenal</div>
+                                        <div class="facility-level">Niveau 2</div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">⚔️</div>
-                                <div class="feature-title">Batailles Navales</div>
-                                <div class="feature-description">
-                                    Engagez des combats navals épiques contre 
-                                    les flottes ennemies pour contrôler les mers.
+
+                            <!-- Expéditions en cours -->
+                            <div class="panel-section">
+                                <h3 class="section-title">🗺️ Expéditions en Cours</h3>
+                                <div class="expedition-list">
+                                    <div class="expedition-item">
+                                        <div class="expedition-header">
+                                            <div class="expedition-name">🚢 Exploration de Sardaigne</div>
+                                            <div class="expedition-status status-sailing">En Route</div>
+                                        </div>
+                                        <div class="expedition-details">3 navires • Retour dans 2h 15min</div>
+                                        <div class="expedition-progress">
+                                            <div class="progress-bar" style="width: 65%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="expedition-item">
+                                        <div class="expedition-header">
+                                            <div class="expedition-name">⚔️ Raid sur Carthage</div>
+                                            <div class="expedition-status status-combat">Combat</div>
+                                        </div>
+                                        <div class="expedition-details">8 navires de guerre • Combat en cours</div>
+                                        <div class="expedition-progress">
+                                            <div class="progress-bar" style="width: 85%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="expedition-item">
+                                        <div class="expedition-header">
+                                            <div class="expedition-name">🏪 Commerce avec Alexandrie</div>
+                                            <div class="expedition-status status-docked">Au Port</div>
+                                        </div>
+                                        <div class="expedition-details">5 navires marchands • Chargement</div>
+                                        <div class="expedition-progress">
+                                            <div class="progress-bar" style="width: 100%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Routes commerciales -->
+                            <div class="panel-section">
+                                <h3 class="section-title">🛣️ Routes Commerciales</h3>
+                                <div class="trade-routes">
+                                    <div class="route-item">
+                                        <div class="route-icon">🏺</div>
+                                        <div class="route-info">
+                                            <div class="route-name">Rome ↔ Athènes</div>
+                                            <div class="route-profit">+450 💰/heure</div>
+                                            <div class="route-status">Active • 2 navires</div>
+                                        </div>
+                                    </div>
+                                    <div class="route-item">
+                                        <div class="route-icon">🍇</div>
+                                        <div class="route-info">
+                                            <div class="route-name">Sicile ↔ Marseille</div>
+                                            <div class="route-profit">+320 💰/heure</div>
+                                            <div class="route-status">Active • 3 navires</div>
+                                        </div>
+                                    </div>
+                                    <div class="route-item">
+                                        <div class="route-icon">⛏️</div>
+                                        <div class="route-info">
+                                            <div class="route-name">Hispanie ↔ Rome</div>
+                                            <div class="route-profit">+280 💰/heure</div>
+                                            <div class="route-status">En pause</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Construction en cours -->
+                            <div class="panel-section">
+                                <h3 class="section-title">🔨 Construction en Cours</h3>
+                                <div class="construction-queue">
+                                    <div class="construction-item">
+                                        <div class="construction-icon">⛵</div>
+                                        <div class="construction-info">
+                                            <div class="construction-name">Trirème</div>
+                                            <div class="construction-time">Terminé dans 1h 45min</div>
+                                        </div>
+                                    </div>
+                                    <div class="construction-item">
+                                        <div class="construction-icon">🚢</div>
+                                        <div class="construction-info">
+                                            <div class="construction-name">Navire Marchand</div>
+                                            <div class="construction-time">Terminé dans 3h 20min</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions rapides -->
+                            <div class="panel-section">
+                                <h3 class="section-title">⚡ Actions Rapides</h3>
+                                <div class="quick-actions">
+                                    <button class="quick-btn">🗺️ Nouvelle Expédition</button>
+                                    <button class="quick-btn">🛣️ Gérer Routes</button>
+                                    <button class="quick-btn">⚓ Améliorer Port</button>
+                                    <button class="quick-btn">📊 Rapport Naval</button>
                                 </div>
                             </div>
                         </div>
@@ -86,5 +697,53 @@
             </main>
         </div>
     </div>
+
+    <script>
+        // Initialisation spécifique à la page Flotte
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page Flotte chargée');
+            
+            // Simulation de mise à jour des barres de progression
+            function updateProgressBars() {
+                const progressBars = document.querySelectorAll('.progress-bar');
+                progressBars.forEach(bar => {
+                    const currentWidth = parseInt(bar.style.width) || 0;
+                    if (currentWidth < 100) {
+                        bar.style.width = Math.min(currentWidth + Math.random() * 2, 100) + '%';
+                    }
+                });
+            }
+
+            // Mise à jour toutes les 5 secondes
+            setInterval(updateProgressBars, 5000);
+
+            // Gestion des boutons de construction
+            const buildButtons = document.querySelectorAll('.build-btn');
+            buildButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const shipName = this.closest('.ship-card').querySelector('.ship-name').textContent;
+                    alert(`Construction d'un ${shipName} lancée !`);
+                    
+                    // Simulation de désactivation temporaire
+                    this.disabled = true;
+                    this.textContent = 'En construction...';
+                    
+                    setTimeout(() => {
+                        this.disabled = false;
+                        this.textContent = `Construire ${shipName}`;
+                    }, 3000);
+                });
+            });
+
+            // Gestion des actions rapides
+            const quickButtons = document.querySelectorAll('.quick-btn');
+            quickButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const action = this.textContent.trim();
+                    alert(`Action "${action}" sera bientôt disponible !`);
+                });
+            });
+        });
+    </script>
 </body>
 </html>

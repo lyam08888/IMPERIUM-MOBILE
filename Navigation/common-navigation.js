@@ -288,7 +288,7 @@ function updatePlayerInfo() {
     const playerAvatar = document.querySelector('.player-avatar');
     
     if (playerName) playerName.textContent = 'Marcus Aurelius';
-    if (playerLevel) playerLevel.textContent = 'Patricien - Niv. 15';
+    if (playerLevel) playerLevel.textContent = 'Citoyen - Niv. 1';
     if (playerAvatar) playerAvatar.textContent = 'M';
 }
 
