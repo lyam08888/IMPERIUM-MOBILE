@@ -1220,14 +1220,8 @@
 
                     // Simuler un chargement
                     setTimeout(() => {
-                        // Cacher l'écran de démarrage
-                        startScreen.classList.add('hidden');
-                        
-                        // Afficher l'interface du jeu
-                        imperiumUI.classList.add('visible');
-                        
-                        // Initialiser le jeu
-                        initGame();
+                        // Rediriger vers la page Cité (point d'entrée du jeu)
+                        window.location.href = 'Navigation/Empire/Cite.html';
                     }, 2500); // 2.5 secondes de chargement
                 });
             }
