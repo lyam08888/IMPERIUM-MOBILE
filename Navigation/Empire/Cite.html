@@ -18,7 +18,7 @@
     <script src="../global-console.js"></script>
 
     <style>
-        /* Styles spécifiques à la cité romaine */
+        /* Variables CSS pour le thème romain moderne */
         :root {
             --roman-red: #8B0000;
             --roman-gold: #FFD700;
@@ -26,76 +26,115 @@
             --roman-marble: #F8F8FF;
             --roman-stone: #696969;
             --roman-purple: #800080;
+            --gradient-primary: linear-gradient(135deg, var(--roman-red), var(--roman-bronze));
+            --gradient-gold: linear-gradient(135deg, var(--roman-gold), #FFA500);
+            --shadow-gold: 0 8px 32px rgba(255, 215, 0, 0.3);
+            --shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
 
+        /* Layout responsive moderne */
+        .city-container {
+            padding: 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: calc(100vh - 120px);
+        }
+
+        .city-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .city-title {
+            color: var(--roman-gold);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: bold;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+            font-family: 'Times New Roman', serif;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .city-subtitle {
+            color: var(--roman-marble);
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        /* Layout principal responsive */
         .city-layout {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 1fr;
             gap: 2rem;
-            height: calc(100vh - 200px);
         }
 
-        /* === CARTE DE LA CITÉ === */
-        .city-map-container {
+        @media (min-width: 1024px) {
+            .city-layout {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        /* Section de la carte de la cité */
+        .city-map-section {
             background: linear-gradient(135deg, 
                 rgba(139, 0, 0, 0.1) 0%, 
                 rgba(205, 127, 50, 0.1) 50%, 
                 rgba(255, 215, 0, 0.1) 100%);
             border-radius: 1.5rem;
-            border: 3px solid var(--roman-bronze);
-            padding: 2rem;
+            border: 2px solid var(--roman-bronze);
+            padding: 1.5rem;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
+            animation: slideInLeft 0.8s ease-out;
         }
 
-        .city-map-container::before {
+        .city-map-section::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="marble" patternUnits="userSpaceOnUse" width="20" height="20"><rect width="20" height="20" fill="%23f8f8ff" opacity="0.05"/><path d="M0,20 L20,0 M-5,5 L5,-5 M15,25 L25,15" stroke="%23ddd" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23marble)"/></svg>') repeat;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="marble" patternUnits="userSpaceOnUse" width="20" height="20"><rect width="20" height="20" fill="%23f8f8ff" opacity="0.03"/><path d="M0,20 L20,0 M-5,5 L5,-5 M15,25 L25,15" stroke="%23ddd" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23marble)"/></svg>') repeat;
             pointer-events: none;
             z-index: 0;
         }
 
-        .city-title {
-            color: var(--roman-gold);
-            font-size: 2rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 2rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-            font-family: 'Times New Roman', serif;
+        .map-header {
             position: relative;
             z-index: 1;
+            text-align: center;
+            margin-bottom: 1.5rem;
         }
 
-        .city-title::before {
-            content: '🏛️';
-            margin-right: 1rem;
+        .map-title {
+            color: var(--roman-gold);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
         }
 
-        .city-title::after {
-            content: '🏛️';
-            margin-left: 1rem;
-        }
-
+        /* Grille des bâtiments responsive */
         .buildings-grid {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            grid-template-rows: repeat(6, 1fr);
-            gap: 0.5rem;
-            height: 500px;
-            background: radial-gradient(circle at center, 
-                rgba(255, 215, 0, 0.1) 0%, 
-                rgba(139, 0, 0, 0.05) 100%);
-            border-radius: 1rem;
-            padding: 1rem;
-            border: 2px solid var(--roman-bronze);
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
             position: relative;
             z-index: 1;
+            min-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .buildings-grid {
+                grid-template-columns: repeat(6, 1fr);
+                min-height: 500px;
+            }
         }
 
         .building-slot {
@@ -103,15 +142,17 @@
                 rgba(248, 248, 255, 0.1) 0%, 
                 rgba(205, 127, 50, 0.1) 100%);
             border: 2px dashed var(--roman-stone);
-            border-radius: 0.8rem;
+            border-radius: 1rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            min-height: 120px;
+            backdrop-filter: blur(5px);
         }
 
         .building-slot:hover {
@@ -119,8 +160,8 @@
             background: linear-gradient(135deg, 
                 rgba(255, 215, 0, 0.2) 0%, 
                 rgba(139, 0, 0, 0.1) 100%);
-            transform: scale(1.05);
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: var(--shadow-gold);
         }
 
         .building-slot.occupied {
@@ -128,23 +169,29 @@
             background: linear-gradient(135deg, 
                 rgba(255, 215, 0, 0.2) 0%, 
                 rgba(205, 127, 50, 0.2) 100%);
+            animation: buildingPulse 3s ease-in-out infinite;
         }
 
-        .building-slot.occupied:hover {
-            border-color: var(--roman-gold);
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        @keyframes buildingPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
         }
 
         .building-icon {
-            font-size: 2.5rem;
+            font-size: clamp(2rem, 4vw, 3rem);
             margin-bottom: 0.5rem;
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+            transition: transform 0.3s ease;
+        }
+
+        .building-slot:hover .building-icon {
+            transform: scale(1.1) rotate(5deg);
         }
 
         .building-name {
             color: var(--roman-marble);
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
             text-align: center;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
             font-family: 'Times New Roman', serif;
@@ -152,33 +199,20 @@
 
         .building-level {
             color: var(--roman-gold);
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             font-weight: bold;
-            margin-top: 0.2rem;
+            margin-top: 0.3rem;
+            padding: 0.2rem 0.5rem;
+            background: rgba(255, 215, 0, 0.2);
+            border-radius: 1rem;
         }
 
-        .building-progress {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-
-        .building-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--roman-gold), var(--roman-bronze));
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        /* === PANNEAU DE CONTRÔLE === */
+        /* Panneau de contrôle responsive */
         .city-control-panel {
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
+            animation: slideInRight 0.8s ease-out;
         }
 
         .panel-section {
@@ -189,6 +223,30 @@
             border-radius: 1rem;
             padding: 1.5rem;
             backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .panel-section:hover::before {
+            left: 100%;
+        }
+
+        .panel-section:hover {
+            border-color: var(--roman-gold);
+            box-shadow: var(--shadow-gold);
+            transform: translateY(-2px);
         }
 
         .section-title {
@@ -199,29 +257,48 @@
             text-align: center;
             font-family: 'Times New Roman', serif;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .section-title::before,
+        .section-title::after {
+            content: '⚜️';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8em;
+            opacity: 0.7;
         }
 
         .section-title::before {
-            content: '⚜️ ';
+            left: -2rem;
         }
 
         .section-title::after {
-            content: ' ⚜️';
+            right: -2rem;
         }
 
-        /* Statistiques de la cité */
+        /* Statistiques avec animations */
         .city-stats {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 1rem;
         }
 
         .stat-item {
             background: rgba(0, 0, 0, 0.2);
-            border-radius: 0.5rem;
+            border-radius: 0.8rem;
             padding: 1rem;
             text-align: center;
             border: 1px solid var(--roman-bronze);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-item:hover {
+            border-color: var(--roman-gold);
+            background: rgba(255, 215, 0, 0.1);
+            transform: scale(1.05);
         }
 
         .stat-value {
@@ -229,6 +306,12 @@
             font-size: 1.5rem;
             font-weight: bold;
             margin-bottom: 0.3rem;
+            animation: countUp 2s ease-out;
+        }
+
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .stat-label {
@@ -254,9 +337,15 @@
             justify-content: space-between;
             align-items: center;
             background: rgba(0, 0, 0, 0.2);
-            border-radius: 0.5rem;
-            padding: 0.8rem;
+            border-radius: 0.8rem;
+            padding: 1rem;
             border: 1px solid var(--roman-bronze);
+            transition: all 0.3s ease;
+        }
+
+        .production-item:hover {
+            border-color: var(--roman-gold);
+            background: rgba(255, 215, 0, 0.1);
         }
 
         .production-resource {
@@ -270,52 +359,152 @@
         .production-rate {
             color: var(--roman-gold);
             font-weight: bold;
+            font-size: 1.1rem;
         }
 
         .production-rate.positive {
             color: #22c55e;
+            animation: pulse 2s infinite;
         }
 
         .production-rate.negative {
             color: #dc2626;
         }
 
-        /* Files d'attente */
-        .queue-container {
-            max-height: 200px;
-            overflow-y: auto;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
-        .queue-item {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 0.8rem;
-            border: 1px solid var(--roman-bronze);
-            position: relative;
+        /* Actions rapides */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
         }
 
-        .queue-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .queue-item-name {
-            color: var(--roman-gold);
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .queue-item-time {
+        .quick-action-btn {
+            background: var(--gradient-primary);
             color: var(--roman-marble);
-            font-size: 0.9rem;
+            border: 2px solid var(--roman-gold);
+            border-radius: 1rem;
+            padding: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Times New Roman', serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
         }
 
-        .queue-progress {
+        .quick-action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .quick-action-btn:hover::before {
+            left: 100%;
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: var(--shadow-gold);
+            border-color: var(--roman-marble);
+        }
+
+        .quick-action-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        /* Animations d'entrée */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive design pour mobile */
+        @media (max-width: 768px) {
+            .city-container {
+                padding: 0.5rem;
+            }
+
+            .city-layout {
+                gap: 1rem;
+            }
+
+            .city-map-section,
+            .panel-section {
+                padding: 1rem;
+            }
+
+            .buildings-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+                min-height: 300px;
+            }
+
+            .building-slot {
+                min-height: 100px;
+            }
+
+            .section-title::before,
+            .section-title::after {
+                display: none;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .buildings-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .city-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Indicateurs de progression */
+        .progress-bar {
+            width: 100%;
             height: 6px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 3px;
@@ -323,689 +512,470 @@
             margin-top: 0.5rem;
         }
 
-        .queue-progress-bar {
+        .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--roman-gold), var(--roman-bronze));
+            background: var(--gradient-gold);
             width: 0%;
             transition: width 0.3s ease;
+            position: relative;
         }
 
-        /* Actions rapides */
-        .quick-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .quick-action-btn {
-            background: linear-gradient(135deg, var(--roman-red), var(--roman-bronze));
-            color: var(--roman-marble);
-            border: 2px solid var(--roman-gold);
-            border-radius: 0.8rem;
-            padding: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Times New Roman', serif;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-
-        .quick-action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
-            border-color: var(--roman-marble);
-        }
-
-        .quick-action-btn:active {
-            transform: translateY(0);
-        }
-
-        /* Stockage avec barres visuelles */
-        .storage-display {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .storage-item {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            border: 1px solid var(--roman-bronze);
-        }
-
-        .storage-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .storage-resource {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--roman-marble);
-            font-weight: bold;
-        }
-
-        .storage-amount {
-            color: var(--roman-gold);
-            font-weight: bold;
-        }
-
-        .storage-bar {
-            height: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .storage-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, 
-                #22c55e 0%, 
-                #eab308 70%, 
-                #dc2626 100%);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .city-layout {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            .buildings-grid {
-                height: 400px;
-            }
-            
-            .building-icon {
-                font-size: 2rem;
-            }
-            
-            .city-stats {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Animations spéciales */
-        @keyframes roman-glow {
-            0%, 100% { 
-                box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); 
-            }
-            50% { 
-                box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); 
-            }
-        }
-
-        .building-slot.constructing {
-            animation: roman-glow 2s infinite;
-        }
-
-        @keyframes resource-pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .production-rate.positive {
-            animation: resource-pulse 2s infinite;
-        }
-
-        /* Effets de particules pour les bâtiments actifs */
-        .building-slot.active::after {
-            content: '✨';
+        .progress-fill::after {
+            content: '';
             position: absolute;
-            top: -5px;
-            right: -5px;
-            font-size: 1rem;
-            animation: sparkle 3s infinite;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
         }
 
-        @keyframes sparkle {
-            0%, 100% { opacity: 0; transform: scale(0.5); }
-            50% { opacity: 1; transform: scale(1); }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Tooltips */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: var(--roman-gold);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
         }
     </style>
 </head>
 <body>
-    <!-- Particules d'arrière-plan -->
-    <div class="particles"></div>
-
-    <!-- INTERFACE PRINCIPALE DU JEU -->
     <div class="imperium-ui">
-        <!-- HEADER -->
+        <!-- Header avec navigation -->
         <header class="imperium-header">
             <div class="header-content">
-                <h1 class="imperium-logo">IMPERIUM</h1>
-                <div id="resources-display" class="resources-display">
-                    <!-- Les ressources seront injectées ici par JS -->
-                </div>
-                <div class="player-info">
-                    <div class="player-avatar" id="player-avatar">🏛️</div>
-                    <div>
-                        <div class="player-name" id="player-name"></div>
-                        <div class="player-level" id="player-title-level"></div>
+                <div class="imperium-logo" onclick="navigateTo('index')">IMPERIUM</div>
+                <nav class="main-navigation">
+                    <div class="nav-sections">
+                        <div class="nav-section">
+                            <span class="nav-section-title">Empire</span>
+                            <div class="nav-items">
+                                <a href="#" onclick="navigateTo('cite')" class="nav-item active">
+                                    <span class="nav-icon">🏛️</span>
+                                    <span class="nav-text">Ma Cité</span>
+                                </a>
+                                <a href="#" onclick="navigateTo('monde')" class="nav-item">
+                                    <span class="nav-icon">🌍</span>
+                                    <span class="nav-text">Monde</span>
+                                </a>
+                                <a href="#" onclick="navigateTo('province')" class="nav-item">
+                                    <span class="nav-icon">🏝️</span>
+                                    <span class="nav-text">Province</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="nav-section">
+                            <span class="nav-section-title">Social</span>
+                            <div class="nav-items">
+                                <a href="#" onclick="navigateTo('diplomatie')" class="nav-item">
+                                    <span class="nav-icon">🤝</span>
+                                    <span class="nav-text">Diplomatie</span>
+                                </a>
+                                <a href="#" onclick="navigateTo('alliance')" class="nav-item">
+                                    <span class="nav-icon">⚔️</span>
+                                    <span class="nav-text">Alliance</span>
+                                </a>
+                                <a href="#" onclick="navigateTo('messages')" class="nav-item">
+                                    <span class="nav-icon">📜</span>
+                                    <span class="nav-text">Messages</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+                <div class="user-info">
+                    <div class="resource-display">
+                        <span class="resource-item">
+                            <span class="resource-icon">🏛️</span>
+                            <span class="resource-value" id="population">1,250</span>
+                        </span>
+                        <span class="resource-item">
+                            <span class="resource-icon">💰</span>
+                            <span class="resource-value" id="gold">15,430</span>
+                        </span>
+                        <span class="resource-item">
+                            <span class="resource-icon">🌾</span>
+                            <span class="resource-value" id="food">8,920</span>
+                        </span>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- CORPS PRINCIPAL -->
-        <div class="imperium-body">
-            <!-- BARRE LATERALE (Desktop) -->
-            <aside class="imperium-sidebar">
-                <!-- Navigation générée dynamiquement par common-navigation.js -->
-            </aside>
+        <!-- Contenu principal -->
+        <main class="imperium-content">
+            <div class="city-container">
+                <!-- En-tête de la cité -->
+                <div class="city-header">
+                    <h1 class="city-title">🏛️ ROMA AETERNA 🏛️</h1>
+                    <p class="city-subtitle">Votre cité prospère sous votre sage gouvernance</p>
+                </div>
 
-            <!-- CONTENU PRINCIPAL -->
-            <main class="main-content">
-                <div class="view-container">
-                    <div class="city-layout">
-                        <!-- Carte de la cité -->
-                        <div class="city-map-container">
-                            <h2 class="city-title" id="city-name">Ma Cité Romaine</h2>
-                            <div class="buildings-grid" id="buildings-grid">
-                                <!-- Généré par JavaScript -->
+                <!-- Layout principal -->
+                <div class="city-layout">
+                    <!-- Section carte de la cité -->
+                    <div class="city-map-section">
+                        <div class="map-header">
+                            <h2 class="map-title">Plan de la Cité</h2>
+                            <p style="color: var(--roman-marble); opacity: 0.8; font-style: italic;">
+                                Cliquez sur un emplacement pour construire ou améliorer
+                            </p>
+                        </div>
+
+                        <div class="buildings-grid" id="buildingsGrid">
+                            <!-- Les bâtiments seront générés dynamiquement -->
+                        </div>
+                    </div>
+
+                    <!-- Panneau de contrôle -->
+                    <div class="city-control-panel">
+                        <!-- Statistiques de la cité -->
+                        <div class="panel-section">
+                            <h3 class="section-title">Statistiques</h3>
+                            <div class="city-stats">
+                                <div class="stat-item tooltip" data-tooltip="Population totale de votre cité">
+                                    <div class="stat-value">
+                                        <span class="stat-icon">👥</span>
+                                        <span id="statPopulation">1,250</span>
+                                    </div>
+                                    <div class="stat-label">Population</div>
+                                </div>
+                                <div class="stat-item tooltip" data-tooltip="Niveau de bonheur des citoyens">
+                                    <div class="stat-value">
+                                        <span class="stat-icon">😊</span>
+                                        <span id="statHappiness">85%</span>
+                                    </div>
+                                    <div class="stat-label">Bonheur</div>
+                                </div>
+                                <div class="stat-item tooltip" data-tooltip="Défense militaire de la cité">
+                                    <div class="stat-value">
+                                        <span class="stat-icon">🛡️</span>
+                                        <span id="statDefense">420</span>
+                                    </div>
+                                    <div class="stat-label">Défense</div>
+                                </div>
+                                <div class="stat-item tooltip" data-tooltip="Niveau culturel et prestige">
+                                    <div class="stat-value">
+                                        <span class="stat-icon">🎭</span>
+                                        <span id="statCulture">67</span>
+                                    </div>
+                                    <div class="stat-label">Culture</div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Panneau de contrôle -->
-                        <div class="city-control-panel">
-                            <!-- Statistiques de la cité -->
-                            <div class="panel-section">
-                                <h3 class="section-title">📊 Statistiques de la Cité</h3>
-                                <div class="city-stats" id="city-stats">
-                                    <div class="stat-item">
-                                        <div class="stat-value" id="population-current">2,450</div>
-                                        <div class="stat-label">
-                                            <span class="stat-icon">👥</span>Citoyens
-                                        </div>
+                        <!-- Production en temps réel -->
+                        <div class="panel-section">
+                            <h3 class="section-title">Production</h3>
+                            <div class="production-display">
+                                <div class="production-item">
+                                    <div class="production-resource">
+                                        <span>💰</span>
+                                        <span>Or</span>
                                     </div>
-                                    <div class="stat-item">
-                                        <div class="stat-value" id="happiness-level">85%</div>
-                                        <div class="stat-label">
-                                            <span class="stat-icon">😊</span>Bonheur
-                                        </div>
+                                    <div class="production-rate positive">+245/h</div>
+                                </div>
+                                <div class="production-item">
+                                    <div class="production-resource">
+                                        <span>🌾</span>
+                                        <span>Nourriture</span>
                                     </div>
-                                    <div class="stat-item">
-                                        <div class="stat-value" id="buildings-count">18</div>
-                                        <div class="stat-label">
-                                            <span class="stat-icon">🏛️</span>Bâtiments
-                                        </div>
+                                    <div class="production-rate positive">+180/h</div>
+                                </div>
+                                <div class="production-item">
+                                    <div class="production-resource">
+                                        <span>🏗️</span>
+                                        <span>Matériaux</span>
                                     </div>
-                                    <div class="stat-item">
-                                        <div class="stat-value" id="military-power">3,250</div>
-                                        <div class="stat-label">
-                                            <span class="stat-icon">⚔️</span>Puissance Militaire
-                                        </div>
+                                    <div class="production-rate positive">+95/h</div>
+                                </div>
+                                <div class="production-item">
+                                    <div class="production-resource">
+                                        <span>⚡</span>
+                                        <span>Énergie</span>
                                     </div>
+                                    <div class="production-rate negative">-45/h</div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Production en temps réel -->
-                            <div class="panel-section">
-                                <h3 class="section-title">⚡ Production par Heure</h3>
-                                <div class="production-display" id="production-display">
-                                    <!-- Généré par JavaScript -->
-                                </div>
-                            </div>
-
-                            <!-- Stockage des ressources -->
-                            <div class="panel-section">
-                                <h3 class="section-title">🏪 Entrepôts</h3>
-                                <div class="storage-display" id="storage-display">
-                                    <!-- Généré par JavaScript -->
-                                </div>
-                            </div>
-
-                            <!-- Files d'attente -->
-                            <div class="panel-section">
-                                <h3 class="section-title">🔨 Construction en Cours</h3>
-                                <div class="queue-container" id="construction-queue">
-                                    <!-- Généré par JavaScript -->
-                                </div>
-                            </div>
-
-                            <!-- Actions rapides -->
-                            <div class="panel-section">
-                                <h3 class="section-title">⚡ Actions Rapides</h3>
-                                <div class="quick-actions">
-                                    <button class="quick-action-btn" onclick="quickCollectTaxes()">
-                                        💰 Collecter Impôts
-                                    </button>
-                                    <button class="quick-action-btn" onclick="quickRecruitUnits()">
-                                        ⚔️ Recruter Soldats
-                                    </button>
-                                    <button class="quick-action-btn" onclick="quickBoostProduction()">
-                                        ⚡ Booster Production
-                                    </button>
-                                    <button class="quick-action-btn" onclick="quickCelebrateFestival()">
-                                        🎭 Organiser Festival
-                                    </button>
-                                </div>
+                        <!-- Actions rapides -->
+                        <div class="panel-section">
+                            <h3 class="section-title">Actions Rapides</h3>
+                            <div class="quick-actions">
+                                <button class="quick-action-btn" onclick="collectTaxes()">
+                                    💰 Collecter Impôts
+                                </button>
+                                <button class="quick-action-btn" onclick="recruitCitizens()">
+                                    👥 Recruter Citoyens
+                                </button>
+                                <button class="quick-action-btn" onclick="organizeGames()">
+                                    🎪 Organiser Jeux
+                                </button>
+                                <button class="quick-action-btn" onclick="upgradeDefenses()">
+                                    🛡️ Améliorer Défenses
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
+            </div>
+        </main>
     </div>
 
-    <!-- Console flottante (sera ajoutée par JavaScript) -->
-    <div id="floating-console" class="floating-console">
-        <!-- Contenu généré par JavaScript -->
-    </div>
+    <!-- Particules d'ambiance -->
+    <div class="particles" id="particles"></div>
 
     <script>
-        // Variables globales
-        let uiManager;
-        let buildingSlots = [];
-        
-        // Initialisation
+        // Données des bâtiments
+        const BUILDINGS_DATA = [
+            { id: 1, type: 'forum', name: 'Forum Romain', icon: '🏛️', level: 3, occupied: true },
+            { id: 2, type: 'temple', name: 'Temple de Jupiter', icon: '⛪', level: 2, occupied: true },
+            { id: 3, type: 'market', name: 'Marché', icon: '🏪', level: 4, occupied: true },
+            { id: 4, type: 'barracks', name: 'Caserne', icon: '⚔️', level: 2, occupied: true },
+            { id: 5, type: 'aqueduct', name: 'Aqueduc', icon: '🌊', level: 1, occupied: true },
+            { id: 6, type: 'amphitheater', name: 'Amphithéâtre', icon: '🏟️', level: 3, occupied: true },
+            { id: 7, type: 'library', name: 'Bibliothèque', icon: '📚', level: 2, occupied: true },
+            { id: 8, type: 'workshop', name: 'Atelier', icon: '🔨', level: 1, occupied: true },
+            { id: 9, type: 'empty', name: 'Terrain Vide', icon: '🏗️', level: 0, occupied: false },
+            { id: 10, type: 'empty', name: 'Terrain Vide', icon: '🏗️', level: 0, occupied: false },
+            { id: 11, type: 'empty', name: 'Terrain Vide', icon: '🏗️', level: 0, occupied: false },
+            { id: 12, type: 'empty', name: 'Terrain Vide', icon: '🏗️', level: 0, occupied: false },
+            { id: 13, type: 'walls', name: 'Murailles', icon: '🏰', level: 2, occupied: true },
+            { id: 14, type: 'granary', name: 'Grenier', icon: '🌾', level: 3, occupied: true },
+            { id: 15, type: 'empty', name: 'Terrain Vide', icon: '🏗️', level: 0, occupied: false },
+            { id: 16, type: 'empty', name: 'Terrain Vide', icon: '🏗️', level: 0, occupied: false },
+            { id: 17, type: 'empty', name: 'Terrain Vide', icon: '🏗️', level: 0, occupied: false },
+            { id: 18, type: 'empty', name: 'Terrain Vide', icon: '🏗️', level: 0, occupied: false }
+        ];
+
+        // Initialisation de la page
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialiser le moteur de jeu s'il n'est pas déjà initialisé
-            if (!gameEngine.isRunning) {
-                gameEngine.init();
-            }
-            
-            // Initialiser le gestionnaire d'interface
-            uiManager = new ImperiumUIManager(gameEngine);
-            
-            // Générer la grille de bâtiments
-            generateBuildingsGrid();
-            
-            // Mettre à jour l'interface
-            updateCityInterface();
-            
-            // Démarrer les mises à jour en temps réel
-            setInterval(updateCityInterface, 1000);
-            
-            console.log('🏛️ Cité romaine initialisée!');
+            initializeCityView();
+            createParticles();
+            startProductionUpdates();
         });
-        
-        // Génération de la grille de bâtiments (6x6)
-        function generateBuildingsGrid() {
-            const grid = document.getElementById('buildings-grid');
-            const gameState = gameEngine.getGameState();
-            const city = gameState.cities.main;
-            
-            // Créer 36 emplacements (6x6)
-            for (let i = 0; i < 36; i++) {
+
+        // Initialiser la vue de la cité
+        function initializeCityView() {
+            const grid = document.getElementById('buildingsGrid');
+            grid.innerHTML = '';
+
+            BUILDINGS_DATA.forEach(building => {
                 const slot = document.createElement('div');
-                slot.className = 'building-slot';
-                slot.dataset.slotId = i;
-                
-                // Vérifier s'il y a un bâtiment à cet emplacement
-                const building = city.buildings[`slot_${i}`];
-                
-                if (building) {
-                    const config = BUILDINGS_CONFIG[building.type];
-                    slot.classList.add('occupied');
-                    if (building.level > 0) {
-                        slot.classList.add('active');
-                    }
-                    
-                    slot.innerHTML = `
-                        <div class="building-icon">${config.icon}</div>
-                        <div class="building-name">${config.name}</div>
-                        <div class="building-level">Niveau ${building.level}</div>
-                        <div class="building-progress">
-                            <div class="building-progress-bar" style="width: 0%"></div>
-                        </div>
-                    `;
-                } else {
-                    slot.innerHTML = `
-                        <div class="building-icon">🏗️</div>
-                        <div class="building-name">Terrain Vacant</div>
-                        <div class="building-level">Construire</div>
-                    `;
-                }
-                
-                // Ajouter l'événement de clic
-                slot.addEventListener('click', () => handleBuildingClick(i, building));
-                
+                slot.className = `building-slot ${building.occupied ? 'occupied' : ''}`;
+                slot.onclick = () => handleBuildingClick(building);
+
+                slot.innerHTML = `
+                    <div class="building-icon">${building.icon}</div>
+                    <div class="building-name">${building.name}</div>
+                    ${building.occupied ? `<div class="building-level">Niv. ${building.level}</div>` : ''}
+                    ${building.occupied && building.level < 5 ? '<div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>' : ''}
+                `;
+
                 grid.appendChild(slot);
-                buildingSlots.push(slot);
-            }
+            });
         }
-        
+
         // Gestion des clics sur les bâtiments
-        function handleBuildingClick(slotId, building) {
-            if (building) {
-                // Bâtiment existant - options d'amélioration
-                showBuildingUpgradeModal(slotId, building);
+        function handleBuildingClick(building) {
+            if (building.occupied) {
+                showBuildingDetails(building);
             } else {
-                // Terrain vacant - options de construction
-                showBuildingConstructionModal(slotId);
+                showBuildingOptions(building);
             }
         }
-        
-        function showBuildingConstructionModal(slotId) {
-            const availableBuildings = Object.keys(BUILDINGS_CONFIG).filter(type => {
-                const config = BUILDINGS_CONFIG[type];
-                return gameEngine.canBuild(type, 1);
-            });
-            
-            if (availableBuildings.length === 0) {
-                uiManager.showNotification('Construction', 'Aucun bâtiment disponible pour le moment', 'warning');
-                return;
-            }
-            
-            const buildingOptions = availableBuildings.map(type => {
-                const config = BUILDINGS_CONFIG[type];
-                const cost = gameEngine.calculateBuildingCost(type, 1);
-                const costText = Object.keys(cost).map(resource => 
-                    `${cost[resource]} ${RESOURCES_CONFIG[resource].icon}`
-                ).join(' ');
-                
-                return `
-                    <div class="building-option" onclick="constructBuilding('${slotId}', '${type}')">
-                        <div class="building-option-icon">${config.icon}</div>
-                        <div class="building-option-name">${config.name}</div>
-                        <div class="building-option-cost">${costText}</div>
-                        <div class="building-option-desc">${config.description}</div>
-                    </div>
-                `;
-            }).join('');
-            
-            uiManager.showModal('Construire un Bâtiment', `
-                <div class="building-selection">
-                    ${buildingOptions}
-                </div>
-            `);
+
+        // Afficher les détails d'un bâtiment
+        function showBuildingDetails(building) {
+            alert(`${building.name} - Niveau ${building.level}\n\nCliquez pour améliorer ou gérer ce bâtiment.`);
         }
-        
-        function showBuildingUpgradeModal(slotId, building) {
-            const config = BUILDINGS_CONFIG[building.type];
-            const nextLevel = building.level + 1;
-            const canUpgrade = gameEngine.canBuild(building.type, nextLevel);
-            const cost = gameEngine.calculateBuildingCost(building.type, nextLevel);
-            
-            const costText = Object.keys(cost).map(resource => 
-                `${cost[resource]} ${RESOURCES_CONFIG[resource].icon}`
-            ).join(' ');
-            
-            uiManager.showModal(`${config.name} - Niveau ${building.level}`, `
-                <div class="building-details">
-                    <div class="building-icon-large">${config.icon}</div>
-                    <div class="building-info">
-                        <p><strong>Description:</strong> ${config.description}</p>
-                        <p><strong>Niveau actuel:</strong> ${building.level}</p>
-                        <p><strong>Production actuelle:</strong> ${gameEngine.calculateBuildingProduction(building.type, building.level)}/h</p>
-                        ${canUpgrade ? `
-                            <p><strong>Coût d'amélioration:</strong> ${costText}</p>
-                            <button class="upgrade-btn" onclick="upgradeBuilding('${slotId}', '${building.type}')">
-                                ⬆️ Améliorer au niveau ${nextLevel}
-                            </button>
-                        ` : `
-                            <p style="color: #dc2626;">Amélioration impossible (ressources insuffisantes ou niveau max atteint)</p>
-                        `}
-                    </div>
-                </div>
-            `);
-        }
-        
-        // Actions de construction et d'amélioration
-        function constructBuilding(slotId, buildingType) {
-            try {
-                gameEngine.startConstruction(buildingType, 1, `slot_${slotId}`);
-                uiManager.closeModal();
-                uiManager.showNotification('Construction', `Construction de ${BUILDINGS_CONFIG[buildingType].name} commencée!`, 'success');
-                updateCityInterface();
-            } catch (error) {
-                uiManager.showNotification('Erreur', error.message, 'error');
-            }
-        }
-        
-        function upgradeBuilding(slotId, buildingType) {
-            try {
-                const gameState = gameEngine.getGameState();
-                const building = gameState.cities.main.buildings[`slot_${slotId}`];
-                gameEngine.startConstruction(buildingType, building.level + 1, `slot_${slotId}`);
-                uiManager.closeModal();
-                uiManager.showNotification('Amélioration', `Amélioration de ${BUILDINGS_CONFIG[buildingType].name} commencée!`, 'success');
-                updateCityInterface();
-            } catch (error) {
-                uiManager.showNotification('Erreur', error.message, 'error');
-            }
-        }
-        
-        // Mise à jour de l'interface de la cité
-        function updateCityInterface() {
-            updateCityStats();
-            updateProductionDisplay();
-            updateStorageDisplay();
-            updateConstructionQueue();
-            updateBuildingSlots();
-        }
-        
-        function updateCityStats() {
-            const gameState = gameEngine.getGameState();
-            const city = gameState.cities.main;
-            
-            // Calculer les statistiques
-            const population = gameEngine.calculatePopulation();
-            const happiness = gameEngine.calculateHappiness();
-            const buildingsCount = Object.keys(city.buildings).length;
-            const militaryPower = gameEngine.calculateMilitaryPower();
-            
-            // Mettre à jour l'affichage
-            document.getElementById('population-current').textContent = population.current;
-            document.getElementById('happiness-level').textContent = Math.floor(happiness) + '%';
-            document.getElementById('buildings-count').textContent = buildingsCount;
-            document.getElementById('military-power').textContent = Math.floor(militaryPower);
-        }
-        
-        function updateProductionDisplay() {
-            const container = document.getElementById('production-display');
-            const production = gameEngine.calculateProduction();
-            
-            container.innerHTML = Object.keys(RESOURCES_CONFIG).map(resource => {
-                const config = RESOURCES_CONFIG[resource];
-                const rate = production[resource] || 0;
-                const rateClass = rate > 0 ? 'positive' : rate < 0 ? 'negative' : '';
-                
-                return `
-                    <div class="production-item">
-                        <div class="production-resource">
-                            <span>${config.icon}</span>
-                            <span>${config.name}</span>
-                        </div>
-                        <div class="production-rate ${rateClass}">
-                            ${rate > 0 ? '+' : ''}${Math.floor(rate)}/h
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        function updateStorageDisplay() {
-            const container = document.getElementById('storage-display');
-            const gameState = gameEngine.getGameState();
-            const capacity = gameEngine.calculateStorageCapacity('main');
-            
-            container.innerHTML = Object.keys(RESOURCES_CONFIG).map(resource => {
-                const config = RESOURCES_CONFIG[resource];
-                const current = gameState.resources[resource] || 0;
-                const max = capacity[resource] || 1000;
-                const percentage = Math.min(100, (current / max) * 100);
-                
-                return `
-                    <div class="storage-item">
-                        <div class="storage-header">
-                            <div class="storage-resource">
-                                <span>${config.icon}</span>
-                                <span>${config.name}</span>
-                            </div>
-                            <div class="storage-amount">
-                                ${Math.floor(current)} / ${Math.floor(max)}
-                            </div>
-                        </div>
-                        <div class="storage-bar">
-                            <div class="storage-bar-fill" style="width: ${percentage}%"></div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        function updateConstructionQueue() {
-            const container = document.getElementById('construction-queue');
-            const gameState = gameEngine.getGameState();
-            const queue = gameState.constructionQueue || [];
-            
-            if (queue.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: var(--roman-marble); padding: 1rem;">Aucune construction en cours</div>';
-                return;
-            }
-            
-            container.innerHTML = queue.map(item => {
-                const config = BUILDINGS_CONFIG[item.type];
-                const progress = ((Date.now() - item.startTime) / item.duration) * 100;
-                const remainingTime = Math.max(0, item.startTime + item.duration - Date.now());
-                const timeText = formatTime(remainingTime);
-                
-                return `
-                    <div class="queue-item">
-                        <div class="queue-item-header">
-                            <div class="queue-item-name">
-                                <span>${config.icon}</span>
-                                <span>${config.name} Niv. ${item.level}</span>
-                            </div>
-                            <div class="queue-item-time">${timeText}</div>
-                        </div>
-                        <div class="queue-progress">
-                            <div class="queue-progress-bar" style="width: ${Math.min(100, progress)}%"></div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        function updateBuildingSlots() {
-            const gameState = gameEngine.getGameState();
-            const city = gameState.cities.main;
-            
-            buildingSlots.forEach((slot, index) => {
-                const building = city.buildings[`slot_${index}`];
-                const constructionItem = gameState.constructionQueue?.find(item => item.slotId === `slot_${index}`);
-                
-                if (constructionItem) {
-                    slot.classList.add('constructing');
-                    const progress = ((Date.now() - constructionItem.startTime) / constructionItem.duration) * 100;
-                    const progressBar = slot.querySelector('.building-progress-bar');
-                    if (progressBar) {
-                        progressBar.style.width = Math.min(100, progress) + '%';
-                    }
-                } else {
-                    slot.classList.remove('constructing');
-                }
-            });
-        }
-        
-        // Actions rapides
-        function quickCollectTaxes() {
-            const gameState = gameEngine.getGameState();
-            const population = gameEngine.calculatePopulation();
-            const taxAmount = Math.floor(population.current * 2); // 2 or par citoyen
-            
-            gameState.resources.gold += taxAmount;
-            uiManager.showNotification('Tributa Collecta', `+${taxAmount} 💰 or collecté des citoyens!`, 'success');
-        }
-        
-        function quickRecruitUnits() {
-            // Rediriger vers la page militaire
-            window.location.href = '../Militaire/Caserne.html';
-        }
-        
-        function quickBoostProduction() {
-            const cost = 500; // Coût en or
-            const gameState = gameEngine.getGameState();
-            
-            if (gameState.resources.gold >= cost) {
-                gameState.resources.gold -= cost;
-                // Appliquer un boost temporaire (sera géré par le système d'événements)
-                uiManager.showNotification('Acceleratio', 'Production accélérée pendant 1 heure! ⚡', 'success');
-            } else {
-                uiManager.showNotification('Erreur', 'Or insuffisant (500 💰 requis)', 'error');
-            }
-        }
-        
-        function quickCelebrateFestival() {
-            const cost = 300; // Coût en or et vin
-            const gameState = gameEngine.getGameState();
-            
-            if (gameState.resources.gold >= cost && gameState.resources.wine >= 50) {
-                gameState.resources.gold -= cost;
-                gameState.resources.wine -= 50;
-                // Augmenter temporairement le bonheur
-                uiManager.showNotification('Festum Celebratum', 'Festival organisé! Bonheur des citoyens +20! 🎭', 'success');
-            } else {
-                uiManager.showNotification('Erreur', 'Ressources insuffisantes (300 💰 + 50 🍇)', 'error');
-            }
-        }
-        
-        // Utilitaires
-        function formatTime(ms) {
-            const seconds = Math.floor(ms / 1000);
-            const minutes = Math.floor(seconds / 60);
-            const hours = Math.floor(minutes / 60);
-            
-            if (hours > 0) {
-                return `${hours}h ${minutes % 60}m`;
-            } else if (minutes > 0) {
-                return `${minutes}m ${seconds % 60}s`;
-            } else {
-                return `${seconds}s`;
-            }
-        }
-        
-        // Conseils de développement
-        function showDevelopmentTips() {
-            const tips = [
-                "🏛️ Construisez un Forum pour augmenter votre population maximale",
-                "🏪 Les Entrepôts augmentent votre capacité de stockage",
-                "🍇 Les Tavernes améliorent le bonheur de vos citoyens",
-                "⚔️ Une Caserne est nécessaire pour recruter des unités",
-                "🔬 L'Académie permet de rechercher de nouvelles technologies",
-                "💰 La Monnaie Impériale génère de l'or automatiquement"
+
+        // Afficher les options de construction
+        function showBuildingOptions(building) {
+            const options = [
+                'Maison Romaine 🏠',
+                'Atelier d\'Artisan 🔨',
+                'Temple 🏛️',
+                'Marché 🏪',
+                'Caserne ⚔️'
             ];
             
-            const randomTip = tips[Math.floor(Math.random() * tips.length)];
-            uiManager.showNotification('Consilium Aedificandi', randomTip, 'info', 8000);
-        }
-        
-        // Afficher un conseil au chargement
-        setTimeout(showDevelopmentTips, 3000);
-        
-        // Raccourcis clavier
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.shiftKey) {
-                switch(e.key) {
-                    case 'T':
-                        e.preventDefault();
-                        quickCollectTaxes();
-                        break;
-                    case 'R':
-                        e.preventDefault();
-                        quickRecruitUnits();
-                        break;
-                    case 'B':
-                        e.preventDefault();
-                        quickBoostProduction();
-                        break;
-                    case 'F':
-                        e.preventDefault();
-                        quickCelebrateFestival();
-                        break;
-                }
+            const choice = prompt(`Que voulez-vous construire ?\n\n${options.map((opt, i) => `${i + 1}. ${opt}`).join('\n')}\n\nEntrez le numéro de votre choix :`);
+            
+            if (choice && choice >= 1 && choice <= options.length) {
+                startConstruction(building, options[choice - 1]);
             }
-        });
-    </script>
+        }
 
-    <script src="../../../../../../link-buttons-to-functions.js"></script>
+        // Démarrer une construction
+        function startConstruction(building, buildingType) {
+            alert(`Construction de ${buildingType} commencée !\n\nTemps estimé : 2h 30min`);
+            // Ici vous pourriez ajouter la logique de construction réelle
+        }
+
+        // Actions rapides
+        function collectTaxes() {
+            const amount = Math.floor(Math.random() * 500) + 200;
+            updateResource('gold', amount);
+            showNotification(`💰 +${amount} pièces d'or collectées !`, 'success');
+        }
+
+        function recruitCitizens() {
+            const amount = Math.floor(Math.random() * 50) + 10;
+            updateResource('population', amount);
+            showNotification(`👥 +${amount} nouveaux citoyens recrutés !`, 'success');
+        }
+
+        function organizeGames() {
+            showNotification(`🎪 Jeux organisés ! Le bonheur de la population augmente !`, 'success');
+            // Augmenter le bonheur
+            const happinessElement = document.getElementById('statHappiness');
+            const currentHappiness = parseInt(happinessElement.textContent);
+            happinessElement.textContent = Math.min(100, currentHappiness + 5) + '%';
+        }
+
+        function upgradeDefenses() {
+            const cost = 1000;
+            const currentGold = parseInt(document.getElementById('gold').textContent.replace(',', ''));
+            
+            if (currentGold >= cost) {
+                updateResource('gold', -cost);
+                const defenseElement = document.getElementById('statDefense');
+                const currentDefense = parseInt(defenseElement.textContent);
+                defenseElement.textContent = currentDefense + 25;
+                showNotification(`🛡️ Défenses améliorées ! (+25 points de défense)`, 'success');
+            } else {
+                showNotification(`❌ Pas assez d'or ! (${cost} requis)`, 'error');
+            }
+        }
+
+        // Mettre à jour les ressources
+        function updateResource(type, amount) {
+            const element = document.getElementById(type);
+            if (element) {
+                const current = parseInt(element.textContent.replace(',', ''));
+                const newValue = current + amount;
+                element.textContent = newValue.toLocaleString();
+                
+                // Animation de changement
+                element.style.transform = 'scale(1.2)';
+                element.style.color = amount > 0 ? '#22c55e' : '#dc2626';
+                
+                setTimeout(() => {
+                    element.style.transform = 'scale(1)';
+                    element.style.color = '';
+                }, 300);
+            }
+        }
+
+        // Afficher une notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#22c55e' : type === 'error' ? '#dc2626' : '#3b82f6'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 0.5rem;
+                font-weight: bold;
+                z-index: 10000;
+                animation: slideInRight 0.3s ease-out;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-in forwards';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Créer des particules d'ambiance
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Démarrer les mises à jour de production
+        function startProductionUpdates() {
+            setInterval(() => {
+                // Simuler la production en temps réel
+                const goldProduction = 245;
+                const foodProduction = 180;
+                const materialsProduction = 95;
+                
+                // Mettre à jour les ressources toutes les heures (simulé toutes les 10 secondes)
+                updateResource('gold', Math.floor(goldProduction / 360)); // /360 pour simuler 10s = 1min
+                updateResource('food', Math.floor(foodProduction / 360));
+            }, 10000); // Toutes les 10 secondes
+        }
+
+        // Navigation (fonction globale)
+        function navigateTo(page) {
+            // Cette fonction sera implémentée par le système de navigation commun
+            console.log('Navigation vers:', page);
+            
+            // Simulation de navigation
+            if (page === 'diplomatie') {
+                window.location.href = '../Social/Diplomatie.html';
+            } else if (page === 'index') {
+                window.location.href = '../../index.html';
+            }
+            // Ajouter d'autres navigations selon les besoins
+        }
+
+        // Animations CSS supplémentaires
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
