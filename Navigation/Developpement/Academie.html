@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -8,29 +8,141 @@
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
 
-    <!-- Styles et scripts communs -->
+    <!-- Styles et scripts communs (simulés dans le code ci-dessous)
     <link rel="stylesheet" href="../common-styles.css">
     <script src="../common-navigation.js"></script>
     <script src="../game-engine.js"></script>
     <script src="../ui-manager.js"></script>
     <script src="../global-console.js"></script>
+    -->
+    <style>
+        /* =============================================================== */
+        /* STYLES COMMUNS (SIMULATION DE common-style.css)     */
+        /* =============================================================== */
+        :root {
+            --gold-primary: #d97706;
+            --gold-secondary: #f59e0b;
+            --gold-light: #fbbf24;
+            --marble-white: #f8fafc;
+            --roman-red: #dc2626;
+            --roman-purple: #7c3aed;
+            --dark-stone: #1e293b;
+            --dark-marble: #334155;
+            --dark-bg: #0f172a;
+            --text-light: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-gold: rgba(217, 119, 6, 0.3);
+            --shadow-gold: rgba(217, 119, 6, 0.4);
+            --success-green: #22c55e;
+            --storage-full-red: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(217, 119, 6, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-stone) 100%);
+            color: var(--text-light);
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- Structure et Navigation --- */
+        .imperium-ui { display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 10; }
+        .imperium-header { background: linear-gradient(135deg, var(--dark-marble) 0%, var(--dark-stone) 100%); backdrop-filter: blur(10px); border-bottom: 2px solid var(--border-gold); padding: 1rem 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 100; }
+        .header-content { max-width: 1600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .imperium-logo { font-size: 2.5rem; font-weight: bold; background: linear-gradient(135deg, var(--gold-primary), var(--gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); letter-spacing: 2px; cursor: pointer; transition: all 0.3s ease; }
+        .resources-display { display: flex; gap: 1.5rem; background: rgba(15, 23, 42, 0.7); padding: 0.75rem 1.5rem; border-radius: 1rem; border: 1px solid var(--border-gold); }
+        .resource-item { display: flex; align-items: center; gap: 0.5rem; font-weight: bold; font-size: 1rem; }
+        .player-info { display: flex; align-items: center; gap: 1rem; }
+        .player-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--roman-red), var(--roman-purple)); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 2px solid var(--gold-primary); }
+        .player-name { color: var(--gold-light); font-weight: bold; }
+        .player-level { color: var(--text-muted); }
+        .imperium-body { display: flex; flex-grow: 1; max-width: 1600px; margin: 0 auto; width: 100%; gap: 1.5rem; padding: 1.5rem 2rem; overflow: hidden; }
+        .imperium-sidebar { width: 280px; flex-shrink: 0; background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%); border-radius: 1rem; border: 1px solid var(--border-gold); padding: 1.5rem; overflow-y: auto; box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+        .nav-section { margin-bottom: 2rem; }
+        .nav-title { color: var(--gold-primary); font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border-gold); padding-bottom: 0.5rem; }
+        .nav-list { list-style: none; }
+        .nav-item a { display: flex; align-items: center; gap: 1rem; color: var(--text-light); text-decoration: none; padding: 0.75rem 1rem; margin-bottom: 0.5rem; border-radius: 0.5rem; transition: all 0.3s ease; border: 1px solid transparent; cursor: pointer; }
+        .nav-item a:hover, .nav-item a.active { background: linear-gradient(135deg, rgba(217, 119, 6, 0.2), rgba(245, 158, 11, 0.1)); border-color: var(--gold-primary); transform: translateX(5px); color: var(--gold-light); }
+        .nav-icon { font-size: 1.3rem; width: 24px; text-align: center; }
+        .main-content { flex-grow: 1; position: relative; overflow: hidden; }
+        .view-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%); border-radius: 1rem; border: 1px solid var(--border-gold); overflow-y: auto; padding: 2rem; box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+        .view-title { font-size: 2.2rem; font-weight: bold; color: var(--gold-primary); margin-bottom: 2rem; text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .panel-section { background: rgba(30, 41, 59, 0.6); border-radius: 0.5rem; padding: 1rem; border: 1px solid var(--border-gold); }
+        .section-title { color: var(--gold-primary); font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .queue-container { margin-top: 1rem; }
+        .queue-empty { text-align: center; color: var(--text-muted); font-style: italic; }
+        .queue-item { display: flex; align-items: center; gap: 1rem; background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border-gold); }
+        .queue-icon { font-size: 2rem; }
+        .queue-info { flex-grow: 1; }
+        .queue-name { font-weight: bold; color: var(--gold-light); }
+        .timer-progress { width: 100%; height: 6px; background: rgba(0,0,0,0.3); border-radius: 3px; overflow: hidden; margin: 0.5rem 0; }
+        .timer-progress-bar { height: 100%; background: linear-gradient(90deg, var(--gold-primary), var(--gold-light)); border-radius: 3px; transition: width 0.3s ease; }
+        .timer-remaining { font-size: 0.9rem; color: var(--gold-light); }
+        
+        /* =============================================================== */
+        /* STYLES SPÉCIFIQUES À L'ACADÉMIE                   */
+        /* =============================================================== */
+        .tech-tree { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; }
+        .tech-branch { background: rgba(15, 23, 42, 0.8); border-radius: 1rem; border: 2px solid var(--border-gold); padding: 1.5rem; }
+        .tech-branch-title { color: var(--gold-primary); font-size: 1.3rem; font-weight: bold; margin-bottom: 1rem; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .tech-branch-description { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; text-align: center; font-style: italic; }
+        .tech-item { background: rgba(30, 41, 59, 0.6); border-radius: 0.8rem; border: 1px solid var(--border-gold); padding: 1rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease; position: relative; }
+        .tech-item:hover { transform: translateY(-2px); box-shadow: 0 5px 15px var(--shadow-gold); border-color: var(--gold-light); }
+        .tech-item.researched { background: rgba(34, 197, 94, 0.2); border-color: #22c55e; cursor: default; }
+        .tech-item.researching { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; cursor: default; }
+        .tech-item.locked { opacity: 0.5; cursor: not-allowed; }
+        .tech-name { color: var(--gold-light); font-weight: bold; margin-bottom: 0.5rem; }
+        .tech-description { color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem; }
+        .tech-cost { display: flex; gap: 1rem; margin-bottom: 0.5rem; }
+        .tech-cost-item { display: flex; align-items: center; gap: 0.3rem; color: var(--text-muted); font-size: 0.8rem; }
+        .tech-status { position: absolute; top: 0.5rem; right: 0.5rem; width: 12px; height: 12px; border-radius: 50%; }
+        .tech-status.researched { background: #22c55e; }
+        .tech-status.researching { background: #3b82f6; animation: pulse 2s infinite; }
+        .tech-requirements { margin-top: 0.5rem; color: var(--text-muted); font-size: 0.8rem; }
+        .tech-effects { margin-top: 0.8rem; color: var(--gold-light); font-size: 0.8rem; }
+        
+        /* --- Styles pour la modale --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: rgba(15, 23, 42, 0.95); border: 2px solid var(--gold-primary); border-radius: 1rem; padding: 2rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; transform: scale(0.8); transition: transform 0.3s ease; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-title { color: var(--gold-primary); font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; text-align: center; }
+        .modal-body { color: var(--text-light); margin-bottom: 2rem; }
+        .modal-actions { display: flex; gap: 1rem; justify-content: center; }
+        .modal-btn { padding: 0.8rem 2rem; border: none; border-radius: 0.5rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; font-family: 'Times New Roman', serif; }
+        .modal-btn.primary { background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary)); color: white; }
+        .modal-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px var(--shadow-gold); }
+        .modal-btn.secondary { background: rgba(30, 41, 59, 0.8); color: var(--text-light); border: 1px solid var(--border-gold); }
+        .cost-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 0.5rem; }
+        .cost-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: rgba(30, 41, 59, 0.6); border-radius: 0.3rem; border: 1px solid var(--border-gold); }
+        .cost-item.sufficient { border-color: var(--success-green); background: rgba(34, 197, 94, 0.1); }
+        .cost-item.insufficient { border-color: var(--roman-red); background: rgba(220, 38, 38, 0.1); }
+        .cost-icon { font-size: 1.2rem; }
+        .cost-amount { font-weight: bold; color: var(--gold-light); }
+        .cost-current { font-size: 0.8rem; color: var(--text-muted); }
+        
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
 </head>
 <body>
-    <!-- Particules d'arrière-plan -->
-    <div class="particles"></div>
-
-    <!-- INTERFACE PRINCIPALE DU JEU -->
     <div class="imperium-ui">
-        <!-- HEADER -->
         <header class="imperium-header">
             <div class="header-content">
                 <h1 class="imperium-logo">IMPERIUM</h1>
-                <div id="resources-display" class="resources-display">
-                    <!-- Les ressources seront injectées ici par JS -->
-                </div>
+                <div id="resources-display" class="resources-display"></div>
                 <div class="player-info">
-                    <div class="player-avatar" id="player-avatar">M</div>
-                    <div>
+                    <div class="player-avatar" id="player-avatar"></div>
+                    <div class="player-details">
                         <div class="player-name" id="player-name"></div>
                         <div class="player-level" id="player-title-level"></div>
                     </div>
@@ -38,33 +150,20 @@
             </div>
         </header>
 
-        <!-- CORPS PRINCIPAL -->
         <div class="imperium-body">
-            <!-- BARRE LATERALE (Desktop) -->
-            <aside class="imperium-sidebar">
-                <!-- Navigation générée dynamiquement par common-navigation.js -->
-            </aside>
+            <aside class="imperium-sidebar"></aside>
 
-            <!-- CONTENU PRINCIPAL -->
             <main class="main-content">
                 <div class="view-container">
                     <h2 class="view-title">Académie Impériale</h2>
                     
-                    <!-- File de recherche -->
                     <div class="panel-section" style="margin-bottom: 2rem;">
                         <h3 class="section-title">🔬 Recherche en cours</h3>
                         <div id="research-queue" class="queue-container">
                             <p class="queue-empty">Aucune recherche en cours</p>
                         </div>
-                        <div class="research-stats">
-                            <div class="stat-item">
-                                <div class="stat-label">Vitesse de recherche</div>
-                                <div class="stat-value" id="research-speed">1.0x</div>
-                            </div>
-                        </div>
                     </div>
                     
-                    <!-- Arbre technologique -->
                     <div class="tech-tree" id="tech-tree">
                         <!-- Généré par JavaScript -->
                     </div>
@@ -74,29 +173,147 @@
     </div>
 
     <script>
-        // Variables globales
-        let uiManager;
-        
-        // Initialisation
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialiser le moteur de jeu s'il n'est pas déjà initialisé
-            if (!gameEngine.isRunning) {
-                gameEngine.init();
+        // ===============================================================
+        // SIMULATION DU MOTEUR DE JEU ET DES DONNÉES
+        // ===============================================================
+        const RESOURCES_CONFIG = {
+            wood: { name: 'Bois', icon: '🌲' },
+            stone: { name: 'Pierre', icon: '🪨' },
+            food: { name: 'Nourriture', icon: '🍇' },
+            iron: { name: 'Fer', icon: '⛏️' },
+            gold: { name: 'Or', icon: '💰' },
+            research: { name: 'Points de recherche', icon: '📚' }
+        };
+
+        const BUILDINGS_CONFIG = {
+            academy: { name: 'Académie' }
+        };
+
+        const TECH_TREE = {
+            urbanisme: {
+                name: 'Urbanisme', icon: '🏛️', description: 'Améliore la gestion et la croissance de vos cités.',
+                techs: {
+                    aqueducs: { name: 'Aqueducs', description: 'Augmente le bonheur et la croissance de la population.', cost: { stone: 100, research: 50 }, effects: { populationGrowth: 0.05, happiness: 5 } },
+                    architecture: { name: 'Architecture', description: 'Réduit le coût en pierre des bâtiments.', cost: { wood: 150, research: 80 }, requirements: { tech: 'urbanisme.aqueducs' }, effects: { stoneCostReduction: 0.10 } }
+                }
+            },
+            militaire: {
+                name: 'Militaire', icon: '⚔️', description: 'Débloque et améliore vos unités militaires.',
+                techs: {
+                    phalanges: { name: 'Phalanges', description: 'Débloque l\'unité Hoplite.', cost: { iron: 100, research: 60 }, effects: { unitsUnlocked: 'Hoplite' } },
+                    tactiques: { name: 'Tactiques de siège', description: 'Augmente les dégâts contre les murailles.', cost: { iron: 200, research: 120 }, requirements: { tech: 'militaire.phalanges' }, effects: { siegeBonus: 0.15 } }
+                }
+            },
+            economie: {
+                name: 'Économie', icon: '💰', description: 'Augmente vos revenus et votre efficacité commerciale.',
+                techs: {
+                    monnaie: { name: 'Monnaie', description: 'Augmente la production d\'or.', cost: { gold: 500, research: 70 }, effects: { goldProductionBonus: 0.10 } },
+                    routes_commerciales: { name: 'Routes Commerciales', description: 'Permet d\'établir plus de routes commerciales.', cost: { wood: 200, gold: 300, research: 100 }, requirements: { tech: 'economie.monnaie' }, effects: { tradeRoutes: 1 } }
+                }
             }
-            
-            // Initialiser le gestionnaire d'interface
-            uiManager = new ImperiumUIManager(gameEngine);
-            
-            // Générer l'arbre technologique
-            generateTechTree();
-            
-            // Mettre à jour l'interface
-            updateAcademyInterface();
-            
-            console.log('📚 Académie initialisée avec succès!');
-        });
+        };
+
+        const gameEngine = {
+            gameState: {
+                resources: { wood: 1000, stone: 1000, food: 1000, iron: 1000, gold: 1000, research: 500 },
+                technologies: [],
+                researchQueue: [],
+                buildings: { main: { academy: { level: 1 } } }
+            },
+            getGameState: function() { return this.gameState; },
+            canAfford: function(cost) { return Object.keys(cost).every(res => this.gameState.resources[res] >= cost[res]); },
+            checkRequirements: function(cityId, requirements) {
+                if (requirements.tech) return this.gameState.technologies.includes(requirements.tech);
+                return true; // Simplifié
+            },
+            startResearch: function(branchKey, techKey) {
+                const tech = TECH_TREE[branchKey].techs[techKey];
+                if (!this.canAfford(tech.cost)) throw new Error("Ressources insuffisantes.");
+                
+                Object.keys(tech.cost).forEach(res => { this.gameState.resources[res] -= tech.cost[res]; });
+                
+                const researchTime = (tech.cost.research * 10) * 1000; // en ms
+                this.gameState.researchQueue.push({
+                    branch: branchKey, id: techKey, name: tech.name,
+                    startTime: Date.now(), endTime: Date.now() + researchTime
+                });
+            },
+            update: function() {
+                const now = Date.now();
+                const completed = [];
+                this.gameState.researchQueue.forEach((item, index) => {
+                    if (now >= item.endTime) {
+                        this.gameState.technologies.push(`${item.branch}.${item.id}`);
+                        completed.push(index);
+                    }
+                });
+                completed.reverse().forEach(index => this.gameState.researchQueue.splice(index, 1));
+            }
+        };
+
+        // ===============================================================
+        // SCRIPT DE NAVIGATION ET UI GLOBALE
+        // ===============================================================
+        const NAVIGATION_CONFIG = {
+            'index':      { title: 'Accueil', file: 'index.html', section: 'Empire', icon: '🏛️' },
+            'cite':       { title: 'Ma Cité', file: 'Empire/Cite.html', section: 'Empire', icon: '🏘️' },
+            'monde':      { title: 'Monde', file: 'Empire/Monde.html', section: 'Empire', icon: '🌍' },
+            'province':   { title: 'Province', file: 'Empire/Province.html', section: 'Empire', icon: '🏝️' },
+            'academie':   { title: 'Académie', file: 'Developpement/Academie.html', section: 'Développement', icon: '📚' },
+            'commerce':   { title: 'Commerce', file: 'Developpement/Commerce.html', section: 'Développement', icon: '⚖️' },
+            'legions':    { title: 'Légions', file: 'Militaire/Légions.html', section: 'Militaire', icon: '⚔️' },
+            'flotte':     { title: 'Flotte', file: 'Militaire/Flotte.html', section: 'Militaire', icon: '🚢' },
+            'simulateur': { title: 'Simulateur', file: 'Militaire/Simulateur.html', section: 'Militaire', icon: '💥' },
+            'diplomatie': { title: 'Diplomatie', file: 'Social/Diplomatie.html', section: 'Social', icon: '🤝' },
+            'alliance':   { title: 'Alliance', file: 'Social/Alliance.html', section: 'Social', icon: '🛡️' },
+            'messages':   { title: 'Messages', file: 'Social/Messsages.html', section: 'Social', icon: '✉️' },
+            'premium':    { title: 'Premium', file: 'Premium/Premium.html', section: 'Premium', icon: '👑' }
+        };
         
-        // Génération de l'arbre technologique
+        function initializeGlobalUI() {
+            const sidebar = document.querySelector('.imperium-sidebar');
+            if (sidebar) sidebar.innerHTML = generateNavigationHTML();
+            
+            const currentPage = 'academie';
+            document.querySelectorAll('.nav-item a').forEach(link => {
+                link.classList.toggle('active', link.getAttribute('data-page') === currentPage);
+            });
+
+            document.querySelector('.player-name').textContent = 'Marcus Aurelius';
+            document.querySelector('.player-level').textContent = 'Consul - Niv. 12';
+            document.querySelector('.player-avatar').textContent = 'M';
+            updateResourcesDisplay();
+        }
+
+        function generateNavigationHTML() {
+            const sections = {};
+            Object.entries(NAVIGATION_CONFIG).forEach(([key, conf]) => {
+                if (key === 'index') return;
+                if (!sections[conf.section]) sections[conf.section] = [];
+                sections[conf.section].push({ key, ...conf });
+            });
+            let html = '';
+            Object.entries(sections).forEach(([sectionName, pages]) => {
+                html += `<div class="nav-section"><h2 class="nav-title">${sectionName}</h2><ul class="nav-list">`;
+                pages.forEach(page => {
+                    html += `<li class="nav-item"><a href="#" data-page="${page.key}"><span class="nav-icon">${page.icon}</span> ${page.title}</a></li>`;
+                });
+                html += `</ul></div>`;
+            });
+            return html;
+        }
+
+        function updateResourcesDisplay() {
+            const resources = gameEngine.getGameState().resources;
+            document.querySelector('.resources-display').innerHTML = Object.keys(RESOURCES_CONFIG)
+                .filter(res => res !== 'research')
+                .map(res => `<div class="resource-item"><span class="resource-icon">${RESOURCES_CONFIG[res].icon}</span><span class="resource-value">${Math.floor(resources[res])}</span></div>`)
+                .join('');
+        }
+
+        // ===============================================================
+        // SCRIPT SPÉCIFIQUE À L'ACADÉMIE
+        // ===============================================================
         function generateTechTree() {
             const techTreeContainer = document.getElementById('tech-tree');
             const gameState = gameEngine.getGameState();
@@ -105,475 +322,138 @@
             
             techTreeContainer.innerHTML = Object.keys(TECH_TREE).map(branchKey => {
                 const branch = TECH_TREE[branchKey];
-                
                 return `
                     <div class="tech-branch">
-                        <h3 class="tech-branch-title">
-                            <span>${branch.icon}</span>
-                            <span>${branch.name}</span>
-                        </h3>
+                        <h3 class="tech-branch-title"><span>${branch.icon}</span><span>${branch.name}</span></h3>
                         <div class="tech-branch-description">${branch.description}</div>
-                        
                         ${Object.keys(branch.techs).map(techKey => {
                             const tech = branch.techs[techKey];
                             const techId = `${branchKey}.${techKey}`;
                             const isResearched = researchedTechs.includes(techId);
                             const isResearching = researchingTechs.includes(techId);
-                            const isLocked = !canResearchTech(branchKey, techKey);
+                            const isLocked = !isResearched && !isResearching && !gameEngine.checkRequirements('main', tech.requirements || {});
                             
-                            let statusClass = '';
-                            let statusIcon = '';
-                            
-                            if (isResearched) {
-                                statusClass = 'researched';
-                                statusIcon = 'researched';
-                            } else if (isResearching) {
-                                statusClass = 'researching';
-                                statusIcon = 'researching';
-                            } else if (isLocked) {
-                                statusClass = 'locked';
-                                statusIcon = '';
-                            }
+                            let statusClass = isResearched ? 'researched' : isResearching ? 'researching' : isLocked ? 'locked' : '';
                             
                             return `
-                                <div class="tech-item ${statusClass}" 
-                                     data-branch="${branchKey}" 
-                                     data-tech="${techKey}"
-                                     ${isLocked ? 'title="Prérequis non satisfaits"' : ''}>
-                                    
-                                    <div class="tech-status ${statusIcon}"></div>
-                                    
+                                <div class="tech-item ${statusClass}" data-branch="${branchKey}" data-tech="${techKey}">
+                                    <div class="tech-status ${statusClass}"></div>
                                     <div class="tech-name">${tech.name}</div>
                                     <div class="tech-description">${tech.description}</div>
-                                    
-                                    <div class="tech-cost">
-                                        ${Object.keys(tech.cost).map(resource => `
-                                            <div class="tech-cost-item">
-                                                <span>${RESOURCES_CONFIG[resource].icon}</span>
-                                                <span>${tech.cost[resource]}</span>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                    
-                                    ${tech.requirements ? `
-                                        <div class="tech-requirements">
-                                            <small>Prérequis: ${formatRequirements(tech.requirements)}</small>
-                                        </div>
-                                    ` : ''}
-                                    
-                                    <div class="tech-effects">
-                                        ${Object.keys(tech.effects).map(effect => `
-                                            <small>• ${formatTechEffect(effect, tech.effects[effect])}</small>
-                                        `).join('<br>')}
-                                    </div>
-                                </div>
-                            `;
+                                    <div class="tech-cost">${Object.keys(tech.cost).map(res => `<div class="tech-cost-item"><span>${RESOURCES_CONFIG[res].icon}</span><span>${tech.cost[res]}</span></div>`).join('')}</div>
+                                </div>`;
                         }).join('')}
-                    </div>
-                `;
+                    </div>`;
             }).join('');
             
-            // Ajouter les gestionnaires d'événements
-            document.querySelectorAll('.tech-item').forEach(item => {
-                item.addEventListener('click', handleTechClick);
-            });
+            document.querySelectorAll('.tech-item').forEach(item => item.addEventListener('click', handleTechClick));
         }
-        
-        // Vérifier si une technologie peut être recherchée
-        function canResearchTech(branchKey, techKey) {
-            const tech = TECH_TREE[branchKey].techs[techKey];
-            const gameState = gameEngine.getGameState();
-            
-            // Vérifier si déjà recherchée
-            if (gameState.technologies.includes(`${branchKey}.${techKey}`)) {
-                return false;
-            }
-            
-            // Vérifier si en cours de recherche
-            if (gameState.researchQueue.some(r => r.branch === branchKey && r.id === techKey)) {
-                return false;
-            }
-            
-            // Vérifier les prérequis
-            if (tech.requirements) {
-                return gameEngine.checkRequirements('main', tech.requirements);
-            }
-            
-            return true;
-        }
-        
-        // Gestion des clics sur les technologies
+
         function handleTechClick(event) {
             const item = event.currentTarget;
-            const branchKey = item.dataset.branch;
-            const techKey = item.dataset.tech;
-            
-            if (item.classList.contains('locked') || 
-                item.classList.contains('researched') || 
-                item.classList.contains('researching')) {
-                return;
-            }
-            
-            showTechResearchModal(branchKey, techKey);
+            if (item.classList.contains('locked') || item.classList.contains('researched') || item.classList.contains('researching')) return;
+            showTechResearchModal(item.dataset.branch, item.dataset.tech);
         }
-        
-        // Afficher la modale de recherche
+
         function showTechResearchModal(branchKey, techKey) {
             const tech = TECH_TREE[branchKey].techs[techKey];
             const canAfford = gameEngine.canAfford(tech.cost);
-            const researchSpeed = gameEngine.calculateResearchSpeed();
-            const researchTime = (tech.cost.research * 10) / researchSpeed;
+            const researchTime = (tech.cost.research * 10);
             
             const modalContent = `
                 <h3 class="modal-title">Rechercher ${tech.name}</h3>
                 <div class="modal-body">
-                    <div class="tech-research-info">
-                        <p class="tech-description">${tech.description}</p>
-                        
-                        <div class="research-cost">
-                            <h4>Coût de recherche:</h4>
-                            <div class="cost-grid">
-                                ${Object.keys(tech.cost).map(resource => {
-                                    const current = gameEngine.getResources()[resource] || 0;
-                                    const needed = tech.cost[resource];
-                                    const sufficient = current >= needed;
-                                    
-                                    return `
-                                        <div class="cost-item ${sufficient ? 'sufficient' : 'insufficient'}">
-                                            <span class="cost-icon">${RESOURCES_CONFIG[resource].icon}</span>
-                                            <span class="cost-amount">${needed}</span>
-                                            <span class="cost-current">(${Math.floor(current)} disponible)</span>
-                                        </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                        </div>
-                        
-                        <div class="research-time">
-                            <h4>Temps de recherche:</h4>
-                            <p>⏱️ ${formatTime(researchTime)} (vitesse: ${researchSpeed.toFixed(1)}x)</p>
-                        </div>
-                        
-                        <div class="research-effects">
-                            <h4>Effets de la technologie:</h4>
-                            <ul>
-                                ${Object.keys(tech.effects).map(effect => 
-                                    `<li>${formatTechEffect(effect, tech.effects[effect])}</li>`
-                                ).join('')}
-                            </ul>
-                        </div>
-                        
-                        ${tech.requirements ? `
-                            <div class="research-requirements">
-                                <h4>Prérequis:</h4>
-                                <p>${formatRequirements(tech.requirements)}</p>
-                            </div>
-                        ` : ''}
+                    <p>${tech.description}</p>
+                    <h4>Coût:</h4>
+                    <div class="cost-grid">
+                        ${Object.keys(tech.cost).map(res => {
+                            const needed = tech.cost[res];
+                            const current = gameEngine.getGameState().resources[res];
+                            return `<div class="cost-item ${current >= needed ? 'sufficient' : 'insufficient'}">
+                                <span class="cost-icon">${RESOURCES_CONFIG[res].icon}</span>
+                                <span class="cost-amount">${needed}</span>
+                                <span class="cost-current">(${Math.floor(current)} dispo.)</span>
+                            </div>`;
+                        }).join('')}
                     </div>
+                    <h4>Temps de recherche: ⏱️ ${researchTime}s</h4>
                 </div>
                 <div class="modal-actions">
-                    ${canAfford ? 
-                        `<button class="modal-btn primary" onclick="startResearch('${branchKey}', '${techKey}')">🔬 Commencer la recherche</button>` : 
-                        `<button class="modal-btn primary" disabled>Ressources insuffisantes</button>`
-                    }
-                    <button class="modal-btn secondary" onclick="closeModal()">Fermer</button>
-                </div>
-            `;
+                    ${canAfford ? `<button class="modal-btn primary" id="start-research-btn">🔬 Commencer</button>` : `<button class="modal-btn primary" disabled>Ressources insuffisantes</button>`}
+                    <button class="modal-btn secondary" id="close-modal-btn">Fermer</button>
+                </div>`;
             
             showModal(modalContent);
+            document.getElementById('close-modal-btn').onclick = closeModal;
+            if (canAfford) {
+                document.getElementById('start-research-btn').onclick = () => startResearch(branchKey, techKey);
+            }
         }
-        
-        // Commencer une recherche
+
         function startResearch(branchKey, techKey) {
             try {
                 gameEngine.startResearch(branchKey, techKey);
                 closeModal();
-                
-                // Régénérer l'arbre technologique
-                setTimeout(() => {
-                    generateTechTree();
-                    updateAcademyInterface();
-                }, 100);
-                
+                updateAllUI();
             } catch (error) {
-                uiManager.showNotification('Erreur', error.message, 'error');
+                alert(error.message);
             }
         }
-        
-        // Mise à jour de l'interface de l'académie
-        function updateAcademyInterface() {
-            // Vitesse de recherche
-            const researchSpeed = gameEngine.calculateResearchSpeed();
-            document.getElementById('research-speed').textContent = researchSpeed.toFixed(1) + 'x';
-            
-            // File de recherche
-            updateResearchQueue();
-        }
-        
-        // Mise à jour de la file de recherche
+
         function updateResearchQueue() {
-            const gameState = gameEngine.getGameState();
-            const queue = gameState.researchQueue;
+            const queue = gameEngine.getGameState().researchQueue;
             const container = document.getElementById('research-queue');
-            
             if (queue.length === 0) {
                 container.innerHTML = '<p class="queue-empty">Aucune recherche en cours</p>';
                 return;
             }
-            
             container.innerHTML = queue.map(research => {
-                const progress = calculateProgress(research.startTime, research.endTime);
-                const remaining = formatTime((research.endTime - Date.now()) / 1000);
-                
+                const now = Date.now();
+                const progress = Math.min(100, (now - research.startTime) / (research.endTime - research.startTime) * 100);
+                const remaining = Math.max(0, (research.endTime - now) / 1000);
                 return `
                     <div class="queue-item">
                         <div class="queue-icon">🔬</div>
                         <div class="queue-info">
                             <div class="queue-name">${research.name}</div>
-                            <div class="timer-progress">
-                                <div class="timer-progress-bar" style="width: ${progress}%"></div>
-                            </div>
-                            <div class="timer-remaining">${remaining}</div>
+                            <div class="timer-progress"><div class="timer-progress-bar" style="width: ${progress}%"></div></div>
+                            <div class="timer-remaining">⏱️ ${Math.floor(remaining)}s</div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             }).join('');
         }
-        
-        // Formatage des effets des technologies
-        function formatTechEffect(effect, value) {
-            const effects = {
-                populationGrowth: `+${(value * 100).toFixed(0)}% croissance de population`,
-                happiness: `+${value} bonheur`,
-                stoneCostReduction: `-${(value * 100).toFixed(0)}% coût en pierre`,
-                buildingQueues: `+${value} file de construction`,
-                unitsUnlocked: `Débloque: ${Array.isArray(value) ? value.join(', ') : value}`,
-                defenseBonus: `+${(value * 100).toFixed(0)}% défense`,
-                attackBonus: `+${(value * 100).toFixed(0)}% attaque`,
-                siegeBonus: `+${(value * 100).toFixed(0)}% dégâts aux murailles`,
-                tradeRoutes: `+${value} route commerciale`,
-                tradeBonus: `+${(value * 100).toFixed(0)}% revenus commerciaux`,
-                goldProductionBonus: `+${(value * 100).toFixed(0)}% production d'or`,
-                navalSpeedBonus: `-${(value * 100).toFixed(0)}% temps de trajet naval`,
-                espionageEnabled: 'Débloque l\'espionnage',
-                allianceBonusIncrease: `+${(value * 100).toFixed(0)}% bonus d'alliance`,
-                allianceMembersBonus: `+${value} membres d'alliance max`,
-                corruptionReduction: `-${(value * 100).toFixed(0)}% corruption`
-            };
-            
-            return effects[effect] || `${effect}: ${value}`;
-        }
-        
-        // Formatage des prérequis
-        function formatRequirements(requirements) {
-            return Object.keys(requirements).map(req => {
-                if (req === 'tech') {
-                    return `Technologie: ${requirements[req]}`;
-                } else {
-                    const config = BUILDINGS_CONFIG[req];
-                    return `${config ? config.name : req} niveau ${requirements[req]}`;
-                }
-            }).join(', ');
-        }
-        
-        // Utilitaires
-        function calculateProgress(startTime, endTime) {
-            const now = Date.now();
-            const total = endTime - startTime;
-            const elapsed = now - startTime;
-            return Math.min(100, Math.max(0, (elapsed / total) * 100));
-        }
-        
-        function formatTime(seconds) {
-            if (seconds < 60) {
-                return `${Math.floor(seconds)}s`;
-            } else if (seconds < 3600) {
-                const minutes = Math.floor(seconds / 60);
-                const secs = Math.floor(seconds % 60);
-                return `${minutes}m ${secs}s`;
-            } else {
-                const hours = Math.floor(seconds / 3600);
-                const minutes = Math.floor((seconds % 3600) / 60);
-                return `${hours}h ${minutes}m`;
-            }
-        }
-        
-        // Système de modales simplifié
+
         function showModal(content) {
             let overlay = document.getElementById('modal-overlay');
             if (!overlay) {
                 overlay = document.createElement('div');
                 overlay.id = 'modal-overlay';
                 overlay.className = 'modal-overlay';
+                overlay.onclick = (e) => { if (e.target.id === 'modal-overlay') closeModal(); };
                 document.body.appendChild(overlay);
             }
-            
             overlay.innerHTML = `<div class="modal-content">${content}</div>`;
             overlay.classList.add('active');
         }
-        
+
         function closeModal() {
             const overlay = document.getElementById('modal-overlay');
-            if (overlay) {
-                overlay.classList.remove('active');
-                setTimeout(() => {
-                    overlay.innerHTML = '';
-                }, 300);
-            }
+            if (overlay) overlay.classList.remove('active');
         }
         
-        // Fermeture de modale par clic sur l'overlay
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal-overlay')) {
-                closeModal();
-            }
-        });
-        
-        // Mise à jour périodique
-        setInterval(() => {
-            updateAcademyInterface();
-            
-            // Régénérer l'arbre si une recherche est terminée
-            const gameState = gameEngine.getGameState();
-            if (gameState.researchQueue.length === 0) {
-                generateTechTree();
-            }
-        }, 1000);
-        
-        // Écouter les événements de recherche terminée
-        gameEngine.on('researchCompleted', (data) => {
-            setTimeout(() => {
-                generateTechTree();
-                updateAcademyInterface();
-            }, 100);
-        });
-        
-        // Conseils pour l'académie
-        function getResearchAdvice() {
-            const gameState = gameEngine.getGameState();
-            const city = gameState.cities.main;
-            const advice = [];
-            
-            if (!city.buildings.academy) {
-                advice.push("🏗️ Construisez d'abord une Académie dans votre cité");
-                return advice;
-            }
-            
-            if (city.buildings.academy.level < 3) {
-                advice.push("📚 Améliorez votre Académie pour accélérer la recherche");
-            }
-            
-            if (!city.buildings.library) {
-                advice.push("📖 Construisez une Bibliothèque pour +20% de vitesse de recherche");
-            }
-            
-            if (!gameState.technologies.includes('urbanisme.aqueducs')) {
-                advice.push("🏛️ Recherchez les Aqueducs pour améliorer le bonheur");
-            }
-            
-            if (!gameState.technologies.includes('militaire.phalanges')) {
-                advice.push("⚔️ Recherchez les Phalanges pour débloquer de nouvelles unités");
-            }
-            
-            if (!gameState.technologies.includes('economie.trade_routes')) {
-                advice.push("💰 Recherchez les Routes Commerciales pour améliorer l'économie");
-            }
-            
-            return advice;
+        function updateAllUI() {
+            gameEngine.update();
+            updateResourcesDisplay();
+            updateResearchQueue();
+            generateTechTree();
         }
-        
-        // Raccourcis clavier
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-                e.preventDefault();
-                const advice = getResearchAdvice();
-                if (advice.length > 0) {
-                    uiManager.showNotification('Conseils de recherche', advice.join('\n'), 'info', 10000);
-                } else {
-                    uiManager.showNotification('Excellent!', 'Votre programme de recherche est optimal!', 'success');
-                }
-            }
+
+        // Initialisation et boucle de mise à jour
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeGlobalUI();
+            updateAllUI();
+            setInterval(updateAllUI, 1000);
         });
     </script>
-
-    <style>
-        /* Styles spécifiques à l'académie */
-        .research-stats {
-            display: flex;
-            justify-content: center;
-            margin-top: 1rem;
-        }
-        
-        .research-stats .stat-item {
-            background: rgba(30, 41, 59, 0.6);
-            padding: 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid var(--border-gold);
-            text-align: center;
-        }
-        
-        .tech-branch-description {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            font-style: italic;
-        }
-        
-        .tech-requirements {
-            margin-top: 0.5rem;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-        }
-        
-        .tech-effects {
-            margin-top: 0.8rem;
-            color: var(--gold-light);
-            font-size: 0.8rem;
-        }
-        
-        .cost-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-        
-        .cost-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            background: rgba(30, 41, 59, 0.6);
-            border-radius: 0.3rem;
-            border: 1px solid var(--border-gold);
-        }
-        
-        .cost-item.sufficient {
-            border-color: #22c55e;
-            background: rgba(34, 197, 94, 0.1);
-        }
-        
-        .cost-item.insufficient {
-            border-color: #dc2626;
-            background: rgba(220, 38, 38, 0.1);
-        }
-        
-        .cost-icon {
-            font-size: 1.2rem;
-        }
-        
-        .cost-amount {
-            font-weight: bold;
-            color: var(--gold-light);
-        }
-        
-        .cost-current {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-    </style>
-
-    <script src="../../../../../../link-buttons-to-functions.js"></script>
 </body>
 </html>
