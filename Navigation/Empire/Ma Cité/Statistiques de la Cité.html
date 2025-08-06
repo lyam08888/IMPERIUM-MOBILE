@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Statistiques de la Cité</title>
+    <meta name="description" content="Consultez les statistiques détaillées de votre cité romaine.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles et scripts communs -->
+    <link rel="stylesheet" href="../common-styles.css">
+    <script src="../common-navigation.js"></script>
+    <script src="../game-engine.js"></script>
+    <script src="../advanced-game-systems.js"></script>
+    <script src="../save-system.js"></script>
+    <script src="../ui-manager.js"></script>
+    <script src="../global-console.js"></script>
+
+    <style>
+        .stats-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        .stats-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--gold-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .stat-change.positive {
+            color: var(--success-green);
+        }
+
+        .stat-change.negative {
+            color: var(--roman-red);
+        }
+
+        .detailed-stats {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-gold);
+        }
+
+        .stats-table th {
+            color: var(--gold-primary);
+            font-weight: bold;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .stats-table td {
+            color: var(--text-light);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+            transition: width 0.3s ease;
+        }
+
+        .chart-container {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .chart-placeholder {
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .efficiency-meter {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .meter-label {
+            color: var(--text-light);
+            min-width: 120px;
+        }
+
+        .meter-bar {
+            flex: 1;
+            height: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .meter-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .meter-fill.excellent {
+            background: linear-gradient(90deg, var(--success-green), #16a34a);
+        }
+
+        .meter-fill.good {
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+        }
+
+        .meter-fill.average {
+            background: linear-gradient(90deg, #f59e0b, #eab308);
+        }
+
+        .meter-fill.poor {
+            background: linear-gradient(90deg, var(--roman-red), #dc2626);
+        }
+
+        .meter-value {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .comparison-section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+        }
+
+        .comparison-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .comparison-label {
+            color: var(--text-light);
+        }
+
+        .comparison-values {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .comparison-value {
+            text-align: center;
+        }
+
+        .comparison-value.yours {
+            color: var(--gold-light);
+            font-weight: bold;
+        }
+
+        .comparison-value.average {
+            color: var(--text-muted);
+        }
+
+        .ranking-badge {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particules d'arrière-plan -->
+    <div class="particles"></div>
+
+    <!-- INTERFACE PRINCIPALE DU JEU -->
+    <div class="imperium-ui">
+        <!-- HEADER -->
+        <header class="imperium-header">
+            <div class="header-content">
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display">
+                    <!-- Les ressources seront injectées ici par JS -->
+                </div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar">M</div>
+                    <div>
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPS PRINCIPAL -->
+        <div class="imperium-body">
+            <!-- BARRE LATERALE (Desktop) -->
+            <aside class="imperium-sidebar">
+                <!-- Navigation générée dynamiquement par common-navigation.js -->
+            </aside>
+
+            <!-- CONTENU PRINCIPAL -->
+            <main class="main-content">
+                <div class="view-container">
+                    <h2 class="view-title">📊 Statistiques de la Cité</h2>
+                    <div class="stats-layout">
+                        <!-- Statistiques principales -->
+                        <div class="stats-section">
+                            <h3 class="section-title">📈 Vue d'Ensemble</h3>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-icon">👥</div>
+                                    <div class="stat-value">8,450</div>
+                                    <div class="stat-label">Population</div>
+                                    <div class="stat-change positive">+125 cette semaine</div>
+                                </div>
+
+                                <div class="stat-card">
+                                    <div class="stat-icon">😊</div>
+                                    <div class="stat-value">78%</div>
+                                    <div class="stat-label">Bonheur</div>
+                                    <div class="stat-change positive">+3% ce mois</div>
+                                </div>
+
+                                <div class="stat-card">
+                                    <div class="stat-icon">💰</div>
+                                    <div class="stat-value">2,340</div>
+                                    <div class="stat-label">Or/heure</div>
+                                    <div class="stat-change positive">+180/h</div>
+                                </div>
+
+                                <div class="stat-card">
+                                    <div class="stat-icon">🏛️</div>
+                                    <div class="stat-value">24</div>
+                                    <div class="stat-label">Bâtiments</div>
+                                    <div class="stat-change positive">+2 ce mois</div>
+                                </div>
+
+                                <div class="stat-card">
+                                    <div class="stat-icon">⚔️</div>
+                                    <div class="stat-value">1,850</div>
+                                    <div class="stat-label">Soldats</div>
+                                    <div class="stat-change positive">+200 recrutés</div>
+                                </div>
+
+                                <div class="stat-card">
+                                    <div class="stat-icon">🎓</div>
+                                    <div class="stat-value">Level 8</div>
+                                    <div class="stat-label">Développement</div>
+                                    <div class="stat-change positive">Progression: 65%</div>
+                                </div>
+                            </div>
+
+                            <!-- Efficacité des systèmes -->
+                            <div class="detailed-stats">
+                                <h4 style="color: var(--gold-primary); margin-bottom: 1rem;">⚙️ Efficacité des Systèmes</h4>
+                                
+                                <div class="efficiency-meter">
+                                    <div class="meter-label">Production</div>
+                                    <div class="meter-bar">
+                                        <div class="meter-fill good" style="width: 85%;"></div>
+                                        <div class="meter-value">85%</div>
+                                    </div>
+                                </div>
+
+                                <div class="efficiency-meter">
+                                    <div class="meter-label">Défense</div>
+                                    <div class="meter-bar">
+                                        <div class="meter-fill excellent" style="width: 92%;"></div>
+                                        <div class="meter-value">92%</div>
+                                    </div>
+                                </div>
+
+                                <div class="efficiency-meter">
+                                    <div class="meter-label">Commerce</div>
+                                    <div class="meter-bar">
+                                        <div class="meter-fill average" style="width: 68%;"></div>
+                                        <div class="meter-value">68%</div>
+                                    </div>
+                                </div>
+
+                                <div class="efficiency-meter">
+                                    <div class="meter-label">Recherche</div>
+                                    <div class="meter-bar">
+                                        <div class="meter-fill good" style="width: 76%;"></div>
+                                        <div class="meter-value">76%</div>
+                                    </div>
+                                </div>
+
+                                <div class="efficiency-meter">
+                                    <div class="meter-label">Infrastructure</div>
+                                    <div class="meter-bar">
+                                        <div class="meter-fill poor" style="width: 45%;"></div>
+                                        <div class="meter-value">45%</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Graphique de croissance -->
+                            <div class="chart-container">
+                                <div class="chart-placeholder">
+                                    <h4 style="color: var(--gold-primary); margin-bottom: 1rem;">📈 Croissance de la Population</h4>
+                                    <div style="display: flex; justify-content: space-around; align-items: end; height: 150px;">
+                                        <div style="width: 30px; height: 60px; background: var(--gold-primary); border-radius: 3px 3px 0 0;"></div>
+                                        <div style="width: 30px; height: 80px; background: var(--gold-primary); border-radius: 3px 3px 0 0;"></div>
+                                        <div style="width: 30px; height: 95px; background: var(--gold-primary); border-radius: 3px 3px 0 0;"></div>
+                                        <div style="width: 30px; height: 110px; background: var(--gold-primary); border-radius: 3px 3px 0 0;"></div>
+                                        <div style="width: 30px; height: 130px; background: var(--gold-light); border-radius: 3px 3px 0 0;"></div>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-around; margin-top: 1rem; color: var(--text-muted); font-size: 0.8rem;">
+                                        <span>Jan</span>
+                                        <span>Fév</span>
+                                        <span>Mar</span>
+                                        <span>Avr</span>
+                                        <span>Mai</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Statistiques détaillées -->
+                        <div class="stats-section">
+                            <h3 class="section-title">📋 Détails Avancés</h3>
+
+                            <!-- Tableau des ressources -->
+                            <div class="detailed-stats">
+                                <h4 style="color: var(--gold-primary); margin-bottom: 1rem;">💎 Production de Ressources</h4>
+                                <table class="stats-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Ressource</th>
+                                            <th>Stock</th>
+                                            <th>Production/h</th>
+                                            <th>Capacité</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>🪵 Bois</td>
+                                            <td>4,250</td>
+                                            <td>+320/h</td>
+                                            <td>8,000</td>
+                                        </tr>
+                                        <tr>
+                                            <td>🪨 Pierre</td>
+                                            <td>3,180</td>
+                                            <td>+240/h</td>
+                                            <td>8,000</td>
+                                        </tr>
+                                        <tr>
+                                            <td>🍷 Vin</td>
+                                            <td>1,890</td>
+                                            <td>+150/h</td>
+                                            <td>5,000</td>
+                                        </tr>
+                                        <tr>
+                                            <td>⚔️ Fer</td>
+                                            <td>2,340</td>
+                                            <td>+180/h</td>
+                                            <td>6,000</td>
+                                        </tr>
+                                        <tr>
+                                            <td>💰 Or</td>
+                                            <td>15,670</td>
+                                            <td>+2,340/h</td>
+                                            <td>∞</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Comparaison avec d'autres cités -->
+                            <div class="comparison-section">
+                                <h4 style="color: var(--gold-primary); margin-bottom: 1rem;">🏆 Comparaison Impériale</h4>
+                                
+                                <div class="comparison-item">
+                                    <div class="comparison-label">Population</div>
+                                    <div class="comparison-values">
+                                        <div class="comparison-value yours">8,450</div>
+                                        <div class="comparison-value average">6,200 (moyenne)</div>
+                                        <div class="ranking-badge">#127 / 2,450</div>
+                                    </div>
+                                </div>
+
+                                <div class="comparison-item">
+                                    <div class="comparison-label">Puissance Militaire</div>
+                                    <div class="comparison-values">
+                                        <div class="comparison-value yours">12,340</div>
+                                        <div class="comparison-value average">8,900 (moyenne)</div>
+                                        <div class="ranking-badge">#89 / 2,450</div>
+                                    </div>
+                                </div>
+
+                                <div class="comparison-item">
+                                    <div class="comparison-label">Richesse</div>
+                                    <div class="comparison-values">
+                                        <div class="comparison-value yours">156,780</div>
+                                        <div class="comparison-value average">98,500 (moyenne)</div>
+                                        <div class="ranking-badge">#156 / 2,450</div>
+                                    </div>
+                                </div>
+
+                                <div class="comparison-item">
+                                    <div class="comparison-label">Développement</div>
+                                    <div class="comparison-values">
+                                        <div class="comparison-value yours">Level 8</div>
+                                        <div class="comparison-value average">Level 6 (moyenne)</div>
+                                        <div class="ranking-badge">#203 / 2,450</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Événements récents -->
+                            <div class="detailed-stats">
+                                <h4 style="color: var(--gold-primary); margin-bottom: 1rem;">📰 Événements Récents</h4>
+                                <div style="max-height: 200px; overflow-y: auto;">
+                                    <div style="padding: 0.8rem; background: rgba(15, 23, 42, 0.5); border-radius: 0.5rem; margin-bottom: 0.5rem; border-left: 3px solid var(--success-green);">
+                                        <div style="color: var(--gold-light); font-weight: bold;">Population en croissance</div>
+                                        <div style="color: var(--text-light); font-size: 0.9rem;">+125 nouveaux citoyens cette semaine</div>
+                                        <div style="color: var(--text-muted); font-size: 0.8rem;">Il y a 2 heures</div>
+                                    </div>
+                                    <div style="padding: 0.8rem; background: rgba(15, 23, 42, 0.5); border-radius: 0.5rem; margin-bottom: 0.5rem; border-left: 3px solid var(--gold-primary);">
+                                        <div style="color: var(--gold-light); font-weight: bold;">Amélioration terminée</div>
+                                        <div style="color: var(--text-light); font-size: 0.9rem;">Le Forum a été amélioré au niveau 5</div>
+                                        <div style="color: var(--text-muted); font-size: 0.8rem;">Il y a 4 heures</div>
+                                    </div>
+                                    <div style="padding: 0.8rem; background: rgba(15, 23, 42, 0.5); border-radius: 0.5rem; margin-bottom: 0.5rem; border-left: 3px solid var(--roman-red);">
+                                        <div style="color: var(--gold-light); font-weight: bold;">Attaque repoussée</div>
+                                        <div style="color: var(--text-light); font-size: 0.9rem;">Raid barbare repoussé avec succès</div>
+                                        <div style="color: var(--text-muted); font-size: 0.8rem;">Il y a 1 jour</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page Statistiques de la Cité chargée');
+            initializeStats();
+            startStatsUpdates();
+        });
+
+        function initializeStats() {
+            // Simulation de données statistiques
+            updateStatsDisplay();
+        }
+
+        function updateStatsDisplay() {
+            // Mise à jour des statistiques en temps réel
+            // Cette fonction serait connectée au moteur de jeu
+        }
+
+        function startStatsUpdates() {
+            // Démarrer les mises à jour automatiques
+            setInterval(updateStatsDisplay, 10000);
+        }
+    </script>
+</body>
+</html>
