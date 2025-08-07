@@ -558,33 +558,39 @@ class ImperiumHeader2025 {
     }
     
     // ===== SAUVEGARDE/CHARGEMENT =====
-    saveToStorage() {
+    async saveToStorage() {
         try {
-            localStorage.setItem('imperium_resources_2025', JSON.stringify(this.resources));
-            localStorage.setItem('imperium_logs_2025', JSON.stringify(this.logs));
+            const playerId = localStorage.getItem('imperium_player_id') || 'demo';
+            await fetch('http://localhost:3001/api/player/' + playerId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    resources: this.resources,
+                    maxResources: this.maxResources,
+                    productionRates: this.productionRates,
+                    logs: this.logs
+                })
+            });
         } catch (e) {
-            console.warn('Impossible de sauvegarder les données:', e);
+            console.warn('Impossible de sauvegarder les données sur l\'API:', e);
         }
     }
-    
-    loadFromStorage() {
+
+    async loadFromStorage() {
         try {
-            // Charger les ressources
-            const savedResources = localStorage.getItem('imperium_resources_2025');
-            if (savedResources) {
-                this.resources = {...this.resources, ...JSON.parse(savedResources)};
+            const playerId = localStorage.getItem('imperium_player_id') || 'demo';
+            const res = await fetch('http://localhost:3001/api/player/' + playerId);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.resources) this.resources = { ...this.resources, ...data.resources };
+                if (data.maxResources) this.maxResources = { ...this.maxResources, ...data.maxResources };
+                if (data.productionRates) this.productionRates = { ...this.productionRates, ...data.productionRates };
+                if (data.logs) this.logs = data.logs;
             }
-            
-            // Charger les logs
-            const savedLogs = localStorage.getItem('imperium_logs_2025');
-            if (savedLogs) {
-                this.logs = JSON.parse(savedLogs);
-            }
-            
             this.refreshResourcesDisplay();
             this.updateLogCount();
         } catch (e) {
-            console.warn('Impossible de charger les données:', e);
+            console.warn('Impossible de charger les données depuis l\'API:', e);
         }
     }
     

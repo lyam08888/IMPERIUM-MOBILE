@@ -1,5 +1,10 @@
 {
+  "name": "imperium-game",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
   "dependencies": {
-    "jsdom": "^26.1.0"
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
   }
 }
