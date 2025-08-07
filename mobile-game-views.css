@@ -1,0 +1,688 @@
+/* ===== VUES DE JEU OPTIMISÉES POUR MOBILE ===== */
+
+@media (max-width: 768px) {
+    
+    /* ===== VUE CITÉ MOBILE ===== */
+    .city-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        height: auto;
+    }
+
+    .city-map {
+        height: 250px;
+        border-radius: var(--mobile-border-radius);
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--mobile-shadow);
+    }
+
+    .city-info {
+        order: -1;
+        background: rgba(30, 41, 59, 0.9);
+        border-radius: var(--mobile-border-radius);
+        padding: 16px;
+        box-shadow: var(--mobile-shadow);
+    }
+
+    .city-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .stat-item {
+        background: rgba(15, 23, 42, 0.8);
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px solid var(--border-gold);
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--gold-light);
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+
+    /* ===== BÂTIMENTS MOBILE ===== */
+    .buildings-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    .building-card {
+        background: rgba(30, 41, 59, 0.8);
+        border-radius: var(--mobile-border-radius);
+        padding: 16px;
+        text-align: center;
+        border: 1px solid var(--border-gold);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .building-card:active {
+        transform: scale(0.98);
+        background: rgba(217, 119, 6, 0.2);
+    }
+
+    .building-icon {
+        font-size: 2rem;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .building-name {
+        font-weight: bold;
+        color: var(--gold-light);
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+    }
+
+    .building-level {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
+
+    .building-status {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+        border-radius: 12px;
+        background: var(--success-green);
+        color: white;
+        margin-top: auto;
+    }
+
+    .building-status.upgrading {
+        background: var(--gold-primary);
+    }
+
+    .building-status.unavailable {
+        background: var(--text-muted);
+    }
+
+    /* ===== RESSOURCES MOBILE ===== */
+    .resources-overview {
+        background: rgba(30, 41, 59, 0.9);
+        border-radius: var(--mobile-border-radius);
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: var(--mobile-shadow);
+    }
+
+    .resources-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .resource-card {
+        background: rgba(15, 23, 42, 0.8);
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border-gold);
+        text-align: center;
+    }
+
+    .resource-card-icon {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .resource-card-amount {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: var(--gold-light);
+        margin-bottom: 4px;
+    }
+
+    .resource-card-production {
+        font-size: 0.8rem;
+        color: var(--success-green);
+    }
+
+    .resource-card-storage {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+
+    /* ===== UNITÉS MILITAIRES MOBILE ===== */
+    .military-overview {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .unit-categories {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+    }
+
+    .unit-category-tab {
+        flex-shrink: 0;
+        padding: 8px 16px;
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid var(--border-gold);
+        border-radius: 20px;
+        color: var(--text-light);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    .unit-category-tab.active {
+        background: var(--gold-primary);
+        color: white;
+    }
+
+    .units-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .unit-card {
+        background: rgba(30, 41, 59, 0.8);
+        border-radius: var(--mobile-border-radius);
+        padding: 16px;
+        border: 1px solid var(--border-gold);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .unit-icon {
+        font-size: 2rem;
+        flex-shrink: 0;
+        width: 50px;
+        text-align: center;
+    }
+
+    .unit-info {
+        flex: 1;
+    }
+
+    .unit-name {
+        font-weight: bold;
+        color: var(--gold-light);
+        margin-bottom: 4px;
+    }
+
+    .unit-count {
+        font-size: 1.1rem;
+        color: var(--text-light);
+        margin-bottom: 4px;
+    }
+
+    .unit-stats {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        display: flex;
+        gap: 12px;
+    }
+
+    .unit-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .unit-action-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        border-radius: 6px;
+        border: 1px solid var(--gold-primary);
+        background: transparent;
+        color: var(--gold-light);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 80px;
+    }
+
+    .unit-action-btn:active {
+        background: var(--gold-primary);
+        color: white;
+    }
+
+    /* ===== RECHERCHE ET DÉVELOPPEMENT MOBILE ===== */
+    .research-tree {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .research-category {
+        background: rgba(30, 41, 59, 0.9);
+        border-radius: var(--mobile-border-radius);
+        padding: 16px;
+        box-shadow: var(--mobile-shadow);
+    }
+
+    .research-category-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--gold-primary);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .research-items {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .research-item {
+        background: rgba(15, 23, 42, 0.8);
+        border-radius: 8px;
+        padding: 16px;
+        border: 1px solid var(--border-gold);
+        position: relative;
+    }
+
+    .research-item.completed {
+        border-color: var(--success-green);
+        background: rgba(34, 197, 94, 0.1);
+    }
+
+    .research-item.researching {
+        border-color: var(--gold-primary);
+        background: rgba(217, 119, 6, 0.1);
+    }
+
+    .research-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+
+    .research-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .research-name {
+        font-weight: bold;
+        color: var(--gold-light);
+        flex: 1;
+    }
+
+    .research-level {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        background: rgba(0,0,0,0.3);
+        padding: 2px 8px;
+        border-radius: 10px;
+    }
+
+    .research-description {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        line-height: 1.4;
+        margin-bottom: 12px;
+    }
+
+    .research-requirements {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .requirement-item {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 12px;
+        color: var(--text-muted);
+    }
+
+    .requirement-item.met {
+        color: var(--success-green);
+        background: rgba(34, 197, 94, 0.2);
+    }
+
+    .research-progress {
+        margin-bottom: 12px;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 4px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+
+    .progress-text {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-align: center;
+    }
+
+    /* ===== COMMERCE ET MARCHÉ MOBILE ===== */
+    .market-overview {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .market-tabs {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+    }
+
+    .market-tab {
+        flex-shrink: 0;
+        padding: 8px 16px;
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid var(--border-gold);
+        border-radius: 20px;
+        color: var(--text-light);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    .market-tab.active {
+        background: var(--gold-primary);
+        color: white;
+    }
+
+    .trade-offers {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .trade-offer {
+        background: rgba(30, 41, 59, 0.8);
+        border-radius: var(--mobile-border-radius);
+        padding: 16px;
+        border: 1px solid var(--border-gold);
+    }
+
+    .trade-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .trader-name {
+        font-weight: bold;
+        color: var(--gold-light);
+    }
+
+    .trade-rating {
+        font-size: 0.8rem;
+        color: var(--success-green);
+    }
+
+    .trade-details {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .trade-give, .trade-receive {
+        flex: 1;
+        text-align: center;
+    }
+
+    .trade-arrow {
+        font-size: 1.2rem;
+        color: var(--gold-primary);
+    }
+
+    .trade-resource {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 0.9rem;
+    }
+
+    .trade-amount {
+        font-weight: bold;
+        color: var(--gold-light);
+    }
+
+    /* ===== MODALES MOBILES SPÉCIFIQUES ===== */
+    .mobile-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        z-index: 2000;
+        padding: 0;
+    }
+
+    .mobile-modal-content {
+        background: var(--dark-marble);
+        border-radius: var(--mobile-border-radius) var(--mobile-border-radius) 0 0;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: slideInUp 0.3s ease-out;
+    }
+
+    .mobile-modal-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-gold);
+        position: sticky;
+        top: 0;
+        background: var(--dark-marble);
+        z-index: 10;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .mobile-modal-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: var(--gold-primary);
+    }
+
+    .mobile-modal-close {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+    .mobile-modal-close:active {
+        background: rgba(255,255,255,0.1);
+        color: var(--text-light);
+    }
+
+    .mobile-modal-body {
+        padding: 20px;
+    }
+
+    .mobile-modal-actions {
+        padding: 16px 20px 20px;
+        border-top: 1px solid var(--border-gold);
+        position: sticky;
+        bottom: 0;
+        background: var(--dark-marble);
+        display: flex;
+        gap: 12px;
+    }
+
+    .mobile-modal-actions .btn {
+        flex: 1;
+    }
+
+    /* ===== ANIMATIONS MOBILES ===== */
+    @keyframes slideInUp {
+        from {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    /* Classes d'animation */
+    .animate-fade-in {
+        animation: fadeInScale 0.3s ease-out;
+    }
+
+    .animate-pulse {
+        animation: pulse 2s infinite;
+    }
+
+    /* ===== ÉTATS DE CHARGEMENT MOBILES ===== */
+    .mobile-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        text-align: center;
+    }
+
+    .mobile-loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid var(--border-gold);
+        border-top-color: var(--gold-light);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 16px;
+    }
+
+    .mobile-loading-text {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    /* ===== ÉTATS VIDES MOBILES ===== */
+    .mobile-empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        text-align: center;
+        color: var(--text-muted);
+    }
+
+    .mobile-empty-icon {
+        font-size: 3rem;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    .mobile-empty-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: var(--text-light);
+    }
+
+    .mobile-empty-description {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        max-width: 300px;
+    }
+}
+
+/* Styles pour très petits écrans */
+@media (max-width: 480px) {
+    .buildings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .city-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .resources-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .unit-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .unit-actions {
+        flex-direction: row;
+        justify-content: center;
+    }
+}

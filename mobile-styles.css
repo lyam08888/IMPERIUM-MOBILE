@@ -1,0 +1,534 @@
+/* ===== STYLES MOBILES COMPLETS POUR IMPERIUM ===== */
+
+/* Variables spécifiques mobiles */
+:root {
+    --mobile-header-height: 60px;
+    --mobile-tab-height: 70px;
+    --mobile-content-padding: 16px;
+    --mobile-touch-target: 48px;
+    --mobile-font-base: 16px;
+    --mobile-font-small: 14px;
+    --mobile-font-large: 18px;
+    --mobile-border-radius: 12px;
+    --mobile-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Détection mobile et activation des styles */
+@media (max-width: 768px) {
+    /* Reset complet pour mobile */
+    * {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    body {
+        overflow: auto;
+        font-size: var(--mobile-font-base);
+        line-height: 1.5;
+    }
+
+    /* Layout mobile principal */
+    .imperium-ui {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Header mobile optimisé */
+    .imperium-header {
+        height: var(--mobile-header-height);
+        padding: 8px 16px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        backdrop-filter: blur(20px);
+    }
+
+    .header-content {
+        max-width: none;
+        height: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .imperium-logo {
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+        flex-shrink: 0;
+    }
+
+    /* Ressources mobiles - format compact */
+    .resources-display {
+        flex: 1;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        min-width: 0;
+    }
+
+    .resources-display::-webkit-scrollbar {
+        display: none;
+    }
+
+    .resource-item {
+        flex-shrink: 0;
+        font-size: var(--mobile-font-small);
+        gap: 4px;
+        white-space: nowrap;
+    }
+
+    .resource-icon {
+        font-size: 1rem;
+    }
+
+    .resource-value {
+        min-width: 40px;
+        font-size: var(--mobile-font-small);
+    }
+
+    /* Player info mobile */
+    .player-info {
+        flex-shrink: 0;
+        gap: 8px;
+    }
+
+    .player-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+
+    .player-details {
+        font-size: var(--mobile-font-small);
+        display: none; /* Caché sur très petits écrans */
+    }
+
+    /* Corps principal mobile */
+    .imperium-body {
+        flex: 1;
+        flex-direction: column;
+        padding: 0;
+        margin-top: var(--mobile-header-height);
+        margin-bottom: var(--mobile-tab-height);
+        gap: 0;
+        max-width: none;
+        overflow: hidden;
+    }
+
+    /* Sidebar cachée sur mobile - remplacée par les onglets */
+    .imperium-sidebar {
+        display: none;
+    }
+
+    /* Contenu principal mobile */
+    .main-content {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .view-container {
+        padding: var(--mobile-content-padding);
+        border-radius: 0;
+        border: none;
+        margin: 0;
+        height: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .view-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        text-align: left;
+        padding: 0 4px;
+    }
+
+    /* ===== NAVIGATION PAR ONGLETS MOBILE ===== */
+    .mobile-tabs {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: var(--mobile-tab-height);
+        background: linear-gradient(135deg, var(--dark-marble) 0%, var(--dark-stone) 100%);
+        border-top: 2px solid var(--border-gold);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+    }
+
+    .mobile-tab {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 4px;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        margin: 4px;
+        min-height: var(--mobile-touch-target);
+        position: relative;
+        cursor: pointer;
+    }
+
+    .mobile-tab:hover,
+    .mobile-tab.active {
+        color: var(--gold-light);
+        background: rgba(217, 119, 6, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .mobile-tab.active::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30px;
+        height: 3px;
+        background: var(--gold-primary);
+        border-radius: 2px;
+    }
+
+    .mobile-tab-icon {
+        font-size: 1.2rem;
+        margin-bottom: 2px;
+    }
+
+    .mobile-tab-label {
+        font-size: 10px;
+        font-weight: 500;
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    /* Badge de notification sur les onglets */
+    .mobile-tab .notification-badge {
+        position: absolute;
+        top: 6px;
+        right: 8px;
+        background: var(--roman-red);
+        color: white;
+        border-radius: 10px;
+        padding: 2px 6px;
+        font-size: 10px;
+        font-weight: bold;
+        min-width: 16px;
+        text-align: center;
+    }
+
+    /* ===== COMPOSANTS MOBILES OPTIMISÉS ===== */
+
+    /* Boutons mobiles */
+    .btn, button, .modal-btn, .action-btn {
+        min-height: var(--mobile-touch-target);
+        padding: 12px 20px;
+        font-size: var(--mobile-font-base);
+        border-radius: var(--mobile-border-radius);
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-weight: 600;
+        text-align: center;
+        box-shadow: var(--mobile-shadow);
+    }
+
+    .btn:active, button:active {
+        transform: scale(0.98);
+    }
+
+    /* Cartes et conteneurs mobiles */
+    .feature-card, .building-card, .unit-card, .queue-container {
+        border-radius: var(--mobile-border-radius);
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: var(--mobile-shadow);
+        border: 1px solid var(--border-gold);
+        background: rgba(30, 41, 59, 0.8);
+        backdrop-filter: blur(10px);
+    }
+
+    .feature-card:active, .building-card:active, .unit-card:active {
+        transform: scale(0.98);
+    }
+
+    /* Grilles mobiles */
+    .feature-grid, .building-grid, .unit-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 0;
+    }
+
+    /* Formulaires mobiles */
+    input, select, textarea {
+        min-height: var(--mobile-touch-target);
+        padding: 12px 16px;
+        font-size: var(--mobile-font-base);
+        border-radius: var(--mobile-border-radius);
+        border: 2px solid var(--border-gold);
+        background: rgba(15, 23, 42, 0.8);
+        color: var(--text-light);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Modales mobiles */
+    .modal-overlay {
+        padding: 20px;
+        align-items: flex-end;
+    }
+
+    .modal-content {
+        width: 100%;
+        max-width: none;
+        max-height: 80vh;
+        border-radius: var(--mobile-border-radius) var(--mobile-border-radius) 0 0;
+        margin: 0;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        padding: 20px 20px 16px;
+        border-bottom: 1px solid var(--border-gold);
+        position: sticky;
+        top: 0;
+        background: var(--dark-marble);
+        z-index: 10;
+    }
+
+    .modal-body {
+        padding: 20px;
+        max-height: none;
+    }
+
+    .modal-actions {
+        padding: 16px 20px 20px;
+        border-top: 1px solid var(--border-gold);
+        position: sticky;
+        bottom: 0;
+        background: var(--dark-marble);
+        display: flex;
+        gap: 12px;
+        flex-direction: column;
+    }
+
+    /* Notifications mobiles */
+    .notification-container {
+        position: fixed;
+        top: calc(var(--mobile-header-height) + 10px);
+        left: 16px;
+        right: 16px;
+        z-index: 2000;
+    }
+
+    .notification {
+        padding: 12px 16px;
+        border-radius: var(--mobile-border-radius);
+        margin-bottom: 8px;
+        font-size: var(--mobile-font-base);
+        box-shadow: var(--mobile-shadow);
+        backdrop-filter: blur(10px);
+    }
+
+    /* Timers et progress bars mobiles */
+    .timer-display {
+        padding: 12px 16px;
+        border-radius: var(--mobile-border-radius);
+        margin: 8px 0;
+    }
+
+    .timer-progress {
+        height: 8px;
+        border-radius: 4px;
+        margin: 8px 0;
+    }
+
+    /* Listes mobiles */
+    .nav-list, .resource-list, .building-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .nav-item, .resource-item, .building-item {
+        margin-bottom: 8px;
+    }
+
+    .nav-item a, .list-item {
+        padding: 16px;
+        border-radius: var(--mobile-border-radius);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: var(--mobile-touch-target);
+        box-sizing: border-box;
+    }
+
+    /* Textes mobiles */
+    h1 { font-size: 1.8rem; line-height: 1.3; margin-bottom: 16px; }
+    h2 { font-size: 1.5rem; line-height: 1.3; margin-bottom: 14px; }
+    h3 { font-size: 1.3rem; line-height: 1.3; margin-bottom: 12px; }
+    h4 { font-size: 1.1rem; line-height: 1.3; margin-bottom: 10px; }
+    
+    p { 
+        font-size: var(--mobile-font-base); 
+        line-height: 1.6; 
+        margin-bottom: 12px; 
+    }
+
+    /* Scrollbars mobiles */
+    ::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: rgba(0,0,0,0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--gold-primary);
+        border-radius: 2px;
+    }
+
+    /* Animations mobiles optimisées */
+    @keyframes slideInUp {
+        from {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .view-container.active {
+        animation: slideInRight 0.3s ease-out;
+    }
+
+    /* États de chargement mobiles */
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid var(--border-gold);
+        border-top-color: var(--gold-light);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+
+    /* Gestion des orientations */
+    @media (orientation: landscape) {
+        .mobile-tabs {
+            height: 60px;
+        }
+        
+        .mobile-tab {
+            flex-direction: row;
+            gap: 8px;
+        }
+        
+        .mobile-tab-icon {
+            margin-bottom: 0;
+            font-size: 1rem;
+        }
+        
+        .mobile-tab-label {
+            font-size: 12px;
+        }
+    }
+}
+
+/* Styles pour très petits écrans (< 480px) */
+@media (max-width: 480px) {
+    :root {
+        --mobile-content-padding: 12px;
+        --mobile-font-base: 15px;
+        --mobile-font-small: 13px;
+    }
+
+    .imperium-logo {
+        font-size: 1.3rem;
+    }
+
+    .resources-display {
+        gap: 6px;
+        padding: 4px 8px;
+    }
+
+    .resource-item {
+        font-size: 12px;
+    }
+
+    .player-details {
+        display: none;
+    }
+
+    .mobile-tab-label {
+        font-size: 9px;
+    }
+
+    .view-title {
+        font-size: 1.3rem;
+    }
+
+    .feature-card, .building-card, .unit-card {
+        padding: 12px;
+    }
+}
+
+/* Styles pour écrans très larges en mode paysage mobile */
+@media (max-width: 768px) and (orientation: landscape) and (max-height: 500px) {
+    .imperium-header {
+        height: 50px;
+    }
+    
+    .mobile-tabs {
+        height: 55px;
+    }
+    
+    .imperium-body {
+        margin-top: 50px;
+        margin-bottom: 55px;
+    }
+    
+    .view-title {
+        font-size: 1.2rem;
+        margin-bottom: 8px;
+    }
+}
