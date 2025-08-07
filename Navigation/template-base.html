@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
+<!DOCTYPE html><html lang="fr"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMPERIUM - [PAGE_TITLE]</title>
@@ -162,7 +160,7 @@
     <link rel="stylesheet" href="../mobile-2025.css">
     <script src="../common-header-2025.js"></script>
     <script src="../resource-updater.js"></script>
-</head>
+<script src="common-interactions.js"></script></head>
 <body>
     <div class="imperium-ui">
         <!-- Header avec navigation -->
@@ -174,15 +172,15 @@
                         <div class="nav-section">
                             <span class="nav-section-title">Empire</span>
                             <div class="nav-items">
-                                <a href="#" onclick="navigateTo('cite')" class="nav-item">
+                                <a href="#" class="nav-item" data-action="navigate" data-params="{&quot;page&quot;:&quot;cite&quot;,&quot;section&quot;:&quot;Empire&quot;}">
                                     <span class="nav-icon">🏛️</span>
                                     <span class="nav-text">Ma Cité</span>
                                 </a>
-                                <a href="#" onclick="navigateTo('monde')" class="nav-item">
+                                <a href="#" class="nav-item" data-action="navigate" data-params="{&quot;page&quot;:&quot;monde&quot;,&quot;section&quot;:&quot;Empire&quot;}">
                                     <span class="nav-icon">🌍</span>
                                     <span class="nav-text">Monde</span>
                                 </a>
-                                <a href="#" onclick="navigateTo('province')" class="nav-item">
+                                <a href="#" class="nav-item" data-action="navigate" data-params="{&quot;page&quot;:&quot;province&quot;,&quot;section&quot;:&quot;Empire&quot;}">
                                     <span class="nav-icon">🏝️</span>
                                     <span class="nav-text">Province</span>
                                 </a>
@@ -191,15 +189,15 @@
                         <div class="nav-section">
                             <span class="nav-section-title">Social</span>
                             <div class="nav-items">
-                                <a href="#" onclick="navigateTo('diplomatie')" class="nav-item">
+                                <a href="#" class="nav-item" data-action="navigate" data-params="{&quot;page&quot;:&quot;diplomatie&quot;,&quot;section&quot;:&quot;Social&quot;}">
                                     <span class="nav-icon">🤝</span>
                                     <span class="nav-text">Diplomatie</span>
                                 </a>
-                                <a href="#" onclick="navigateTo('alliance')" class="nav-item">
+                                <a href="#" class="nav-item" data-action="alliance" data-params="{&quot;faction&quot;:&quot;Rome&quot;,&quot;action&quot;:&quot;propose&quot;}">
                                     <span class="nav-icon">⚔️</span>
                                     <span class="nav-text">Alliance</span>
                                 </a>
-                                <a href="#" onclick="navigateTo('messages')" class="nav-item">
+                                <a href="#" class="nav-item" data-action="navigate" data-params="{&quot;page&quot;:&quot;messages&quot;,&quot;section&quot;:&quot;Social&quot;}">
                                     <span class="nav-icon">📜</span>
                                     <span class="nav-text">Messages</span>
                                 </a>
@@ -342,5 +340,5 @@
         `;
         document.head.appendChild(style);
     </script>
-</body>
-</html>
+
+</body></html>

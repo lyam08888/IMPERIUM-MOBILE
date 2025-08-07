@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
+<!DOCTYPE html><html lang="fr"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>IMPERIUM - Ma Cité</title>
@@ -510,7 +508,7 @@
     <link rel="stylesheet" href="../../mobile-2025.css">
     <script src="../../common-header-2025.js"></script>
     <script src="../../resource-updater.js"></script>
-</head>
+<script src="../common-interactions.js"></script></head>
 <body>
     <div class="particles"></div>
 
@@ -591,7 +589,7 @@
                             <div class="panel-section">
                                 <h3 class="section-title">Actions Rapides</h3>
                                 <div class="quick-actions">
-                                    <button class="quick-action-btn" onclick="collectTaxes()">💰 Collecter Impôts</button>
+                                    <button class="quick-action-btn" data-action="collect" data-params="{&quot;resourceType&quot;:&quot;generic_resource&quot;,&quot;amount&quot;:100}">💰 Collecter Impôts</button>
                                     <button class="quick-action-btn" onclick="organizeGames()">🎪 Organiser Jeux</button>
                                 </div>
                             </div>
@@ -806,5 +804,6 @@
             }
         }
     </script>
-</body>
-</html>
+
+
+</body></html>

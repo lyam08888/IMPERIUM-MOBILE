@@ -1,6 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="fr">
-<head>
+<html lang="fr"><head><script src="../../common-interactions.js"></script></head><body>﻿
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMPERIUM - Entrepôts de la Cité</title>
@@ -432,8 +432,8 @@
     <link rel="stylesheet" href="../../../mobile-2025.css">
     <script src="../../../common-header-2025.js"></script>
     <script src="../../../resource-updater.js"></script>
-</head>
-<body>
+
+
     <!-- Particules d'arrière-plan -->
     <div class="particles"></div>
 
@@ -612,7 +612,7 @@
                                             </div>
                                         </div>
                                         <div class="warehouse-actions">
-                                            <button class="action-btn" onclick="upgradeWarehouse('main')">🔧 Améliorer</button>
+                                            <button class="action-btn" data-action="upgrade" data-params="{&quot;buildingType&quot;:&quot;generic_building&quot;,&quot;cost&quot;:{&quot;wood&quot;:150,&quot;stone&quot;:150,&quot;gold&quot;:75},&quot;time&quot;:8000}">🔧 Améliorer</button>
                                             <button class="action-btn secondary" onclick="manageWarehouse('main')">⚙️ Gérer</button>
                                         </div>
                                     </div>
@@ -636,7 +636,7 @@
                                             </div>
                                         </div>
                                         <div class="warehouse-actions">
-                                            <button class="action-btn" onclick="upgradeWarehouse('wine')">🔧 Améliorer</button>
+                                            <button class="action-btn" data-action="upgrade" data-params="{&quot;buildingType&quot;:&quot;generic_building&quot;,&quot;cost&quot;:{&quot;wood&quot;:150,&quot;stone&quot;:150,&quot;gold&quot;:75},&quot;time&quot;:8000}">🔧 Améliorer</button>
                                             <button class="action-btn secondary" onclick="manageWarehouse('wine')">⚙️ Gérer</button>
                                         </div>
                                     </div>
@@ -660,7 +660,7 @@
                                             </div>
                                         </div>
                                         <div class="warehouse-actions">
-                                            <button class="action-btn" onclick="upgradeWarehouse('arsenal')">🔧 Améliorer</button>
+                                            <button class="action-btn" data-action="upgrade" data-params="{&quot;buildingType&quot;:&quot;generic_building&quot;,&quot;cost&quot;:{&quot;wood&quot;:150,&quot;stone&quot;:150,&quot;gold&quot;:75},&quot;time&quot;:8000}">🔧 Améliorer</button>
                                             <button class="action-btn secondary" onclick="manageWarehouse('arsenal')">⚙️ Gérer</button>
                                         </div>
                                     </div>
@@ -684,7 +684,7 @@
                                             </div>
                                         </div>
                                         <div class="warehouse-actions">
-                                            <button class="action-btn" onclick="upgradeWarehouse('granary')">🔧 Améliorer</button>
+                                            <button class="action-btn" data-action="upgrade" data-params="{&quot;buildingType&quot;:&quot;generic_building&quot;,&quot;cost&quot;:{&quot;wood&quot;:150,&quot;stone&quot;:150,&quot;gold&quot;:75},&quot;time&quot;:8000}">🔧 Améliorer</button>
                                             <button class="action-btn secondary" onclick="manageWarehouse('granary')">⚙️ Gérer</button>
                                         </div>
                                     </div>
@@ -717,10 +717,10 @@
                             <div class="panel-section">
                                 <h3 class="section-title">🏗️ Expansion</h3>
                                 <div class="expansion-options">
-                                    <button class="expansion-btn" onclick="buildNewWarehouse()">
+                                    <button class="expansion-btn" data-action="build" data-params="{&quot;buildingType&quot;:&quot;warehouse&quot;,&quot;cost&quot;:{&quot;wood&quot;:200,&quot;stone&quot;:200},&quot;time&quot;:5000}">
                                         🏪 Construire Nouvel Entrepôt
                                     </button>
-                                    <button class="expansion-btn secondary" onclick="upgradeAllWarehouses()">
+                                    <button class="expansion-btn secondary" data-action="upgrade" data-params="{&quot;buildingType&quot;:&quot;warehouse&quot;,&quot;cost&quot;:{&quot;wood&quot;:300,&quot;stone&quot;:300},&quot;time&quot;:8000}">
                                         🔧 Améliorer Tous les Entrepôts
                                     </button>
                                     <button class="expansion-btn secondary" onclick="optimizeStorage()">
@@ -733,7 +733,7 @@
                             <div class="panel-section">
                                 <h3 class="section-title">⚡ Actions Rapides</h3>
                                 <div class="quick-actions">
-                                    <button class="quick-btn" onclick="sellExcess()">💰 Vendre Surplus</button>
+                                    <button class="quick-btn" data-action="sell" data-params="{&quot;resourceType&quot;:&quot;generic_resource&quot;,&quot;amount&quot;:100,&quot;price&quot;:2}">💰 Vendre Surplus</button>
                                     <button class="quick-btn" onclick="redistributeResources()">🔄 Redistribuer</button>
                                     <button class="quick-btn" onclick="emergencyExpansion()">🚨 Expansion d'Urgence</button>
                                     <button class="quick-btn" onclick="viewStorageHistory()">📈 Historique</button>
@@ -867,5 +867,6 @@
     </script>
 
     <script src="../../../../../../../link-buttons-to-functions.js"></script>
-</body>
-</html>
+
+
+</body></html>

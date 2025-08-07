@@ -1,6 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="fr">
-<head>
+<html lang="fr"><head><script src="../../common-interactions.js"></script></head><body>﻿
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMPERIUM - Bâtiments de la Cité</title>
@@ -398,8 +398,8 @@
     <link rel="stylesheet" href="../../../mobile-2025.css">
     <script src="../../../common-header-2025.js"></script>
     <script src="../../../resource-updater.js"></script>
-</head>
-<body>
+
+
     <!-- Particules d'arrière-plan -->
     <div class="particles"></div>
 
@@ -496,7 +496,7 @@
                             <div class="panel-section">
                                 <h3 class="section-title">⚡ Actions Rapides</h3>
                                 <div class="quick-actions">
-                                    <button class="quick-btn" onclick="upgradeAll()">🔧 Tout Améliorer</button>
+                                    <button class="quick-btn" data-action="upgrade" data-params="{&quot;buildingType&quot;:&quot;generic_building&quot;,&quot;cost&quot;:{&quot;wood&quot;:150,&quot;stone&quot;:150,&quot;gold&quot;:75},&quot;time&quot;:8000}">🔧 Tout Améliorer</button>
                                     <button class="quick-btn" onclick="repairAll()">🔨 Tout Réparer</button>
                                     <button class="quick-btn" onclick="optimizeLayout()">📐 Optimiser</button>
                                     <button class="quick-btn" onclick="showBuildingPlanner()">📋 Planificateur</button>
@@ -722,5 +722,6 @@
     </script>
 
     <script src="../../../../../../../link-buttons-to-functions.js"></script>
-</body>
-</html>
+
+
+</body></html>

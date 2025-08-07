@@ -1,6 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="fr">
-<head>
+<html lang="fr"><head><script src="../common-interactions.js"></script></head><body>﻿
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMPERIUM - Flotte Navale</title>
@@ -425,8 +425,8 @@
     <link rel="stylesheet" href="../../mobile-2025.css">
     <script src="../../common-header-2025.js"></script>
     <script src="../../resource-updater.js"></script>
-</head>
-<body>
+
+
     <!-- Particules d'arrière-plan -->
     <div class="particles"></div>
 
@@ -480,7 +480,7 @@
                                             <div class="cost-item">🌲 <span>800</span></div>
                                             <div class="cost-item">💰 <span>1200</span></div>
                                         </div>
-                                        <button class="build-btn">Construire Trirème</button>
+                                        <button class="build-btn" data-action="build" data-params="{&quot;buildingType&quot;:&quot;generic_building&quot;,&quot;cost&quot;:{&quot;wood&quot;:100,&quot;stone&quot;:100,&quot;gold&quot;:50},&quot;time&quot;:5000}">Construire Trirème</button>
                                     </div>
 
                                     <div class="ship-card">
@@ -497,7 +497,7 @@
                                             <div class="cost-item">🌲 <span>400</span></div>
                                             <div class="cost-item">💰 <span>600</span></div>
                                         </div>
-                                        <button class="build-btn">Construire Marchand</button>
+                                        <button class="build-btn" data-action="build" data-params="{&quot;buildingType&quot;:&quot;generic_building&quot;,&quot;cost&quot;:{&quot;wood&quot;:100,&quot;stone&quot;:100,&quot;gold&quot;:50},&quot;time&quot;:5000}">Construire Marchand</button>
                                     </div>
 
                                     <div class="ship-card">
@@ -515,7 +515,7 @@
                                             <div class="cost-item">💰 <span>2000</span></div>
                                             <div class="cost-item">⛏️ <span>300</span></div>
                                         </div>
-                                        <button class="build-btn">Construire Galère</button>
+                                        <button class="build-btn" data-action="build" data-params="{&quot;buildingType&quot;:&quot;generic_building&quot;,&quot;cost&quot;:{&quot;wood&quot;:100,&quot;stone&quot;:100,&quot;gold&quot;:50},&quot;time&quot;:5000}">Construire Galère</button>
                                     </div>
 
                                     <div class="ship-card">
@@ -533,7 +533,7 @@
                                             <div class="cost-item">💰 <span>900</span></div>
                                             <div class="cost-item">📚 <span>50</span></div>
                                         </div>
-                                        <button class="build-btn">Construire Explorateur</button>
+                                        <button class="build-btn" data-action="build" data-params="{&quot;buildingType&quot;:&quot;generic_building&quot;,&quot;cost&quot;:{&quot;wood&quot;:100,&quot;stone&quot;:100,&quot;gold&quot;:50},&quot;time&quot;:5000}">Construire Explorateur</button>
                                     </div>
                                 </div>
                             </div>
@@ -690,7 +690,7 @@
                                 <div class="quick-actions">
                                     <button class="quick-btn">🗺️ Nouvelle Expédition</button>
                                     <button class="quick-btn">🛣️ Gérer Routes</button>
-                                    <button class="quick-btn">⚓ Améliorer Port</button>
+                                    <button class="quick-btn" data-action="upgrade" data-params="{&quot;buildingType&quot;:&quot;port&quot;,&quot;cost&quot;:{&quot;wood&quot;:600,&quot;stone&quot;:450,&quot;gold&quot;:300},&quot;time&quot;:8000}">⚓ Améliorer Port</button>
                                     <button class="quick-btn">📊 Rapport Naval</button>
                                 </div>
                             </div>
@@ -750,5 +750,6 @@
     </script>
 
     <script src="../../../../../../link-buttons-to-functions.js"></script>
-</body>
-</html>
+
+
+</body></html>

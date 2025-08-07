@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
+<!DOCTYPE html><html lang="fr"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMPERIUM - Province</title>
@@ -177,7 +175,7 @@
     <link rel="stylesheet" href="../../mobile-2025.css">
     <script src="../../common-header-2025.js"></script>
     <script src="../../resource-updater.js"></script>
-</head>
+<script src="../common-interactions.js"></script></head>
 <body>
     <div class="imperium-ui">
         <header class="imperium-header">
@@ -251,7 +249,7 @@
                                         <div class="stat-item"><div class="stat-value">23%</div><div class="stat-label">Bonheur</div></div>
                                     </div>
                                     <div class="province-resources"><strong>Ressources potentielles:</strong><div class="resource-list"><span class="resource-tag">🌲 Forêts</span><span class="resource-tag">⛏️ Mines</span><span class="resource-tag">🐎 Chevaux</span></div></div>
-                                    <div class="province-actions"><button class="action-btn" style="background: var(--roman-red);">Attaquer</button><button class="action-btn secondary">Espionner</button></div>
+                                    <div class="province-actions"><button class="action-btn" style="background: var(--roman-red);" data-action="attack" data-params="{&quot;target&quot;:&quot;Ennemi&quot;,&quot;units&quot;:{&quot;legionnaire&quot;:50,&quot;archer&quot;:20},&quot;travelTime&quot;:8000}">Attaquer</button><button class="action-btn secondary">Espionner</button></div>
                                 </div>
                                 
                                 <div class="province-card new-province-card">
@@ -348,5 +346,6 @@
             initializeProvinceMap();
         });
     </script>
-</body>
-</html>
+
+
+</body></html>

@@ -1,0 +1,2258 @@
+{
+  "totalPages": 114,
+  "totalButtons": 164,
+  "functionalButtons": 115,
+  "nonFunctionalButtons": 49,
+  "pagesMissingHeader": [
+    "Navigation/Developpement/Academie.html",
+    "Navigation/Developpement/Académie/Académie Impériale.html",
+    "Navigation/Developpement/Académie/Art Militaire.html",
+    "Navigation/Developpement/Académie/Diplomatie.html",
+    "Navigation/Developpement/Académie/Economie.html",
+    "Navigation/Developpement/Académie/Recherche en cours.html",
+    "Navigation/Developpement/Académie/Urbanisme.html",
+    "Navigation/Developpement/Commerce/Acheter des Ressources.html",
+    "Navigation/Developpement/Commerce/Evolution des Prix.html",
+    "Navigation/Developpement/Commerce/Marché Impérial.html",
+    "Navigation/Developpement/Commerce/Mes ordres.html",
+    "Navigation/Developpement/Commerce/Ordres d'achat.html",
+    "Navigation/Developpement/Commerce/Ordres de vente.html",
+    "Navigation/Developpement/Commerce/Tous les ordres.html",
+    "Navigation/Developpement/Commerce/Vendre des Ressources.html",
+    "Navigation/Developpement/Commerce.html",
+    "Navigation/Empire/Cite.html",
+    "Navigation/Empire/Ma Cité/Actions Rapides.html",
+    "Navigation/Empire/Ma Cité/Bonheur.html",
+    "Navigation/Empire/Ma Cité/Booster Production.html",
+    "Navigation/Empire/Ma Cité/Bâtiments.html",
+    "Navigation/Empire/Ma Cité/Citoyens.html",
+    "Navigation/Empire/Ma Cité/Collecter Impôts.html",
+    "Navigation/Empire/Ma Cité/Construction en Cours.html",
+    "Navigation/Empire/Ma Cité/Entrepôts.html",
+    "Navigation/Empire/Ma Cité/Ma Cité Romaine.html",
+    "Navigation/Empire/Ma Cité/Organiser Festival.html",
+    "Navigation/Empire/Ma Cité/Production par Heure.html",
+    "Navigation/Empire/Ma Cité/Puissance Militaire.html",
+    "Navigation/Empire/Ma Cité/Recruter Soldats.html",
+    "Navigation/Empire/Ma Cité/Statistiques de la Cité.html",
+    "Navigation/Empire/Ma Cité/ma-cite-template.html",
+    "Navigation/Empire/Monde/Actions Rapides.html",
+    "Navigation/Empire/Monde/Alliés.html",
+    "Navigation/Empire/Monde/Carte du Monde Méditerranéen.html",
+    "Navigation/Empire/Monde/Coloniser.html",
+    "Navigation/Empire/Monde/Commerce.html",
+    "Navigation/Empire/Monde/Diplomatie.html",
+    "Navigation/Empire/Monde/Ennemis.html",
+    "Navigation/Empire/Monde/Espionner.html",
+    "Navigation/Empire/Monde/Explorer.html",
+    "Navigation/Empire/Monde/Ile Sélectionnée.html",
+    "Navigation/Empire/Monde/Iles Contrôlées.html",
+    "Navigation/Empire/Monde/Influence.html",
+    "Navigation/Empire/Monde/Mes Flottes.html",
+    "Navigation/Empire/Monde/Mes Territoires.html",
+    "Navigation/Empire/Monde/Mon Rang.html",
+    "Navigation/Empire/Monde/Neutres.html",
+    "Navigation/Empire/Monde/Nouvelle Expédition.html",
+    "Navigation/Empire/Monde/Routes Commerciales.html",
+    "Navigation/Empire/Monde/Statistiques Mondiales.html",
+    "Navigation/Empire/Monde.html",
+    "Navigation/Empire/Province/Attaquer.html",
+    "Navigation/Empire/Province/Découvrir de nouvelles terres.html",
+    "Navigation/Empire/Province/Détails.html",
+    "Navigation/Empire/Province/Espionner.html",
+    "Navigation/Empire/Province/Etendre l'Empire.html",
+    "Navigation/Empire/Province/Expédition maritime.html",
+    "Navigation/Empire/Province/Gérer.html",
+    "Navigation/Empire/Province.html",
+    "Navigation/Militaire/Flotte.html",
+    "Navigation/Militaire/Flottes/Améliorer Port.html",
+    "Navigation/Militaire/Flottes/Batailles Navales.html",
+    "Navigation/Militaire/Flottes/Expéditions Navales.html",
+    "Navigation/Militaire/Flottes/Gérer Routes.html",
+    "Navigation/Militaire/Flottes/Mes Navires.html",
+    "Navigation/Militaire/Flottes/Nouvelle Expédition.html",
+    "Navigation/Militaire/Flottes/Port.html",
+    "Navigation/Militaire/Flottes/Rapport Naval.html",
+    "Navigation/Militaire/Légions/Action Rapides.html",
+    "Navigation/Militaire/Légions/Campagnes.html",
+    "Navigation/Militaire/Légions/Défendre Cité.html",
+    "Navigation/Militaire/Légions/Entraînement Rapide.html",
+    "Navigation/Militaire/Légions/Entraînement.html",
+    "Navigation/Militaire/Légions/Légions Romaines.html",
+    "Navigation/Militaire/Légions/Nouvelle Campagne.html",
+    "Navigation/Militaire/Légions/Rapport de Bataille.html",
+    "Navigation/Militaire/Légions/Recrutement.html",
+    "Navigation/Militaire/Légions/Résumé de l'Armée.html",
+    "Navigation/Militaire/Légions.html",
+    "Navigation/Militaire/Simulateur.html",
+    "Navigation/Premium/Premium/Devenez Empereur Premium.html",
+    "Navigation/Premium/Premium/Devenez Empereur.html",
+    "Navigation/Premium/Premium.html",
+    "Navigation/Social/Alliance/Actions Rapides.html",
+    "Navigation/Social/Alliance/Bonus d'Alliance.html",
+    "Navigation/Social/Alliance/Classements.html",
+    "Navigation/Social/Alliance/Guerres d'Alliance.html",
+    "Navigation/Social/Alliance/Guerres.html",
+    "Navigation/Social/Alliance/Gérer.html",
+    "Navigation/Social/Alliance/Ma Guilde.html",
+    "Navigation/Social/Alliance/Quitter.html",
+    "Navigation/Social/Alliance/Statisitique.html",
+    "Navigation/Social/Alliance.html",
+    "Navigation/Social/Diplomatie/Accords Commerciaux.html",
+    "Navigation/Social/Diplomatie/Foedus - Alliances Romaines/Créer une Alliance.html",
+    "Navigation/Social/Diplomatie/Foedus - Alliances Romaines/Invitations.html",
+    "Navigation/Social/Diplomatie/Pactes Militaires.html",
+    "Navigation/Social/Diplomatie/Relations Impériales.html",
+    "Navigation/Social/Diplomatie/Traités de Paix.html",
+    "Navigation/Social/Diplomatie.html",
+    "Navigation/Social/Messages/Annonces.html",
+    "Navigation/Social/Messages/Boîte de réception.html",
+    "Navigation/Social/Messages/Dossiers.html",
+    "Navigation/Social/Messages/Messages Diplomatiques.html",
+    "Navigation/Social/Messages/Nouveau Message.html",
+    "Navigation/Social/Messages/Rapports de Bataille.html",
+    "Navigation/Social/Messsages.html",
+    "Navigation/page-template-2025.html",
+    "Navigation/template-base.html",
+    "index-2025.html",
+    "index.html",
+    "page-template-2025.html",
+    "test-navigation.html"
+  ],
+  "buttonsByPage": {
+    "Navigation/Developpement/Academie.html": {
+      "path": "Navigation/Developpement/Academie.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Académie/Académie Impériale.html": {
+      "path": "Navigation/Developpement/Académie/Académie Impériale.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Académie/Art Militaire.html": {
+      "path": "Navigation/Developpement/Académie/Art Militaire.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Académie/Diplomatie.html": {
+      "path": "Navigation/Developpement/Académie/Diplomatie.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Académie/Economie.html": {
+      "path": "Navigation/Developpement/Académie/Economie.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Académie/Recherche en cours.html": {
+      "path": "Navigation/Developpement/Académie/Recherche en cours.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Académie/Urbanisme.html": {
+      "path": "Navigation/Developpement/Académie/Urbanisme.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Commerce/Acheter des Ressources.html": {
+      "path": "Navigation/Developpement/Commerce/Acheter des Ressources.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Commerce/Evolution des Prix.html": {
+      "path": "Navigation/Developpement/Commerce/Evolution des Prix.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Commerce/Marché Impérial.html": {
+      "path": "Navigation/Developpement/Commerce/Marché Impérial.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Commerce/Mes ordres.html": {
+      "path": "Navigation/Developpement/Commerce/Mes ordres.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Commerce/Ordres d'achat.html": {
+      "path": "Navigation/Developpement/Commerce/Ordres d'achat.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Commerce/Ordres de vente.html": {
+      "path": "Navigation/Developpement/Commerce/Ordres de vente.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Commerce/Tous les ordres.html": {
+      "path": "Navigation/Developpement/Commerce/Tous les ordres.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Commerce/Vendre des Ressources.html": {
+      "path": "Navigation/Developpement/Commerce/Vendre des Ressources.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Developpement/Commerce.html": {
+      "path": "Navigation/Developpement/Commerce.html",
+      "totalButtons": 2,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 2,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "💰 Placer l'ordre d'achat",
+          "id": "place-buy-order",
+          "class": "place-order-btn buy",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "💎 Placer l'ordre de vente",
+          "id": "place-sell-order",
+          "class": "place-order-btn sell",
+          "isFunctional": false,
+          "action": null
+        }
+      ]
+    },
+    "Navigation/Empire/Cite.html": {
+      "path": "Navigation/Empire/Cite.html",
+      "totalButtons": 2,
+      "functionalButtons": 2,
+      "nonFunctionalButtons": 0,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "💰 Collecter Impôts",
+          "id": null,
+          "class": "quick-action-btn",
+          "isFunctional": true,
+          "action": "collectTaxes()"
+        },
+        {
+          "type": "button",
+          "text": "🎪 Organiser Jeux",
+          "id": null,
+          "class": "quick-action-btn",
+          "isFunctional": true,
+          "action": "organizeGames()"
+        }
+      ]
+    },
+    "Navigation/Empire/Ma Cité/Actions Rapides.html": {
+      "path": "Navigation/Empire/Ma Cité/Actions Rapides.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Ma Cité/Bonheur.html": {
+      "path": "Navigation/Empire/Ma Cité/Bonheur.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Ma Cité/Booster Production.html": {
+      "path": "Navigation/Empire/Ma Cité/Booster Production.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Ma Cité/Bâtiments.html": {
+      "path": "Navigation/Empire/Ma Cité/Bâtiments.html",
+      "totalButtons": 9,
+      "functionalButtons": 9,
+      "nonFunctionalButtons": 0,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "Tous",
+          "id": null,
+          "class": "category-btn active",
+          "isFunctional": true,
+          "action": "filterBuildings('all')"
+        },
+        {
+          "type": "button",
+          "text": "Production",
+          "id": null,
+          "class": "category-btn",
+          "isFunctional": true,
+          "action": "filterBuildings('production')"
+        },
+        {
+          "type": "button",
+          "text": "Militaire",
+          "id": null,
+          "class": "category-btn",
+          "isFunctional": true,
+          "action": "filterBuildings('military')"
+        },
+        {
+          "type": "button",
+          "text": "Culture",
+          "id": null,
+          "class": "category-btn",
+          "isFunctional": true,
+          "action": "filterBuildings('culture')"
+        },
+        {
+          "type": "button",
+          "text": "Infrastructure",
+          "id": null,
+          "class": "category-btn",
+          "isFunctional": true,
+          "action": "filterBuildings('infrastructure')"
+        },
+        {
+          "type": "button",
+          "text": "🔧 Tout Améliorer",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "upgradeAll()"
+        },
+        {
+          "type": "button",
+          "text": "🔨 Tout Réparer",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "repairAll()"
+        },
+        {
+          "type": "button",
+          "text": "📐 Optimiser",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "optimizeLayout()"
+        },
+        {
+          "type": "button",
+          "text": "📋 Planificateur",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "showBuildingPlanner()"
+        }
+      ]
+    },
+    "Navigation/Empire/Ma Cité/Citoyens.html": {
+      "path": "Navigation/Empire/Ma Cité/Citoyens.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Ma Cité/Collecter Impôts.html": {
+      "path": "Navigation/Empire/Ma Cité/Collecter Impôts.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Ma Cité/Construction en Cours.html": {
+      "path": "Navigation/Empire/Ma Cité/Construction en Cours.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Ma Cité/Entrepôts.html": {
+      "path": "Navigation/Empire/Ma Cité/Entrepôts.html",
+      "totalButtons": 15,
+      "functionalButtons": 15,
+      "nonFunctionalButtons": 0,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "🔧 Améliorer",
+          "id": null,
+          "class": "action-btn",
+          "isFunctional": true,
+          "action": "upgradeWarehouse('main')"
+        },
+        {
+          "type": "button",
+          "text": "⚙️ Gérer",
+          "id": null,
+          "class": "action-btn secondary",
+          "isFunctional": true,
+          "action": "manageWarehouse('main')"
+        },
+        {
+          "type": "button",
+          "text": "🔧 Améliorer",
+          "id": null,
+          "class": "action-btn",
+          "isFunctional": true,
+          "action": "upgradeWarehouse('wine')"
+        },
+        {
+          "type": "button",
+          "text": "⚙️ Gérer",
+          "id": null,
+          "class": "action-btn secondary",
+          "isFunctional": true,
+          "action": "manageWarehouse('wine')"
+        },
+        {
+          "type": "button",
+          "text": "🔧 Améliorer",
+          "id": null,
+          "class": "action-btn",
+          "isFunctional": true,
+          "action": "upgradeWarehouse('arsenal')"
+        },
+        {
+          "type": "button",
+          "text": "⚙️ Gérer",
+          "id": null,
+          "class": "action-btn secondary",
+          "isFunctional": true,
+          "action": "manageWarehouse('arsenal')"
+        },
+        {
+          "type": "button",
+          "text": "🔧 Améliorer",
+          "id": null,
+          "class": "action-btn",
+          "isFunctional": true,
+          "action": "upgradeWarehouse('granary')"
+        },
+        {
+          "type": "button",
+          "text": "⚙️ Gérer",
+          "id": null,
+          "class": "action-btn secondary",
+          "isFunctional": true,
+          "action": "manageWarehouse('granary')"
+        },
+        {
+          "type": "button",
+          "text": "🏪 Construire Nouvel Entrepôt",
+          "id": null,
+          "class": "expansion-btn",
+          "isFunctional": true,
+          "action": "buildNewWarehouse()"
+        },
+        {
+          "type": "button",
+          "text": "🔧 Améliorer Tous les Entrepôts",
+          "id": null,
+          "class": "expansion-btn secondary",
+          "isFunctional": true,
+          "action": "upgradeAllWarehouses()"
+        },
+        {
+          "type": "button",
+          "text": "📊 Optimiser le Stockage",
+          "id": null,
+          "class": "expansion-btn secondary",
+          "isFunctional": true,
+          "action": "optimizeStorage()"
+        },
+        {
+          "type": "button",
+          "text": "💰 Vendre Surplus",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "sellExcess()"
+        },
+        {
+          "type": "button",
+          "text": "🔄 Redistribuer",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "redistributeResources()"
+        },
+        {
+          "type": "button",
+          "text": "🚨 Expansion d'Urgence",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "emergencyExpansion()"
+        },
+        {
+          "type": "button",
+          "text": "📈 Historique",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "viewStorageHistory()"
+        }
+      ]
+    },
+    "Navigation/Empire/Ma Cité/Ma Cité Romaine.html": {
+      "path": "Navigation/Empire/Ma Cité/Ma Cité Romaine.html",
+      "totalButtons": 6,
+      "functionalButtons": 6,
+      "nonFunctionalButtons": 0,
+      "buttons": [
+        {
+          "type": "a",
+          "text": "🏗️\n                Gérer les Bâtiments",
+          "id": null,
+          "class": "quick-action-btn",
+          "isFunctional": true,
+          "action": "Bâtiments.html"
+        },
+        {
+          "type": "a",
+          "text": "👥\n                Voir les Citoyens",
+          "id": null,
+          "class": "quick-action-btn",
+          "isFunctional": true,
+          "action": "Citoyens.html"
+        },
+        {
+          "type": "a",
+          "text": "⚡\n                Production",
+          "id": null,
+          "class": "quick-action-btn",
+          "isFunctional": true,
+          "action": "Production par Heure.html"
+        },
+        {
+          "type": "a",
+          "text": "💰\n                Collecter Impôts",
+          "id": null,
+          "class": "quick-action-btn",
+          "isFunctional": true,
+          "action": "Collecter Impôts.html"
+        },
+        {
+          "type": "a",
+          "text": "⚔️\n                Recruter Soldats",
+          "id": null,
+          "class": "quick-action-btn",
+          "isFunctional": true,
+          "action": "Recruter Soldats.html"
+        },
+        {
+          "type": "a",
+          "text": "🎭\n                Organiser Festival",
+          "id": null,
+          "class": "quick-action-btn",
+          "isFunctional": true,
+          "action": "Organiser Festival.html"
+        }
+      ]
+    },
+    "Navigation/Empire/Ma Cité/Organiser Festival.html": {
+      "path": "Navigation/Empire/Ma Cité/Organiser Festival.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Ma Cité/Production par Heure.html": {
+      "path": "Navigation/Empire/Ma Cité/Production par Heure.html",
+      "totalButtons": 4,
+      "functionalButtons": 4,
+      "nonFunctionalButtons": 0,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "🚀 Boost Général (+50% - 1h)",
+          "id": null,
+          "class": "action-btn",
+          "isFunctional": true,
+          "action": "boostProduction('all')"
+        },
+        {
+          "type": "button",
+          "text": "💰 Boost Or (+100% - 30min)",
+          "id": null,
+          "class": "action-btn secondary",
+          "isFunctional": true,
+          "action": "boostProduction('gold')"
+        },
+        {
+          "type": "button",
+          "text": "📦 Boost Ressources (+75% - 45min)",
+          "id": null,
+          "class": "action-btn secondary",
+          "isFunctional": true,
+          "action": "boostProduction('resources')"
+        },
+        {
+          "type": "button",
+          "text": "🎓 Boost Recherche (+200% - 20min)",
+          "id": null,
+          "class": "action-btn secondary",
+          "isFunctional": true,
+          "action": "boostProduction('research')"
+        }
+      ]
+    },
+    "Navigation/Empire/Ma Cité/Puissance Militaire.html": {
+      "path": "Navigation/Empire/Ma Cité/Puissance Militaire.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Ma Cité/Recruter Soldats.html": {
+      "path": "Navigation/Empire/Ma Cité/Recruter Soldats.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Ma Cité/Statistiques de la Cité.html": {
+      "path": "Navigation/Empire/Ma Cité/Statistiques de la Cité.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Ma Cité/ma-cite-template.html": {
+      "path": "Navigation/Empire/Ma Cité/ma-cite-template.html",
+      "totalButtons": 2,
+      "functionalButtons": 2,
+      "nonFunctionalButtons": 0,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "🚀\n                Action Principale",
+          "id": null,
+          "class": "action-btn primary",
+          "isFunctional": true,
+          "action": "showNotification('Fonctionnalité bientôt disponible !', 'info')"
+        },
+        {
+          "type": "button",
+          "text": "🏛️\n                Retour à Ma Cité",
+          "id": null,
+          "class": "action-btn",
+          "isFunctional": true,
+          "action": "navigateToMaCitePage('ma-cite-romaine')"
+        }
+      ]
+    },
+    "Navigation/Empire/Monde/Actions Rapides.html": {
+      "path": "Navigation/Empire/Monde/Actions Rapides.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Alliés.html": {
+      "path": "Navigation/Empire/Monde/Alliés.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Carte du Monde Méditerranéen.html": {
+      "path": "Navigation/Empire/Monde/Carte du Monde Méditerranéen.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Coloniser.html": {
+      "path": "Navigation/Empire/Monde/Coloniser.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Commerce.html": {
+      "path": "Navigation/Empire/Monde/Commerce.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Diplomatie.html": {
+      "path": "Navigation/Empire/Monde/Diplomatie.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Ennemis.html": {
+      "path": "Navigation/Empire/Monde/Ennemis.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Espionner.html": {
+      "path": "Navigation/Empire/Monde/Espionner.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Explorer.html": {
+      "path": "Navigation/Empire/Monde/Explorer.html",
+      "totalButtons": 12,
+      "functionalButtons": 8,
+      "nonFunctionalButtons": 4,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "Explorer",
+          "id": null,
+          "class": "exploration-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Explorer",
+          "id": null,
+          "class": "exploration-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Explorer",
+          "id": null,
+          "class": "exploration-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Explorer",
+          "id": null,
+          "class": "exploration-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "🤖 Auto-Explorer",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "autoExplore()"
+        },
+        {
+          "type": "button",
+          "text": "🔙 Rappeler Tout",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "recallExpeditions()"
+        },
+        {
+          "type": "button",
+          "text": "🗺️ Carte Complète",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "viewMap()"
+        },
+        {
+          "type": "button",
+          "text": "📚 Historique",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "explorationHistory()"
+        },
+        {
+          "type": "div",
+          "text": "🏖️\n                                            \n                                                Exploration Côtière\n                                                Découvrir de nouvelles côtes et îles\n                                            \n                                        \n                                        \n                                            \n                                                2-4h\n                                                Durée\n                                            \n                                            \n                                                70%\n                                                Succès\n                                            \n                                            \n                                                Moyen\n                                                Risque\n                                            \n                                        \n                                        \n                                            \n                                                💰 500\n                                                🚢 1 Navire\n                                                👥 50 Hommes\n                                            \n                                            Explorer",
+          "id": null,
+          "class": "exploration-card",
+          "isFunctional": true,
+          "action": "startExploration('coastal')"
+        },
+        {
+          "type": "div",
+          "text": "⛰️\n                                            \n                                                Expédition Montagnarde\n                                                Traverser les chaînes montagneuses\n                                            \n                                        \n                                        \n                                            \n                                                4-6h\n                                                Durée\n                                            \n                                            \n                                                50%\n                                                Succès\n                                            \n                                            \n                                                Élevé\n                                                Risque\n                                            \n                                        \n                                        \n                                            \n                                                💰 800\n                                                ⚔️ 100 Soldats\n                                                🍞 200 Vivres\n                                            \n                                            Explorer",
+          "id": null,
+          "class": "exploration-card",
+          "isFunctional": true,
+          "action": "startExploration('mountain')"
+        },
+        {
+          "type": "div",
+          "text": "🏜️\n                                            \n                                                Traversée du Désert\n                                                Découvrir les oasis cachées\n                                            \n                                        \n                                        \n                                            \n                                                6-8h\n                                                Durée\n                                            \n                                            \n                                                30%\n                                                Succès\n                                            \n                                            \n                                                Très Élevé\n                                                Risque\n                                            \n                                        \n                                        \n                                            \n                                                💰 1200\n                                                🐪 20 Chameaux\n                                                💧 500 Eau\n                                            \n                                            Explorer",
+          "id": null,
+          "class": "exploration-card",
+          "isFunctional": true,
+          "action": "startExploration('desert')"
+        },
+        {
+          "type": "div",
+          "text": "🌲\n                                            \n                                                Exploration Forestière\n                                                Cartographier les forêts denses\n                                            \n                                        \n                                        \n                                            \n                                                3-5h\n                                                Durée\n                                            \n                                            \n                                                60%\n                                                Succès\n                                            \n                                            \n                                                Moyen\n                                                Risque\n                                            \n                                        \n                                        \n                                            \n                                                💰 600\n                                                🏹 75 Éclaireurs\n                                                🗡️ 25 Gardes\n                                            \n                                            Explorer",
+          "id": null,
+          "class": "exploration-card",
+          "isFunctional": true,
+          "action": "startExploration('forest')"
+        }
+      ]
+    },
+    "Navigation/Empire/Monde/Ile Sélectionnée.html": {
+      "path": "Navigation/Empire/Monde/Ile Sélectionnée.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Iles Contrôlées.html": {
+      "path": "Navigation/Empire/Monde/Iles Contrôlées.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Influence.html": {
+      "path": "Navigation/Empire/Monde/Influence.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Mes Flottes.html": {
+      "path": "Navigation/Empire/Monde/Mes Flottes.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Mes Territoires.html": {
+      "path": "Navigation/Empire/Monde/Mes Territoires.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Mon Rang.html": {
+      "path": "Navigation/Empire/Monde/Mon Rang.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Neutres.html": {
+      "path": "Navigation/Empire/Monde/Neutres.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Nouvelle Expédition.html": {
+      "path": "Navigation/Empire/Monde/Nouvelle Expédition.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Routes Commerciales.html": {
+      "path": "Navigation/Empire/Monde/Routes Commerciales.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde/Statistiques Mondiales.html": {
+      "path": "Navigation/Empire/Monde/Statistiques Mondiales.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Monde.html": {
+      "path": "Navigation/Empire/Monde.html",
+      "totalButtons": 8,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 8,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "🔍+",
+          "id": "zoom-in",
+          "class": "map-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "🔍-",
+          "id": "zoom-out",
+          "class": "map-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "🎯",
+          "id": "center-map",
+          "class": "map-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "🛣️",
+          "id": "toggle-routes",
+          "class": "map-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "🚢 Nouvelle Expédition",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "🗺️ Explorer",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "⚖️ Commerce",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "🤝 Diplomatie",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": false,
+          "action": null
+        }
+      ]
+    },
+    "Navigation/Empire/Province/Attaquer.html": {
+      "path": "Navigation/Empire/Province/Attaquer.html",
+      "totalButtons": 16,
+      "functionalButtons": 16,
+      "nonFunctionalButtons": 0,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "-100",
+          "id": null,
+          "class": "unit-btn",
+          "isFunctional": true,
+          "action": "adjustUnits('legionnaires', -100)"
+        },
+        {
+          "type": "button",
+          "text": "+100",
+          "id": null,
+          "class": "unit-btn",
+          "isFunctional": true,
+          "action": "adjustUnits('legionnaires', 100)"
+        },
+        {
+          "type": "button",
+          "text": "-50",
+          "id": null,
+          "class": "unit-btn",
+          "isFunctional": true,
+          "action": "adjustUnits('archers', -50)"
+        },
+        {
+          "type": "button",
+          "text": "+50",
+          "id": null,
+          "class": "unit-btn",
+          "isFunctional": true,
+          "action": "adjustUnits('archers', 50)"
+        },
+        {
+          "type": "button",
+          "text": "-25",
+          "id": null,
+          "class": "unit-btn",
+          "isFunctional": true,
+          "action": "adjustUnits('cavalry', -25)"
+        },
+        {
+          "type": "button",
+          "text": "+25",
+          "id": null,
+          "class": "unit-btn",
+          "isFunctional": true,
+          "action": "adjustUnits('cavalry', 25)"
+        },
+        {
+          "type": "button",
+          "text": "-5",
+          "id": null,
+          "class": "unit-btn",
+          "isFunctional": true,
+          "action": "adjustUnits('siege', -5)"
+        },
+        {
+          "type": "button",
+          "text": "+5",
+          "id": null,
+          "class": "unit-btn",
+          "isFunctional": true,
+          "action": "adjustUnits('siege', 5)"
+        },
+        {
+          "type": "button",
+          "text": "⚔️ ATTAQUER !",
+          "id": "launch-attack-btn",
+          "class": "attack-btn",
+          "isFunctional": true,
+          "action": "launchAttack()"
+        },
+        {
+          "type": "button",
+          "text": "Toute l'Armée",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "selectAllUnits()"
+        },
+        {
+          "type": "button",
+          "text": "Vider",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "clearArmy()"
+        },
+        {
+          "type": "button",
+          "text": "Équilibrée",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "balancedArmy()"
+        },
+        {
+          "type": "button",
+          "text": "Élite",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": true,
+          "action": "eliteArmy()"
+        },
+        {
+          "type": "div",
+          "text": "Facile\n                                        \n                                            B\n                                            \n                                                Barbares du Nord\n                                                Chef Brutus\n                                            \n                                        \n                                        \n                                            \n                                                1,200\n                                                Soldats\n                                            \n                                            \n                                                2,500\n                                                Puissance\n                                            \n                                            \n                                                3,200\n                                                Richesses",
+          "id": null,
+          "class": "target-card",
+          "isFunctional": true,
+          "action": "selectTarget(1)"
+        },
+        {
+          "type": "div",
+          "text": "Moyen\n                                        \n                                            G\n                                            \n                                                Tribus Gauloises\n                                                Vercingétorix\n                                            \n                                        \n                                        \n                                            \n                                                2,800\n                                                Soldats\n                                            \n                                            \n                                                4,200\n                                                Puissance\n                                            \n                                            \n                                                6,500\n                                                Richesses",
+          "id": null,
+          "class": "target-card",
+          "isFunctional": true,
+          "action": "selectTarget(2)"
+        },
+        {
+          "type": "div",
+          "text": "Difficile\n                                        \n                                            C\n                                            \n                                                Carthage\n                                                Hannibal Barca\n                                            \n                                        \n                                        \n                                            \n                                                5,500\n                                                Soldats\n                                            \n                                            \n                                                8,900\n                                                Puissance\n                                            \n                                            \n                                                12,000\n                                                Richesses",
+          "id": null,
+          "class": "target-card",
+          "isFunctional": true,
+          "action": "selectTarget(3)"
+        }
+      ]
+    },
+    "Navigation/Empire/Province/Découvrir de nouvelles terres.html": {
+      "path": "Navigation/Empire/Province/Découvrir de nouvelles terres.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Province/Détails.html": {
+      "path": "Navigation/Empire/Province/Détails.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Province/Espionner.html": {
+      "path": "Navigation/Empire/Province/Espionner.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Province/Etendre l'Empire.html": {
+      "path": "Navigation/Empire/Province/Etendre l'Empire.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Province/Expédition maritime.html": {
+      "path": "Navigation/Empire/Province/Expédition maritime.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Empire/Province/Gérer.html": {
+      "path": "Navigation/Empire/Province/Gérer.html",
+      "totalButtons": 11,
+      "functionalButtons": 11,
+      "nonFunctionalButtons": 0,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "💰 Collecter les Impôts",
+          "id": null,
+          "class": "action-btn",
+          "isFunctional": true,
+          "action": "collectTaxes()"
+        },
+        {
+          "type": "button",
+          "text": "👑 Nommer un Gouverneur",
+          "id": null,
+          "class": "action-btn secondary",
+          "isFunctional": true,
+          "action": "appointGovernor()"
+        },
+        {
+          "type": "button",
+          "text": "📊 Ajuster les Impôts",
+          "id": null,
+          "class": "action-btn secondary",
+          "isFunctional": true,
+          "action": "adjustTaxes()"
+        },
+        {
+          "type": "button",
+          "text": "🎭 Organiser un Événement",
+          "id": null,
+          "class": "action-btn secondary",
+          "isFunctional": true,
+          "action": "organizeEvent()"
+        },
+        {
+          "type": "button",
+          "text": "📋 Rapports Détaillés",
+          "id": null,
+          "class": "action-btn secondary",
+          "isFunctional": true,
+          "action": "viewReports()"
+        },
+        {
+          "type": "button",
+          "text": "⚠️ Déclarer l'État d'Urgence",
+          "id": null,
+          "class": "action-btn danger",
+          "isFunctional": true,
+          "action": "declareEmergency()"
+        },
+        {
+          "type": "button",
+          "text": "🏃 Évacuation d'Urgence",
+          "id": null,
+          "class": "action-btn danger",
+          "isFunctional": true,
+          "action": "evacuateProvince()"
+        },
+        {
+          "type": "div",
+          "text": "🏛️\n                                            \n                                                Forum Provincial\n                                                Niveau 5\n                                            \n                                        \n                                        \n                                            \n                                                +250\n                                                Influence/h\n                                            \n                                            \n                                                +15%\n                                                Bonheur",
+          "id": null,
+          "class": "building-card",
+          "isFunctional": true,
+          "action": "manageBuilding('forum')"
+        },
+        {
+          "type": "div",
+          "text": "🌊\n                                            \n                                                Aqueduc\n                                                Niveau 3\n                                            \n                                        \n                                        \n                                            \n                                                +500\n                                                Population Max\n                                            \n                                            \n                                                +10%\n                                                Santé",
+          "id": null,
+          "class": "building-card",
+          "isFunctional": true,
+          "action": "manageBuilding('aqueduct')"
+        },
+        {
+          "type": "div",
+          "text": "🛣️\n                                            \n                                                Réseau Routier\n                                                Niveau 4\n                                            \n                                        \n                                        \n                                            \n                                                +20%\n                                                Commerce\n                                            \n                                            \n                                                +15%\n                                                Mobilité",
+          "id": null,
+          "class": "building-card",
+          "isFunctional": true,
+          "action": "manageBuilding('roads')"
+        },
+        {
+          "type": "div",
+          "text": "🌾\n                                            \n                                                Greniers Publics\n                                                Niveau 6\n                                            \n                                        \n                                        \n                                            \n                                                +1000\n                                                Stockage\n                                            \n                                            \n                                                +5%\n                                                Sécurité",
+          "id": null,
+          "class": "building-card",
+          "isFunctional": true,
+          "action": "manageBuilding('granary')"
+        }
+      ]
+    },
+    "Navigation/Empire/Province.html": {
+      "path": "Navigation/Empire/Province.html",
+      "totalButtons": 6,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 6,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "Gérer",
+          "id": null,
+          "class": "action-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Détails",
+          "id": null,
+          "class": "action-btn secondary",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Gérer",
+          "id": null,
+          "class": "action-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Détails",
+          "id": null,
+          "class": "action-btn secondary",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Attaquer",
+          "id": null,
+          "class": "action-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Espionner",
+          "id": null,
+          "class": "action-btn secondary",
+          "isFunctional": false,
+          "action": null
+        }
+      ]
+    },
+    "Navigation/Militaire/Flotte.html": {
+      "path": "Navigation/Militaire/Flotte.html",
+      "totalButtons": 8,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 8,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "Construire Trirème",
+          "id": null,
+          "class": "build-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Construire Marchand",
+          "id": null,
+          "class": "build-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Construire Galère",
+          "id": null,
+          "class": "build-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Construire Explorateur",
+          "id": null,
+          "class": "build-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "🗺️ Nouvelle Expédition",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "🛣️ Gérer Routes",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "⚓ Améliorer Port",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "📊 Rapport Naval",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": false,
+          "action": null
+        }
+      ]
+    },
+    "Navigation/Militaire/Flottes/Améliorer Port.html": {
+      "path": "Navigation/Militaire/Flottes/Améliorer Port.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Flottes/Batailles Navales.html": {
+      "path": "Navigation/Militaire/Flottes/Batailles Navales.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Flottes/Expéditions Navales.html": {
+      "path": "Navigation/Militaire/Flottes/Expéditions Navales.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Flottes/Gérer Routes.html": {
+      "path": "Navigation/Militaire/Flottes/Gérer Routes.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Flottes/Mes Navires.html": {
+      "path": "Navigation/Militaire/Flottes/Mes Navires.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Flottes/Nouvelle Expédition.html": {
+      "path": "Navigation/Militaire/Flottes/Nouvelle Expédition.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Flottes/Port.html": {
+      "path": "Navigation/Militaire/Flottes/Port.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Flottes/Rapport Naval.html": {
+      "path": "Navigation/Militaire/Flottes/Rapport Naval.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Légions/Action Rapides.html": {
+      "path": "Navigation/Militaire/Légions/Action Rapides.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Légions/Campagnes.html": {
+      "path": "Navigation/Militaire/Légions/Campagnes.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Légions/Défendre Cité.html": {
+      "path": "Navigation/Militaire/Légions/Défendre Cité.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Légions/Entraînement Rapide.html": {
+      "path": "Navigation/Militaire/Légions/Entraînement Rapide.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Légions/Entraînement.html": {
+      "path": "Navigation/Militaire/Légions/Entraînement.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Légions/Légions Romaines.html": {
+      "path": "Navigation/Militaire/Légions/Légions Romaines.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Légions/Nouvelle Campagne.html": {
+      "path": "Navigation/Militaire/Légions/Nouvelle Campagne.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Légions/Rapport de Bataille.html": {
+      "path": "Navigation/Militaire/Légions/Rapport de Bataille.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Légions/Recrutement.html": {
+      "path": "Navigation/Militaire/Légions/Recrutement.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Légions/Résumé de l'Armée.html": {
+      "path": "Navigation/Militaire/Légions/Résumé de l'Armée.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Militaire/Légions.html": {
+      "path": "Navigation/Militaire/Légions.html",
+      "totalButtons": 8,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 8,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "Recruter",
+          "id": null,
+          "class": "recruit-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Recruter",
+          "id": null,
+          "class": "recruit-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Recruter",
+          "id": null,
+          "class": "recruit-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Bâtiment requis",
+          "id": null,
+          "class": "recruit-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Nouvelle Campagne",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Défendre Cité",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Entraînement Rapide",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Rapport de Bataille",
+          "id": null,
+          "class": "quick-btn",
+          "isFunctional": false,
+          "action": null
+        }
+      ]
+    },
+    "Navigation/Militaire/Simulateur.html": {
+      "path": "Navigation/Militaire/Simulateur.html",
+      "totalButtons": 1,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 1,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "SIMULER",
+          "id": "simulate-battle",
+          "class": "simulate-btn",
+          "isFunctional": false,
+          "action": null
+        }
+      ]
+    },
+    "Navigation/Premium/Premium/Devenez Empereur Premium.html": {
+      "path": "Navigation/Premium/Premium/Devenez Empereur Premium.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Premium/Premium/Devenez Empereur.html": {
+      "path": "Navigation/Premium/Premium/Devenez Empereur.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Premium/Premium.html": {
+      "path": "Navigation/Premium/Premium.html",
+      "totalButtons": 1,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 1,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "🚀 Devenir Empereur Premium",
+          "id": null,
+          "class": "cta-button",
+          "isFunctional": false,
+          "action": null
+        }
+      ]
+    },
+    "Navigation/Social/Alliance/Actions Rapides.html": {
+      "path": "Navigation/Social/Alliance/Actions Rapides.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Alliance/Bonus d'Alliance.html": {
+      "path": "Navigation/Social/Alliance/Bonus d'Alliance.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Alliance/Classements.html": {
+      "path": "Navigation/Social/Alliance/Classements.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Alliance/Guerres d'Alliance.html": {
+      "path": "Navigation/Social/Alliance/Guerres d'Alliance.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Alliance/Guerres.html": {
+      "path": "Navigation/Social/Alliance/Guerres.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Alliance/Gérer.html": {
+      "path": "Navigation/Social/Alliance/Gérer.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Alliance/Ma Guilde.html": {
+      "path": "Navigation/Social/Alliance/Ma Guilde.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Alliance/Quitter.html": {
+      "path": "Navigation/Social/Alliance/Quitter.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Alliance/Statisitique.html": {
+      "path": "Navigation/Social/Alliance/Statisitique.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Alliance.html": {
+      "path": "Navigation/Social/Alliance.html",
+      "totalButtons": 1,
+      "functionalButtons": 1,
+      "nonFunctionalButtons": 0,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "×",
+          "id": null,
+          "class": "close-btn",
+          "isFunctional": true,
+          "action": "closeSearchModal()"
+        }
+      ]
+    },
+    "Navigation/Social/Diplomatie/Accords Commerciaux.html": {
+      "path": "Navigation/Social/Diplomatie/Accords Commerciaux.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Diplomatie/Foedus - Alliances Romaines/Créer une Alliance.html": {
+      "path": "Navigation/Social/Diplomatie/Foedus - Alliances Romaines/Créer une Alliance.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Diplomatie/Foedus - Alliances Romaines/Invitations.html": {
+      "path": "Navigation/Social/Diplomatie/Foedus - Alliances Romaines/Invitations.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Diplomatie/Pactes Militaires.html": {
+      "path": "Navigation/Social/Diplomatie/Pactes Militaires.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Diplomatie/Relations Impériales.html": {
+      "path": "Navigation/Social/Diplomatie/Relations Impériales.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Diplomatie/Traités de Paix.html": {
+      "path": "Navigation/Social/Diplomatie/Traités de Paix.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Diplomatie.html": {
+      "path": "Navigation/Social/Diplomatie.html",
+      "totalButtons": 5,
+      "functionalButtons": 4,
+      "nonFunctionalButtons": 1,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "Relations",
+          "id": null,
+          "class": "diplomacy-tab active",
+          "isFunctional": true,
+          "action": "switchTab(event, 'relations')"
+        },
+        {
+          "type": "button",
+          "text": "Propositions",
+          "id": null,
+          "class": "diplomacy-tab",
+          "isFunctional": true,
+          "action": "switchTab(event, 'proposals')"
+        },
+        {
+          "type": "button",
+          "text": "Négocier",
+          "id": null,
+          "class": "diplomacy-tab",
+          "isFunctional": true,
+          "action": "switchTab(event, 'negotiate')"
+        },
+        {
+          "type": "button",
+          "text": "Historique",
+          "id": null,
+          "class": "diplomacy-tab",
+          "isFunctional": true,
+          "action": "switchTab(event, 'history')"
+        },
+        {
+          "type": "button",
+          "text": "📜 Envoyer",
+          "id": null,
+          "class": "submit-btn",
+          "isFunctional": false,
+          "action": null
+        }
+      ]
+    },
+    "Navigation/Social/Messages/Annonces.html": {
+      "path": "Navigation/Social/Messages/Annonces.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Messages/Boîte de réception.html": {
+      "path": "Navigation/Social/Messages/Boîte de réception.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Messages/Dossiers.html": {
+      "path": "Navigation/Social/Messages/Dossiers.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Messages/Messages Diplomatiques.html": {
+      "path": "Navigation/Social/Messages/Messages Diplomatiques.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Messages/Nouveau Message.html": {
+      "path": "Navigation/Social/Messages/Nouveau Message.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Messages/Rapports de Bataille.html": {
+      "path": "Navigation/Social/Messages/Rapports de Bataille.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/Social/Messsages.html": {
+      "path": "Navigation/Social/Messsages.html",
+      "totalButtons": 7,
+      "functionalButtons": 6,
+      "nonFunctionalButtons": 1,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "✉️ Nouveau Message",
+          "id": null,
+          "class": "compose-btn",
+          "isFunctional": true,
+          "action": "openComposeModal()"
+        },
+        {
+          "type": "button",
+          "text": "📖 Tout marquer lu",
+          "id": null,
+          "class": "action-btn",
+          "isFunctional": true,
+          "action": "markAllAsRead()"
+        },
+        {
+          "type": "button",
+          "text": "🗑️ Supprimer",
+          "id": null,
+          "class": "action-btn",
+          "isFunctional": true,
+          "action": "deleteSelected()"
+        },
+        {
+          "type": "button",
+          "text": "🔄 Actualiser",
+          "id": null,
+          "class": "action-btn",
+          "isFunctional": true,
+          "action": "refreshMessages()"
+        },
+        {
+          "type": "button",
+          "text": "×",
+          "id": null,
+          "class": "close-btn",
+          "isFunctional": true,
+          "action": "closeComposeModal()"
+        },
+        {
+          "type": "button",
+          "text": "Annuler",
+          "id": null,
+          "class": "btn-secondary",
+          "isFunctional": true,
+          "action": "closeComposeModal()"
+        },
+        {
+          "type": "button",
+          "text": "📤 Envoyer",
+          "id": null,
+          "class": "btn-primary",
+          "isFunctional": false,
+          "action": null
+        }
+      ]
+    },
+    "Navigation/page-template-2025.html": {
+      "path": "Navigation/page-template-2025.html",
+      "totalButtons": 0,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 0,
+      "buttons": []
+    },
+    "Navigation/template-base.html": {
+      "path": "Navigation/template-base.html",
+      "totalButtons": 7,
+      "functionalButtons": 7,
+      "nonFunctionalButtons": 0,
+      "buttons": [
+        {
+          "type": "a",
+          "text": "🏛️\n                                    Ma Cité",
+          "id": null,
+          "class": "nav-item",
+          "isFunctional": true,
+          "action": "navigateTo('cite')"
+        },
+        {
+          "type": "a",
+          "text": "🌍\n                                    Monde",
+          "id": null,
+          "class": "nav-item",
+          "isFunctional": true,
+          "action": "navigateTo('monde')"
+        },
+        {
+          "type": "a",
+          "text": "🏝️\n                                    Province",
+          "id": null,
+          "class": "nav-item",
+          "isFunctional": true,
+          "action": "navigateTo('province')"
+        },
+        {
+          "type": "a",
+          "text": "🤝\n                                    Diplomatie",
+          "id": null,
+          "class": "nav-item",
+          "isFunctional": true,
+          "action": "navigateTo('diplomatie')"
+        },
+        {
+          "type": "a",
+          "text": "⚔️\n                                    Alliance",
+          "id": null,
+          "class": "nav-item",
+          "isFunctional": true,
+          "action": "navigateTo('alliance')"
+        },
+        {
+          "type": "a",
+          "text": "📜\n                                    Messages",
+          "id": null,
+          "class": "nav-item",
+          "isFunctional": true,
+          "action": "navigateTo('messages')"
+        },
+        {
+          "type": "div",
+          "text": "IMPERIUM",
+          "id": null,
+          "class": "imperium-logo",
+          "isFunctional": true,
+          "action": "navigateTo('index')"
+        }
+      ]
+    },
+    "index-2025.html": {
+      "path": "index-2025.html",
+      "totalButtons": 3,
+      "functionalButtons": 3,
+      "nonFunctionalButtons": 0,
+      "buttons": [
+        {
+          "type": "a",
+          "text": "Commencer à jouer",
+          "id": null,
+          "class": "hero-button primary",
+          "isFunctional": true,
+          "action": "Navigation/Empire/Cite.html"
+        },
+        {
+          "type": "a",
+          "text": "Devenir Premium",
+          "id": null,
+          "class": "hero-button",
+          "isFunctional": true,
+          "action": "Navigation/Premium/Premium.html"
+        },
+        {
+          "type": "a",
+          "text": "Commencer l'Aventure",
+          "id": null,
+          "class": "hero-button primary",
+          "isFunctional": true,
+          "action": "Navigation/Empire/Cite.html"
+        }
+      ]
+    },
+    "index.html": {
+      "path": "index.html",
+      "totalButtons": 9,
+      "functionalButtons": 0,
+      "nonFunctionalButtons": 9,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "Commencez à jouer",
+          "id": "start-game-btn",
+          "class": "start-button",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Sauvegarder",
+          "id": "save-btn",
+          "class": "footer-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Charger",
+          "id": "load-btn",
+          "class": "footer-btn",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "button",
+          "text": "Fermer",
+          "id": "modal-cancel-btn",
+          "class": "modal-btn cancel",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "a",
+          "text": "🏛️",
+          "id": null,
+          "class": "mobile-nav-item",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "a",
+          "text": "🌍",
+          "id": null,
+          "class": "mobile-nav-item",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "a",
+          "text": "📚",
+          "id": null,
+          "class": "mobile-nav-item",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "a",
+          "text": "⚔️",
+          "id": null,
+          "class": "mobile-nav-item",
+          "isFunctional": false,
+          "action": null
+        },
+        {
+          "type": "a",
+          "text": "🛡️",
+          "id": null,
+          "class": "mobile-nav-item",
+          "isFunctional": false,
+          "action": null
+        }
+      ]
+    },
+    "page-template-2025.html": {
+      "path": "page-template-2025.html",
+      "totalButtons": 16,
+      "functionalButtons": 16,
+      "nonFunctionalButtons": 0,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "Construire",
+          "id": null,
+          "class": "button-2025 primary",
+          "isFunctional": true,
+          "action": "build"
+        },
+        {
+          "type": "button",
+          "text": "Améliorer",
+          "id": null,
+          "class": "button-2025 secondary",
+          "isFunctional": true,
+          "action": "upgrade"
+        },
+        {
+          "type": "button",
+          "text": "Construire",
+          "id": null,
+          "class": "button-2025 primary",
+          "isFunctional": true,
+          "action": "build"
+        },
+        {
+          "type": "button",
+          "text": "Améliorer",
+          "id": null,
+          "class": "button-2025 secondary",
+          "isFunctional": true,
+          "action": "upgrade"
+        },
+        {
+          "type": "button",
+          "text": "Construire",
+          "id": null,
+          "class": "button-2025 primary",
+          "isFunctional": true,
+          "action": "build"
+        },
+        {
+          "type": "button",
+          "text": "Améliorer",
+          "id": null,
+          "class": "button-2025 secondary",
+          "isFunctional": true,
+          "action": "upgrade"
+        },
+        {
+          "type": "button",
+          "text": "Construire",
+          "id": null,
+          "class": "button-2025 primary",
+          "isFunctional": true,
+          "action": "build"
+        },
+        {
+          "type": "button",
+          "text": "Améliorer",
+          "id": null,
+          "class": "button-2025 secondary",
+          "isFunctional": true,
+          "action": "upgrade"
+        },
+        {
+          "type": "button",
+          "text": "Recruter (10)",
+          "id": null,
+          "class": "button-2025 primary",
+          "isFunctional": true,
+          "action": "train"
+        },
+        {
+          "type": "button",
+          "text": "Recruter (50)",
+          "id": null,
+          "class": "button-2025 secondary",
+          "isFunctional": true,
+          "action": "train"
+        },
+        {
+          "type": "button",
+          "text": "Recruter (10)",
+          "id": null,
+          "class": "button-2025 primary",
+          "isFunctional": true,
+          "action": "train"
+        },
+        {
+          "type": "button",
+          "text": "Recruter (50)",
+          "id": null,
+          "class": "button-2025 secondary",
+          "isFunctional": true,
+          "action": "train"
+        },
+        {
+          "type": "button",
+          "text": "Recruter (10)",
+          "id": null,
+          "class": "button-2025 primary",
+          "isFunctional": true,
+          "action": "train"
+        },
+        {
+          "type": "button",
+          "text": "Recruter (50)",
+          "id": null,
+          "class": "button-2025 secondary",
+          "isFunctional": true,
+          "action": "train"
+        },
+        {
+          "type": "button",
+          "text": "Recruter (10)",
+          "id": null,
+          "class": "button-2025 primary",
+          "isFunctional": true,
+          "action": "train"
+        },
+        {
+          "type": "button",
+          "text": "Recruter (50)",
+          "id": null,
+          "class": "button-2025 secondary",
+          "isFunctional": true,
+          "action": "train"
+        }
+      ]
+    },
+    "test-navigation.html": {
+      "path": "test-navigation.html",
+      "totalButtons": 5,
+      "functionalButtons": 5,
+      "nonFunctionalButtons": 0,
+      "buttons": [
+        {
+          "type": "button",
+          "text": "🏛️ Ma Cité",
+          "id": null,
+          "class": "test-button",
+          "isFunctional": true,
+          "action": "testNavigation('cite')"
+        },
+        {
+          "type": "button",
+          "text": "🌍 Monde",
+          "id": null,
+          "class": "test-button",
+          "isFunctional": true,
+          "action": "testNavigation('monde')"
+        },
+        {
+          "type": "button",
+          "text": "🏝️ Province",
+          "id": null,
+          "class": "test-button",
+          "isFunctional": true,
+          "action": "testNavigation('province')"
+        },
+        {
+          "type": "button",
+          "text": "📚 Académie",
+          "id": null,
+          "class": "test-button",
+          "isFunctional": true,
+          "action": "testNavigation('academie')"
+        },
+        {
+          "type": "button",
+          "text": "⚔️ Légions",
+          "id": null,
+          "class": "test-button",
+          "isFunctional": true,
+          "action": "testNavigation('legions')"
+        }
+      ]
+    }
+  }
+}

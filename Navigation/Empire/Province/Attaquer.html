@@ -1,6 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="fr">
-<head>
+<html lang="fr"><head><script src="../../common-interactions.js"></script></head><body>﻿
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMPERIUM - Attaquer une Province</title>
@@ -450,8 +450,8 @@
     <link rel="stylesheet" href="../../../mobile-2025.css">
     <script src="../../../common-header-2025.js"></script>
     <script src="../../../resource-updater.js"></script>
-</head>
-<body>
+
+
     <!-- Particules d'arrière-plan -->
     <div class="particles"></div>
 
@@ -661,7 +661,7 @@
                             <!-- Lancer l'attaque -->
                             <div class="panel-section">
                                 <h3 class="section-title">⚔️ Lancer l'Attaque</h3>
-                                <button class="attack-btn" id="launch-attack-btn" onclick="launchAttack()" disabled>
+                                <button class="attack-btn" id="launch-attack-btn" disabled="" data-action="attack" data-params="{&quot;target&quot;:&quot;Ennemi&quot;,&quot;units&quot;:{&quot;legionnaire&quot;:50,&quot;archer&quot;:20},&quot;travelTime&quot;:8000}">
                                     ⚔️ ATTAQUER !
                                 </button>
                                 <div style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">
@@ -907,5 +907,6 @@
     </script>
 
     <script src="../../../../../../../link-buttons-to-functions.js"></script>
-</body>
-</html>
+
+
+</body></html>
