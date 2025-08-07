@@ -1,0 +1,1318 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Alliance Impériale</title>
+    <meta name="description" content="Rejoignez ou créez une alliance pour dominer ensemble la Méditerranée.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles et scripts communs -->
+    <link rel="stylesheet" href="../common-styles.css">
+    <script src="../common-navigation.js"></script>
+    <script src="../game-engine.js"></script>
+    <script src="../advanced-game-systems.js"></script>
+    <script src="../save-system.js"></script>
+    <script src="../ui-manager.js"></script>
+    <script src="../global-console.js"></script>
+
+    <style>
+        /* Styles spécifiques aux alliances */
+        .alliance-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        .alliance-main {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .alliance-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        /* État sans alliance */
+        .no-alliance-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 1rem;
+            border: 2px dashed var(--border-gold);
+        }
+
+        .no-alliance-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.7;
+        }
+
+        .no-alliance-title {
+            color: var(--gold-primary);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .no-alliance-description {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .alliance-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .action-btn-large {
+            padding: 1rem 2rem;
+            border-radius: 0.8rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            border: 2px solid;
+        }
+
+        .btn-create {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border-color: var(--gold-light);
+        }
+
+        .btn-create:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px var(--shadow-gold);
+        }
+
+        .btn-search {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .btn-search:hover {
+            background: rgba(59, 130, 246, 0.3);
+            transform: translateY(-3px);
+        }
+
+        /* Informations de l'alliance */
+        .alliance-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .alliance-emblem {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            border: 3px solid var(--gold-light);
+            box-shadow: 0 0 20px var(--shadow-gold);
+        }
+
+        .alliance-info {
+            flex: 1;
+        }
+
+        .alliance-name {
+            color: var(--gold-primary);
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .alliance-motto {
+            color: var(--text-light);
+            font-style: italic;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .alliance-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .stat-value {
+            color: var(--gold-light);
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Liste des membres */
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .member-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .member-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border-color: var(--gold-light);
+        }
+
+        .member-card.leader::before {
+            content: '👑';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .member-card.officer::before {
+            content: '⭐';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .member-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .member-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--roman-red), var(--roman-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            border: 2px solid var(--gold-primary);
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            color: var(--gold-light);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .member-rank {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .member-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .member-stat {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .member-stat-label {
+            color: var(--text-muted);
+        }
+
+        .member-stat-value {
+            color: var(--text-light);
+            font-weight: bold;
+        }
+
+        .member-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .status-online {
+            color: #22c55e;
+        }
+
+        .status-offline {
+            color: #6b7280;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Panneau de contrôle de l'alliance */
+        .alliance-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .alliance-chat {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .chat-message {
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-message:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.3rem;
+        }
+
+        .chat-author {
+            color: var(--gold-light);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .chat-time {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+        }
+
+        .chat-content {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .chat-input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            padding: 0.8rem;
+            color: var(--text-light);
+            font-family: 'Times New Roman', serif;
+        }
+
+        .chat-input:focus {
+            border-color: var(--gold-light);
+            outline: none;
+        }
+
+        .chat-send-btn {
+            padding: 0.8rem 1rem;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-send-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .alliance-events {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .event-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+        }
+
+        .event-icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .event-content {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .event-text {
+            color: var(--text-light);
+            margin-bottom: 0.2rem;
+        }
+
+        .event-time {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+        }
+
+        .alliance-bonuses {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .bonus-item {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .bonus-value {
+            color: var(--gold-light);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .bonus-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .quick-btn {
+            padding: 0.8rem;
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--text-light);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--gold-light);
+            background: rgba(217, 119, 6, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* Modal de recherche d'alliance */
+        .search-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .search-modal.show {
+            display: flex;
+        }
+
+        .search-content {
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 1rem;
+            border: 2px solid var(--gold-primary);
+            padding: 2rem;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-gold);
+        }
+
+        .search-title {
+            color: var(--gold-primary);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .search-filters {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            color: var(--gold-light);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .filter-input, .filter-select {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            padding: 0.8rem;
+            color: var(--text-light);
+            font-family: 'Times New Roman', serif;
+        }
+
+        .alliance-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1rem;
+        }
+
+        .alliance-result-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .alliance-result-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--gold-light);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-emblem {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .result-info {
+            flex: 1;
+        }
+
+        .result-name {
+            color: var(--gold-light);
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .result-members {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .result-stat {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-join {
+            flex: 1;
+            padding: 0.6rem;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn-join:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-info {
+            padding: 0.6rem;
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-info:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .alliance-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+            
+            .alliance-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .search-filters {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../../mobile-2025.css">
+    <script src="../../common-header-2025.js"></script>
+    <script src="../../resource-updater.js"></script>
+</head>
+<body>
+    <!-- Particules d'arrière-plan -->
+    <div class="particles"></div>
+
+    <!-- INTERFACE PRINCIPALE DU JEU -->
+    <div class="imperium-ui">
+        <!-- HEADER -->
+        <header class="imperium-header">
+            <div class="header-content">
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display">
+                    <!-- Les ressources seront injectées ici par JS -->
+                </div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar">M</div>
+                    <div>
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPS PRINCIPAL -->
+        <div class="imperium-body">
+            <!-- BARRE LATERALE (Desktop) -->
+            <aside class="imperium-sidebar">
+                <!-- Navigation générée dynamiquement par common-navigation.js -->
+            </aside>
+
+            <!-- CONTENU PRINCIPAL -->
+            <main class="main-content">
+                <div class="view-container">
+                    <h2 class="view-title">Alliance Impériale</h2>
+                    <div class="alliance-layout">
+                        <div class="alliance-main">
+                            <div id="alliance-content">
+                                <!-- Contenu généré par JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Panneau de contrôle -->
+                        <div class="alliance-panel" id="alliance-panel">
+                            <!-- Contenu généré par JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal de recherche d'alliance -->
+    <div class="search-modal" id="search-modal">
+        <div class="search-content">
+            <div class="search-header">
+                <h3 class="search-title">🔍 Rechercher une Alliance</h3>
+                <button class="close-btn" onclick="closeSearchModal()">&times;</button>
+            </div>
+            <div class="search-filters">
+                <div class="filter-group">
+                    <label class="filter-label">Nom de l'alliance :</label>
+                    <input type="text" class="filter-input" placeholder="Rechercher...">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Taille minimale :</label>
+                    <select class="filter-select">
+                        <option value="">Toutes tailles</option>
+                        <option value="5">5+ membres</option>
+                        <option value="10">10+ membres</option>
+                        <option value="20">20+ membres</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Type d'alliance :</label>
+                    <select class="filter-select">
+                        <option value="">Tous types</option>
+                        <option value="military">Militaire</option>
+                        <option value="trade">Commerce</option>
+                        <option value="diplomatic">Diplomatique</option>
+                    </select>
+                </div>
+            </div>
+            <div class="alliance-results" id="alliance-results">
+                <!-- Résultats générés par JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // État de l'alliance du joueur (null = pas d'alliance)
+        let playerAlliance = {
+            id: 1,
+            name: 'Légions de l\'Aigle d\'Or',
+            motto: 'Virtus et Honor - Courage et Honneur',
+            emblem: 'L',
+            members: 24,
+            power: 156000,
+            territory: 45,
+            rank: 3
+        };
+
+        // Données des membres (si dans une alliance)
+        const allianceMembers = [
+            {
+                id: 1,
+                name: 'Marcus Aurelius',
+                rank: 'Membre',
+                avatar: 'M',
+                power: 8500,
+                territory: 12,
+                contribution: 2400,
+                status: 'online',
+                isPlayer: true
+            },
+            {
+                id: 2,
+                name: 'Julius Maximus',
+                rank: 'Chef',
+                avatar: 'J',
+                power: 15200,
+                territory: 18,
+                contribution: 5600,
+                status: 'online',
+                isLeader: true
+            },
+            {
+                id: 3,
+                name: 'Gaius Octavius',
+                rank: 'Officier',
+                avatar: 'G',
+                power: 12800,
+                territory: 15,
+                contribution: 4200,
+                status: 'offline',
+                isOfficer: true
+            },
+            {
+                id: 4,
+                name: 'Lucius Brutus',
+                rank: 'Membre',
+                avatar: 'L',
+                power: 9600,
+                territory: 11,
+                contribution: 3100,
+                status: 'online'
+            },
+            {
+                id: 5,
+                name: 'Titus Flavius',
+                rank: 'Membre',
+                avatar: 'T',
+                power: 7200,
+                territory: 9,
+                contribution: 1800,
+                status: 'offline'
+            },
+            {
+                id: 6,
+                name: 'Publius Scipio',
+                rank: 'Membre',
+                avatar: 'P',
+                power: 6800,
+                territory: 8,
+                contribution: 1600,
+                status: 'online'
+            }
+        ];
+
+        // Messages du chat d'alliance
+        const allianceChat = [
+            {
+                author: 'Julius Maximus',
+                content: 'Préparez-vous pour l\'attaque coordonnée sur Carthage demain à 20h !',
+                time: '2min'
+            },
+            {
+                author: 'Gaius Octavius',
+                content: 'Mes légions sont prêtes. J\'apporte 2000 soldats.',
+                time: '5min'
+            },
+            {
+                author: 'Marcus Aurelius',
+                content: 'Parfait ! Ma flotte sécurisera les routes maritimes.',
+                time: '8min'
+            },
+            {
+                author: 'Lucius Brutus',
+                content: 'Quelqu\'un peut m\'aider avec des ressources pour mes catapultes ?',
+                time: '15min'
+            }
+        ];
+
+        // Événements récents de l'alliance
+        const allianceEvents = [
+            {
+                icon: '⚔️',
+                text: 'Victoire contre l\'Alliance des Barbares',
+                time: '2h'
+            },
+            {
+                icon: '👤',
+                text: 'Nouveau membre: Quintus Fabius',
+                time: '4h'
+            },
+            {
+                icon: '🏆',
+                text: 'Montée au rang 3 du classement',
+                time: '1j'
+            },
+            {
+                icon: '💰',
+                text: 'Bonus de territoire activé (+15%)',
+                time: '2j'
+            }
+        ];
+
+        // Alliances disponibles pour la recherche
+        const availableAlliances = [
+            {
+                id: 101,
+                name: 'Imperium Romanum',
+                emblem: 'I',
+                members: 45,
+                power: 280000,
+                rank: 1,
+                type: 'military',
+                description: 'La plus puissante alliance militaire'
+            },
+            {
+                id: 102,
+                name: 'Mercatores Maximi',
+                emblem: 'M',
+                members: 32,
+                power: 195000,
+                rank: 5,
+                type: 'trade',
+                description: 'Spécialisée dans le commerce'
+            },
+            {
+                id: 103,
+                name: 'Senatus Populusque',
+                emblem: 'S',
+                members: 28,
+                power: 167000,
+                rank: 7,
+                type: 'diplomatic',
+                description: 'Excellence diplomatique'
+            },
+            {
+                id: 104,
+                name: 'Gladiatores Invicti',
+                emblem: 'G',
+                members: 18,
+                power: 142000,
+                rank: 12,
+                type: 'military',
+                description: 'Guerriers invincibles'
+            }
+        ];
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page Alliance chargée');
+            loadAllianceContent();
+        });
+
+        // Charger le contenu selon l'état de l'alliance
+        function loadAllianceContent() {
+            const allianceContent = document.getElementById('alliance-content');
+            const alliancePanel = document.getElementById('alliance-panel');
+
+            if (playerAlliance) {
+                // Le joueur est dans une alliance
+                allianceContent.innerHTML = generateAllianceView();
+                alliancePanel.innerHTML = generateAlliancePanel();
+            } else {
+                // Le joueur n'est pas dans une alliance
+                allianceContent.innerHTML = generateNoAllianceView();
+                alliancePanel.innerHTML = generateSearchPanel();
+            }
+        }
+
+        // Vue sans alliance
+        function generateNoAllianceView() {
+            return `
+                <div class="no-alliance-state">
+                    <div class="no-alliance-icon">🛡️</div>
+                    <h3 class="no-alliance-title">Aucune Alliance</h3>
+                    <p class="no-alliance-description">
+                        Rejoignez une alliance pour bénéficier de bonus, participer à des guerres coordonnées 
+                        et échanger avec d'autres joueurs. Ensemble, vous pourrez dominer la Méditerranée !
+                    </p>
+                    <div class="alliance-actions">
+                        <button class="action-btn-large btn-create" onclick="createAlliance()">
+                            ⚔️ Créer une Alliance
+                        </button>
+                        <button class="action-btn-large btn-search" onclick="openSearchModal()">
+                            🔍 Rechercher une Alliance
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Vue avec alliance
+        function generateAllianceView() {
+            return `
+                <div class="alliance-header">
+                    <div class="alliance-emblem">${playerAlliance.emblem}</div>
+                    <div class="alliance-info">
+                        <div class="alliance-name">${playerAlliance.name}</div>
+                        <div class="alliance-motto">${playerAlliance.motto}</div>
+                        <div class="alliance-stats">
+                            <div class="stat-item">
+                                <span class="stat-value">${playerAlliance.members}</span>
+                                <span class="stat-label">Membres</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">${playerAlliance.power.toLocaleString()}</span>
+                                <span class="stat-label">Puissance</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">${playerAlliance.territory}</span>
+                                <span class="stat-label">Territoires</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">#${playerAlliance.rank}</span>
+                                <span class="stat-label">Classement</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alliance-section">
+                    <h3 class="section-title">👥 Membres de l'Alliance</h3>
+                    <div class="members-grid">
+                        ${allianceMembers.map(member => `
+                            <div class="member-card ${member.isLeader ? 'leader' : member.isOfficer ? 'officer' : ''}" onclick="viewMemberProfile(${member.id})">
+                                <div class="member-header">
+                                    <div class="member-avatar">${member.avatar}</div>
+                                    <div class="member-info">
+                                        <div class="member-name">${member.name} ${member.isPlayer ? '(Vous)' : ''}</div>
+                                        <div class="member-rank">${member.rank}</div>
+                                    </div>
+                                </div>
+                                <div class="member-stats">
+                                    <div class="member-stat">
+                                        <span class="member-stat-label">Puissance:</span>
+                                        <span class="member-stat-value">${member.power.toLocaleString()}</span>
+                                    </div>
+                                    <div class="member-stat">
+                                        <span class="member-stat-label">Territoires:</span>
+                                        <span class="member-stat-value">${member.territory}</span>
+                                    </div>
+                                    <div class="member-stat">
+                                        <span class="member-stat-label">Contribution:</span>
+                                        <span class="member-stat-value">${member.contribution.toLocaleString()}</span>
+                                    </div>
+                                </div>
+                                <div class="member-status ${member.status === 'online' ? 'status-online' : 'status-offline'}">
+                                    <div class="status-indicator"></div>
+                                    <span>${member.status === 'online' ? 'En ligne' : 'Hors ligne'}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Panneau de contrôle de l'alliance
+        function generateAlliancePanel() {
+            return `
+                <!-- Chat de l'alliance -->
+                <div class="panel-section">
+                    <h3 class="section-title">💬 Chat de l'Alliance</h3>
+                    <div class="alliance-chat">
+                        ${allianceChat.map(message => `
+                            <div class="chat-message">
+                                <div class="chat-header">
+                                    <div class="chat-author">${message.author}</div>
+                                    <div class="chat-time">${message.time}</div>
+                                </div>
+                                <div class="chat-content">${message.content}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="chat-input-group">
+                        <input type="text" class="chat-input" placeholder="Tapez votre message..." id="chat-input">
+                        <button class="chat-send-btn" onclick="sendChatMessage()">📤</button>
+                    </div>
+                </div>
+
+                <!-- Événements récents -->
+                <div class="panel-section">
+                    <h3 class="section-title">📰 Événements Récents</h3>
+                    <div class="alliance-events">
+                        ${allianceEvents.map(event => `
+                            <div class="event-item">
+                                <div class="event-icon">${event.icon}</div>
+                                <div class="event-content">
+                                    <div class="event-text">${event.text}</div>
+                                    <div class="event-time">Il y a ${event.time}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Bonus d'alliance -->
+                <div class="panel-section">
+                    <h3 class="section-title">🎁 Bonus d'Alliance</h3>
+                    <div class="alliance-bonuses">
+                        <div class="bonus-item">
+                            <div class="bonus-value">+15%</div>
+                            <div class="bonus-label">Production</div>
+                        </div>
+                        <div class="bonus-item">
+                            <div class="bonus-value">+20%</div>
+                            <div class="bonus-label">Commerce</div>
+                        </div>
+                        <div class="bonus-item">
+                            <div class="bonus-value">+10%</div>
+                            <div class="bonus-label">Recherche</div>
+                        </div>
+                        <div class="bonus-item">
+                            <div class="bonus-value">-25%</div>
+                            <div class="bonus-label">Coût Guerre</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions rapides -->
+                <div class="panel-section">
+                    <h3 class="section-title">⚡ Actions Rapides</h3>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="viewAllianceWars()">⚔️ Guerres</button>
+                        <button class="quick-btn" onclick="manageAlliance()">⚙️ Gérer</button>
+                        <button class="quick-btn" onclick="viewAllianceStats()">📊 Statistiques</button>
+                        <button class="quick-btn" onclick="leaveAlliance()">🚪 Quitter</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Panneau de recherche (sans alliance)
+        function generateSearchPanel() {
+            return `
+                <div class="panel-section">
+                    <h3 class="section-title">🏆 Top Alliances</h3>
+                    <div class="alliance-events">
+                        ${availableAlliances.slice(0, 3).map(alliance => `
+                            <div class="event-item" onclick="viewAllianceDetails(${alliance.id})">
+                                <div class="event-icon">${alliance.emblem}</div>
+                                <div class="event-content">
+                                    <div class="event-text">${alliance.name}</div>
+                                    <div class="event-time">${alliance.members} membres • Rang #${alliance.rank}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3 class="section-title">💡 Avantages des Alliances</h3>
+                    <div class="alliance-bonuses">
+                        <div class="bonus-item">
+                            <div class="bonus-value">+15%</div>
+                            <div class="bonus-label">Production</div>
+                        </div>
+                        <div class="bonus-item">
+                            <div class="bonus-value">+20%</div>
+                            <div class="bonus-label">Commerce</div>
+                        </div>
+                        <div class="bonus-item">
+                            <div class="bonus-value">🛡️</div>
+                            <div class="bonus-label">Protection</div>
+                        </div>
+                        <div class="bonus-item">
+                            <div class="bonus-value">⚔️</div>
+                            <div class="bonus-label">Guerres</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3 class="section-title">⚡ Actions</h3>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="createAlliance()">⚔️ Créer</button>
+                        <button class="quick-btn" onclick="openSearchModal()">🔍 Rechercher</button>
+                        <button class="quick-btn" onclick="viewAllianceGuide()">📖 Guide</button>
+                        <button class="quick-btn" onclick="viewInvitations()">✉️ Invitations</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Fonctions d'interaction
+        function createAlliance() {
+            alert('Création d\'une nouvelle alliance...\nCoût: 10,000 or\nFonctionnalité à venir !');
+        }
+
+        function openSearchModal() {
+            document.getElementById('search-modal').classList.add('show');
+            loadSearchResults();
+        }
+
+        function closeSearchModal() {
+            document.getElementById('search-modal').classList.remove('show');
+        }
+
+        function loadSearchResults() {
+            const resultsContainer = document.getElementById('alliance-results');
+            resultsContainer.innerHTML = availableAlliances.map(alliance => `
+                <div class="alliance-result-card">
+                    <div class="result-header">
+                        <div class="result-emblem">${alliance.emblem}</div>
+                        <div class="result-info">
+                            <div class="result-name">${alliance.name}</div>
+                            <div class="result-members">${alliance.members} membres</div>
+                        </div>
+                    </div>
+                    <div class="result-stats">
+                        <div class="result-stat">
+                            <span>Puissance:</span>
+                            <span>${alliance.power.toLocaleString()}</span>
+                        </div>
+                        <div class="result-stat">
+                            <span>Rang:</span>
+                            <span>#${alliance.rank}</span>
+                        </div>
+                        <div class="result-stat">
+                            <span>Type:</span>
+                            <span>${alliance.type}</span>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">${alliance.description}</p>
+                    <div class="result-actions">
+                        <button class="btn-join" onclick="joinAlliance(${alliance.id})">Rejoindre</button>
+                        <button class="btn-info" onclick="viewAllianceDetails(${alliance.id})">ℹ️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function joinAlliance(allianceId) {
+            const alliance = availableAlliances.find(a => a.id === allianceId);
+            if (alliance) {
+                alert(`Demande d'adhésion envoyée à ${alliance.name} !`);
+                closeSearchModal();
+            }
+        }
+
+        function viewAllianceDetails(allianceId) {
+            const alliance = availableAlliances.find(a => a.id === allianceId);
+            if (alliance) {
+                alert(`Détails de ${alliance.name}\n\nMembres: ${alliance.members}\nPuissance: ${alliance.power.toLocaleString()}\nRang: #${alliance.rank}\nType: ${alliance.type}\n\n${alliance.description}`);
+            }
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (message) {
+                alert(`Message envoyé: "${message}"`);
+                input.value = '';
+            }
+        }
+
+        function viewMemberProfile(memberId) {
+            const member = allianceMembers.find(m => m.id === memberId);
+            if (member) {
+                alert(`Profil de ${member.name}\n\nRang: ${member.rank}\nPuissance: ${member.power.toLocaleString()}\nTerritoires: ${member.territory}\nContribution: ${member.contribution.toLocaleString()}\nStatut: ${member.status === 'online' ? 'En ligne' : 'Hors ligne'}`);
+            }
+        }
+
+        function viewAllianceWars() {
+            alert('Guerres d\'alliance:\n\n⚔️ Guerre contre "Barbares du Nord"\n🏆 Victoire contre "Pirates de Sicile"\n⏳ Préparation attaque sur Carthage');
+        }
+
+        function manageAlliance() {
+            alert('Gestion de l\'alliance (réservé aux officiers et chefs)');
+        }
+
+        function viewAllianceStats() {
+            alert('Statistiques détaillées de l\'alliance...');
+        }
+
+        function leaveAlliance() {
+            if (confirm('Êtes-vous sûr de vouloir quitter l\'alliance ?')) {
+                playerAlliance = null;
+                loadAllianceContent();
+                alert('Vous avez quitté l\'alliance.');
+            }
+        }
+
+        function viewAllianceGuide() {
+            alert('Guide des alliances:\n\n1. Rejoignez une alliance pour des bonus\n2. Participez aux guerres coordonnées\n3. Contribuez aux objectifs communs\n4. Communiquez avec vos alliés');
+        }
+
+        function viewInvitations() {
+            alert('Invitations reçues:\n\n📨 Imperium Romanum vous invite\n📨 Gladiatores Invicti vous invite');
+        }
+
+        // Fermer le modal en cliquant à l'extérieur
+        document.getElementById('search-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSearchModal();
+            }
+        });
+    </script>
+
+    <script src="../../../../../../link-buttons-to-functions.js"></script>
+</body>
+</html>

@@ -1,0 +1,726 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Bâtiments de la Cité</title>
+    <meta name="description" content="Gérez et améliorez les bâtiments de votre cité romaine.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles et scripts communs -->
+    <link rel="stylesheet" href="../common-styles.css">
+    <script src="../common-navigation.js"></script>
+    <script src="../game-engine.js"></script>
+    <script src="../advanced-game-systems.js"></script>
+    <script src="../save-system.js"></script>
+    <script src="../ui-manager.js"></script>
+    <script src="../global-console.js"></script>
+
+    <style>
+        .buildings-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        .buildings-main {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .buildings-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .city-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 0.5rem;
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%);
+            border-radius: 1rem;
+            border: 2px solid var(--border-gold);
+            padding: 1rem;
+            min-height: 300px;
+        }
+
+        .building-plot {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .building-plot:hover {
+            transform: scale(1.05);
+            border-color: var(--gold-light);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .building-plot.built {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+        }
+
+        .building-plot.constructing {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: #f59e0b;
+            animation: constructing-pulse 2s infinite;
+        }
+
+        .building-plot.empty {
+            background: rgba(107, 114, 128, 0.2);
+            border-color: #6b7280;
+            border-style: dashed;
+        }
+
+        @keyframes constructing-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .building-icon {
+            font-size: 2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .building-name {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .building-level {
+            font-size: 0.6rem;
+            color: var(--gold-light);
+            margin-top: 0.2rem;
+        }
+
+        .construction-progress {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            right: 2px;
+            height: 4px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+            transition: width 0.3s ease;
+        }
+
+        .buildings-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .building-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .building-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .building-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .building-card-icon {
+            font-size: 2.5rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            border-radius: 50%;
+            color: white;
+        }
+
+        .building-info {
+            flex: 1;
+        }
+
+        .building-card-name {
+            color: var(--gold-light);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .building-card-level {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .building-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .building-stat {
+            text-align: center;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+        }
+
+        .stat-value {
+            color: var(--gold-light);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .building-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-weight: bold;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px var(--shadow-gold);
+        }
+
+        .action-btn.secondary {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+
+        .action-btn.secondary:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .buildings-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .construction-queue {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .queue-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .queue-icon {
+            font-size: 1.5rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        .queue-info {
+            flex: 1;
+        }
+
+        .queue-name {
+            color: var(--gold-light);
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .queue-progress {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .queue-eta {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .quick-btn {
+            padding: 0.8rem;
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--text-light);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--gold-light);
+            background: rgba(217, 119, 6, 0.1);
+        }
+
+        .building-categories {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(30, 41, 59, 0.6);
+            color: var(--text-light);
+            border: 1px solid var(--border-gold);
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border-color: var(--gold-light);
+        }
+
+        .category-btn:hover {
+            border-color: var(--gold-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .buildings-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+            
+            .city-grid {
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(3, 1fr);
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../../../mobile-2025.css">
+    <script src="../../../common-header-2025.js"></script>
+    <script src="../../../resource-updater.js"></script>
+</head>
+<body>
+    <!-- Particules d'arrière-plan -->
+    <div class="particles"></div>
+
+    <!-- INTERFACE PRINCIPALE DU JEU -->
+    <div class="imperium-ui">
+        <!-- HEADER -->
+        <header class="imperium-header">
+            <div class="header-content">
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display">
+                    <!-- Les ressources seront injectées ici par JS -->
+                </div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar">M</div>
+                    <div>
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPS PRINCIPAL -->
+        <div class="imperium-body">
+            <!-- BARRE LATERALE (Desktop) -->
+            <aside class="imperium-sidebar">
+                <!-- Navigation générée dynamiquement par common-navigation.js -->
+            </aside>
+
+            <!-- CONTENU PRINCIPAL -->
+            <main class="main-content">
+                <div class="view-container">
+                    <h2 class="view-title">🏗️ Bâtiments de la Cité</h2>
+                    <div class="buildings-layout">
+                        <div class="buildings-main">
+                            <!-- Plan de la cité -->
+                            <div class="buildings-section">
+                                <h3 class="section-title">🏛️ Plan de la Cité</h3>
+                                <div class="city-grid" id="city-grid">
+                                    <!-- Généré par JavaScript -->
+                                </div>
+                            </div>
+
+                            <!-- Liste des bâtiments -->
+                            <div class="buildings-section">
+                                <h3 class="section-title">📋 Gestion des Bâtiments</h3>
+                                
+                                <div class="building-categories">
+                                    <button class="category-btn active" onclick="filterBuildings('all')">Tous</button>
+                                    <button class="category-btn" onclick="filterBuildings('production')">Production</button>
+                                    <button class="category-btn" onclick="filterBuildings('military')">Militaire</button>
+                                    <button class="category-btn" onclick="filterBuildings('culture')">Culture</button>
+                                    <button class="category-btn" onclick="filterBuildings('infrastructure')">Infrastructure</button>
+                                </div>
+
+                                <div class="buildings-list" id="buildings-list">
+                                    <!-- Généré par JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panneau de gestion -->
+                        <div class="buildings-panel">
+                            <!-- File de construction -->
+                            <div class="panel-section">
+                                <h3 class="section-title">🔨 File de Construction</h3>
+                                <div class="construction-queue">
+                                    <div class="queue-item">
+                                        <div class="queue-icon">🏛️</div>
+                                        <div class="queue-info">
+                                            <div class="queue-name">Forum - Niveau 6</div>
+                                            <div class="queue-progress">Construction en cours</div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 65%;"></div>
+                                            </div>
+                                            <div class="queue-eta">Terminé dans 2h 15min</div>
+                                        </div>
+                                    </div>
+                                    <div class="queue-item">
+                                        <div class="queue-icon">🏪</div>
+                                        <div class="queue-info">
+                                            <div class="queue-name">Entrepôt - Niveau 4</div>
+                                            <div class="queue-progress">En attente</div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 0%;"></div>
+                                            </div>
+                                            <div class="queue-eta">Démarrage dans 2h 15min</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions rapides -->
+                            <div class="panel-section">
+                                <h3 class="section-title">⚡ Actions Rapides</h3>
+                                <div class="quick-actions">
+                                    <button class="quick-btn" onclick="upgradeAll()">🔧 Tout Améliorer</button>
+                                    <button class="quick-btn" onclick="repairAll()">🔨 Tout Réparer</button>
+                                    <button class="quick-btn" onclick="optimizeLayout()">📐 Optimiser</button>
+                                    <button class="quick-btn" onclick="showBuildingPlanner()">📋 Planificateur</button>
+                                </div>
+                            </div>
+
+                            <!-- Statistiques de construction -->
+                            <div class="panel-section">
+                                <h3 class="section-title">📊 Statistiques</h3>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div style="text-align: center; background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 0.5rem;">
+                                        <div style="color: var(--gold-light); font-size: 1.5rem; font-weight: bold;">24</div>
+                                        <div style="color: var(--text-muted); font-size: 0.8rem;">Bâtiments Construits</div>
+                                    </div>
+                                    <div style="text-align: center; background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 0.5rem;">
+                                        <div style="color: var(--gold-light); font-size: 1.5rem; font-weight: bold;">6</div>
+                                        <div style="color: var(--text-muted); font-size: 0.8rem;">Emplacements Libres</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 1rem; text-align: center; background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 0.5rem;">
+                                    <div style="color: var(--gold-light); font-size: 1.5rem; font-weight: bold;">Level 8</div>
+                                    <div style="color: var(--text-muted); font-size: 0.8rem;">Niveau de Développement</div>
+                                </div>
+                            </div>
+
+                            <!-- Conseils de construction -->
+                            <div class="panel-section">
+                                <h3 class="section-title">💡 Conseils</h3>
+                                <div style="color: var(--text-light); font-size: 0.9rem; line-height: 1.5;">
+                                    <p><strong>🏛️ Priorité :</strong> Améliorez le Forum pour débloquer de nouveaux bâtiments</p>
+                                    <p><strong>🏪 Stockage :</strong> Vos entrepôts sont à 85% de capacité</p>
+                                    <p><strong>⚔️ Défense :</strong> Construisez des murailles pour améliorer la sécurité</p>
+                                    <p><strong>💰 Économie :</strong> Plus de tavernes augmenteront vos revenus</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Configuration des bâtiments
+        const BUILDINGS_DATA = {
+            forum: { icon: '🏛️', name: 'Forum', level: 5, category: 'infrastructure', x: 2, y: 1 },
+            warehouse: { icon: '🏪', name: 'Entrepôt', level: 3, category: 'infrastructure', x: 0, y: 0 },
+            barracks: { icon: '⚔️', name: 'Caserne', level: 4, category: 'military', x: 4, y: 0 },
+            academy: { icon: '🎓', name: 'Académie', level: 3, category: 'culture', x: 1, y: 2 },
+            lumbercamp: { icon: '🪵', name: 'Scierie', level: 6, category: 'production', x: 0, y: 3 },
+            quarry: { icon: '🪨', name: 'Carrière', level: 5, category: 'production', x: 1, y: 3 },
+            vineyard: { icon: '🍷', name: 'Vignoble', level: 4, category: 'production', x: 2, y: 3 },
+            ironmine: { icon: '⚔️', name: 'Mine de Fer', level: 3, category: 'production', x: 3, y: 3 },
+            mint: { icon: '💰', name: 'Hôtel des Monnaies', level: 4, category: 'production', x: 4, y: 3 },
+            tavern: { icon: '🍺', name: 'Taverne', level: 2, category: 'culture', x: 3, y: 1 },
+            temple: { icon: '⛪', name: 'Temple', level: 3, category: 'culture', x: 1, y: 1 },
+            library: { icon: '📚', name: 'Bibliothèque', level: 2, category: 'culture', x: 3, y: 2 }
+        };
+
+        let currentFilter = 'all';
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page Bâtiments chargée');
+            generateCityGrid();
+            generateBuildingsList();
+            startConstructionUpdates();
+        });
+
+        function generateCityGrid() {
+            const grid = document.getElementById('city-grid');
+            grid.innerHTML = '';
+
+            for (let y = 0; y < 4; y++) {
+                for (let x = 0; x < 5; x++) {
+                    const plot = document.createElement('div');
+                    plot.className = 'building-plot';
+                    plot.dataset.x = x;
+                    plot.dataset.y = y;
+
+                    const building = findBuildingAt(x, y);
+                    if (building) {
+                        plot.classList.add('built');
+                        plot.innerHTML = `
+                            <div class="building-icon">${building.icon}</div>
+                            <div class="building-name">${building.name}</div>
+                            <div class="building-level">Niv. ${building.level}</div>
+                        `;
+                        plot.onclick = () => manageBuilding(building);
+                    } else if (isConstructing(x, y)) {
+                        plot.classList.add('constructing');
+                        plot.innerHTML = `
+                            <div class="building-icon">🔨</div>
+                            <div class="building-name">Construction</div>
+                            <div class="construction-progress">
+                                <div class="progress-fill" style="width: 65%;"></div>
+                            </div>
+                        `;
+                    } else {
+                        plot.classList.add('empty');
+                        plot.innerHTML = `
+                            <div class="building-icon" style="opacity: 0.5;">➕</div>
+                            <div class="building-name">Construire</div>
+                        `;
+                        plot.onclick = () => showBuildingOptions(x, y);
+                    }
+
+                    grid.appendChild(plot);
+                }
+            }
+        }
+
+        function generateBuildingsList() {
+            const list = document.getElementById('buildings-list');
+            list.innerHTML = '';
+
+            Object.entries(BUILDINGS_DATA).forEach(([key, building]) => {
+                if (currentFilter === 'all' || building.category === currentFilter) {
+                    const card = document.createElement('div');
+                    card.className = 'building-card';
+                    card.innerHTML = `
+                        <div class="building-header">
+                            <div class="building-card-icon">${building.icon}</div>
+                            <div class="building-info">
+                                <div class="building-card-name">${building.name}</div>
+                                <div class="building-card-level">Niveau ${building.level}</div>
+                            </div>
+                        </div>
+                        <div class="building-stats">
+                            <div class="building-stat">
+                                <div class="stat-value">+${building.level * 50}</div>
+                                <div class="stat-label">Production/h</div>
+                            </div>
+                            <div class="building-stat">
+                                <div class="stat-value">${building.level * 100}</div>
+                                <div class="stat-label">Capacité</div>
+                            </div>
+                        </div>
+                        <div class="building-actions">
+                            <button class="action-btn" onclick="upgradeBuilding('${key}')">🔧 Améliorer</button>
+                            <button class="action-btn secondary" onclick="repairBuilding('${key}')">🔨 Réparer</button>
+                        </div>
+                    `;
+                    list.appendChild(card);
+                }
+            });
+        }
+
+        function findBuildingAt(x, y) {
+            return Object.values(BUILDINGS_DATA).find(building => building.x === x && building.y === y);
+        }
+
+        function isConstructing(x, y) {
+            // Simulation - le Forum est en construction
+            return x === 2 && y === 1;
+        }
+
+        function filterBuildings(category) {
+            currentFilter = category;
+            
+            // Mettre à jour les boutons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            generateBuildingsList();
+        }
+
+        function manageBuilding(building) {
+            alert(`Gestion de ${building.name}\n\nNiveau: ${building.level}\nProduction: +${building.level * 50}/h\nCapacité: ${building.level * 100}\n\nOptions:\n• Améliorer\n• Réparer\n• Voir détails`);
+        }
+
+        function showBuildingOptions(x, y) {
+            alert(`Construire un nouveau bâtiment\n\nEmplacement: (${x}, ${y})\n\nBâtiments disponibles:\n• Forum (500 bois, 200 pierre)\n• Entrepôt (300 bois, 100 pierre)\n• Caserne (400 bois, 150 fer)\n• Académie (600 bois, 300 pierre)`);
+        }
+
+        function upgradeBuilding(buildingKey) {
+            const building = BUILDINGS_DATA[buildingKey];
+            const cost = building.level * 200;
+            
+            if (confirm(`Améliorer ${building.name} ?\n\nNiveau actuel: ${building.level}\nNiveau suivant: ${building.level + 1}\n\nCoût: ${cost} or\nTemps: ${building.level}h`)) {
+                alert(`🔧 Amélioration de ${building.name} lancée !\n\nL'amélioration sera terminée dans ${building.level} heures.`);
+            }
+        }
+
+        function repairBuilding(buildingKey) {
+            const building = BUILDINGS_DATA[buildingKey];
+            const cost = building.level * 50;
+            
+            if (confirm(`Réparer ${building.name} ?\n\nCoût: ${cost} or\nTemps: 30 minutes`)) {
+                alert(`🔨 Réparation de ${building.name} lancée !\n\nLa réparation sera terminée dans 30 minutes.`);
+            }
+        }
+
+        function upgradeAll() {
+            if (confirm('Améliorer tous les bâtiments possibles ?\n\nCela coûtera beaucoup de ressources mais accélérera votre développement.')) {
+                alert('🔧 Amélioration de tous les bâtiments lancée !\n\nVos ouvriers travaillent sur tous les chantiers.');
+            }
+        }
+
+        function repairAll() {
+            if (confirm('Réparer tous les bâtiments ?\n\nCoût total: 2,500 or\nTemps: 2 heures')) {
+                alert('🔨 Réparation de tous les bâtiments lancée !\n\nVos artisans réparent tous les dégâts.');
+            }
+        }
+
+        function optimizeLayout() {
+            alert('📐 Optimisation du Plan de Cité\n\nAnalyse de l\'efficacité actuelle:\n• Production: +15% avec réorganisation\n• Défense: +10% avec murailles\n• Bonheur: +5% avec espaces verts\n\nRecommandations appliquées !');
+        }
+
+        function showBuildingPlanner() {
+            alert('📋 Planificateur de Construction\n\nPlan recommandé pour les 7 prochains jours:\n\n1. Améliorer Forum (Niv. 6)\n2. Construire Murailles\n3. Améliorer Entrepôts (Niv. 4)\n4. Construire Amphithéâtre\n5. Améliorer Caserne (Niv. 5)');
+        }
+
+        function startConstructionUpdates() {
+            // Simulation des mises à jour de construction
+            setInterval(() => {
+                // Ici on mettrait à jour les barres de progression
+                // et les statuts de construction
+            }, 5000);
+        }
+    </script>
+
+    <script src="../../../../../../../link-buttons-to-functions.js"></script>
+</body>
+</html>

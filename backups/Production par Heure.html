@@ -1,0 +1,784 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Production par Heure</title>
+    <meta name="description" content="Suivez la production de ressources de votre cité romaine en temps réel.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles et scripts communs -->
+    <link rel="stylesheet" href="../common-styles.css">
+    <script src="../common-navigation.js"></script>
+    <script src="../game-engine.js"></script>
+    <script src="../advanced-game-systems.js"></script>
+    <script src="../save-system.js"></script>
+    <script src="../ui-manager.js"></script>
+    <script src="../global-console.js"></script>
+
+    <style>
+        .production-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        .production-main {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .production-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .production-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .resource-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .resource-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+        }
+
+        .resource-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .resource-name {
+            color: var(--gold-light);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .production-rate {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--success-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .production-rate.negative {
+            color: var(--roman-red);
+        }
+
+        .production-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .production-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .production-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .breakdown-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+        }
+
+        .breakdown-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .breakdown-icon {
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            border-radius: 50%;
+            color: white;
+        }
+
+        .breakdown-info {
+            flex: 1;
+        }
+
+        .breakdown-name {
+            color: var(--gold-light);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .breakdown-total {
+            color: var(--success-green);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .breakdown-sources {
+            margin-top: 1rem;
+        }
+
+        .source-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .source-name {
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .source-value {
+            color: var(--success-green);
+            font-weight: bold;
+        }
+
+        .source-value.negative {
+            color: var(--roman-red);
+        }
+
+        .efficiency-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 0.5rem;
+        }
+
+        .efficiency-excellent {
+            background: var(--success-green);
+        }
+
+        .efficiency-good {
+            background: var(--gold-primary);
+        }
+
+        .efficiency-average {
+            background: #f59e0b;
+        }
+
+        .efficiency-poor {
+            background: var(--roman-red);
+        }
+
+        .production-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .boost-card {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid var(--gold-primary);
+        }
+
+        .boost-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .boost-name {
+            color: var(--gold-light);
+            font-weight: bold;
+        }
+
+        .boost-value {
+            color: var(--success-green);
+            font-weight: bold;
+        }
+
+        .boost-description {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .boost-duration {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+            transition: width 0.3s ease;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border: none;
+            border-radius: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow-gold);
+        }
+
+        .action-btn.secondary {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+
+        .action-btn.secondary:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .quick-stat {
+            text-align: center;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .quick-stat-value {
+            color: var(--gold-light);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .quick-stat-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .production-chart {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .chart-placeholder {
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .chart-bars {
+            display: flex;
+            justify-content: space-around;
+            align-items: end;
+            height: 120px;
+            width: 100%;
+        }
+
+        .chart-bar {
+            width: 20px;
+            background: linear-gradient(to top, var(--gold-primary), var(--gold-light));
+            border-radius: 3px 3px 0 0;
+            transition: height 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .production-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../../../mobile-2025.css">
+    <script src="../../../common-header-2025.js"></script>
+    <script src="../../../resource-updater.js"></script>
+</head>
+<body>
+    <!-- Particules d'arrière-plan -->
+    <div class="particles"></div>
+
+    <!-- INTERFACE PRINCIPALE DU JEU -->
+    <div class="imperium-ui">
+        <!-- HEADER -->
+        <header class="imperium-header">
+            <div class="header-content">
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display">
+                    <!-- Les ressources seront injectées ici par JS -->
+                </div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar">M</div>
+                    <div>
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPS PRINCIPAL -->
+        <div class="imperium-body">
+            <!-- BARRE LATERALE (Desktop) -->
+            <aside class="imperium-sidebar">
+                <!-- Navigation générée dynamiquement par common-navigation.js -->
+            </aside>
+
+            <!-- CONTENU PRINCIPAL -->
+            <main class="main-content">
+                <div class="view-container">
+                    <h2 class="view-title">⚡ Production par Heure</h2>
+                    <div class="production-layout">
+                        <div class="production-main">
+                            <!-- Vue d'ensemble de la production -->
+                            <div class="production-section">
+                                <h3 class="section-title">📊 Vue d'Ensemble</h3>
+                                <div class="production-overview">
+                                    <div class="resource-card">
+                                        <div class="resource-icon">🪵</div>
+                                        <div class="resource-name">Bois</div>
+                                        <div class="production-rate">+320</div>
+                                        <div class="production-label">par heure</div>
+                                        <div class="production-details">
+                                            <span>Production: +380</span>
+                                            <span>Consommation: -60</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="resource-card">
+                                        <div class="resource-icon">🪨</div>
+                                        <div class="resource-name">Pierre</div>
+                                        <div class="production-rate">+240</div>
+                                        <div class="production-label">par heure</div>
+                                        <div class="production-details">
+                                            <span>Production: +290</span>
+                                            <span>Consommation: -50</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="resource-card">
+                                        <div class="resource-icon">🍷</div>
+                                        <div class="resource-name">Vin</div>
+                                        <div class="production-rate">+150</div>
+                                        <div class="production-label">par heure</div>
+                                        <div class="production-details">
+                                            <span>Production: +180</span>
+                                            <span>Consommation: -30</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="resource-card">
+                                        <div class="resource-icon">⚔️</div>
+                                        <div class="resource-name">Fer</div>
+                                        <div class="production-rate">+180</div>
+                                        <div class="production-label">par heure</div>
+                                        <div class="production-details">
+                                            <span>Production: +220</span>
+                                            <span>Consommation: -40</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="resource-card">
+                                        <div class="resource-icon">💰</div>
+                                        <div class="resource-name">Or</div>
+                                        <div class="production-rate">+2,340</div>
+                                        <div class="production-label">par heure</div>
+                                        <div class="production-details">
+                                            <span>Revenus: +2,800</span>
+                                            <span>Dépenses: -460</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="resource-card">
+                                        <div class="resource-icon">🎓</div>
+                                        <div class="resource-name">Recherche</div>
+                                        <div class="production-rate">+85</div>
+                                        <div class="production-label">par heure</div>
+                                        <div class="production-details">
+                                            <span>Académies: +85</span>
+                                            <span>Bonus: +0</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Graphique de production -->
+                                <div class="production-chart">
+                                    <div class="chart-placeholder">
+                                        <h4 style="color: var(--gold-primary); margin-bottom: 1rem;">📈 Évolution de la Production (24h)</h4>
+                                        <div class="chart-bars">
+                                            <div class="chart-bar" style="height: 60px;"></div>
+                                            <div class="chart-bar" style="height: 75px;"></div>
+                                            <div class="chart-bar" style="height: 85px;"></div>
+                                            <div class="chart-bar" style="height: 70px;"></div>
+                                            <div class="chart-bar" style="height: 90px;"></div>
+                                            <div class="chart-bar" style="height: 95px;"></div>
+                                            <div class="chart-bar" style="height: 100px;"></div>
+                                            <div class="chart-bar" style="height: 110px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Détail par ressource -->
+                            <div class="production-section">
+                                <h3 class="section-title">🔍 Détail de la Production</h3>
+                                <div class="production-breakdown">
+                                    <div class="breakdown-card">
+                                        <div class="breakdown-header">
+                                            <div class="breakdown-icon">🪵</div>
+                                            <div class="breakdown-info">
+                                                <div class="breakdown-name">Production de Bois</div>
+                                                <div class="breakdown-total">+320/h</div>
+                                            </div>
+                                        </div>
+                                        <div class="breakdown-sources">
+                                            <div class="source-item">
+                                                <div class="source-name">
+                                                    🏭 Scierie Niv. 6
+                                                    <span class="efficiency-indicator efficiency-excellent"></span>
+                                                </div>
+                                                <div class="source-value">+280/h</div>
+                                            </div>
+                                            <div class="source-item">
+                                                <div class="source-name">
+                                                    🌲 Forêt Adjacente
+                                                    <span class="efficiency-indicator efficiency-good"></span>
+                                                </div>
+                                                <div class="source-value">+100/h</div>
+                                            </div>
+                                            <div class="source-item">
+                                                <div class="source-name">
+                                                    🏗️ Construction
+                                                    <span class="efficiency-indicator efficiency-poor"></span>
+                                                </div>
+                                                <div class="source-value negative">-60/h</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="breakdown-card">
+                                        <div class="breakdown-header">
+                                            <div class="breakdown-icon">💰</div>
+                                            <div class="breakdown-info">
+                                                <div class="breakdown-name">Revenus en Or</div>
+                                                <div class="breakdown-total">+2,340/h</div>
+                                            </div>
+                                        </div>
+                                        <div class="breakdown-sources">
+                                            <div class="source-item">
+                                                <div class="source-name">
+                                                    🏛️ Impôts Citoyens
+                                                    <span class="efficiency-indicator efficiency-excellent"></span>
+                                                </div>
+                                                <div class="source-value">+1,200/h</div>
+                                            </div>
+                                            <div class="source-item">
+                                                <div class="source-name">
+                                                    🍺 Tavernes
+                                                    <span class="efficiency-indicator efficiency-good"></span>
+                                                </div>
+                                                <div class="source-value">+800/h</div>
+                                            </div>
+                                            <div class="source-item">
+                                                <div class="source-name">
+                                                    💰 Hôtel des Monnaies
+                                                    <span class="efficiency-indicator efficiency-good"></span>
+                                                </div>
+                                                <div class="source-value">+800/h</div>
+                                            </div>
+                                            <div class="source-item">
+                                                <div class="source-name">
+                                                    ⚔️ Entretien Armée
+                                                    <span class="efficiency-indicator efficiency-average"></span>
+                                                </div>
+                                                <div class="source-value negative">-460/h</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="breakdown-card">
+                                        <div class="breakdown-header">
+                                            <div class="breakdown-icon">🎓</div>
+                                            <div class="breakdown-info">
+                                                <div class="breakdown-name">Points de Recherche</div>
+                                                <div class="breakdown-total">+85/h</div>
+                                            </div>
+                                        </div>
+                                        <div class="breakdown-sources">
+                                            <div class="source-item">
+                                                <div class="source-name">
+                                                    🎓 Académie Niv. 3
+                                                    <span class="efficiency-indicator efficiency-good"></span>
+                                                </div>
+                                                <div class="source-value">+60/h</div>
+                                            </div>
+                                            <div class="source-item">
+                                                <div class="source-name">
+                                                    📚 Bibliothèque Niv. 2
+                                                    <span class="efficiency-indicator efficiency-average"></span>
+                                                </div>
+                                                <div class="source-value">+25/h</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panneau de contrôle -->
+                        <div class="production-panel">
+                            <!-- Bonus actifs -->
+                            <div class="panel-section">
+                                <h3 class="section-title">🚀 Bonus Actifs</h3>
+                                <div class="boost-card">
+                                    <div class="boost-header">
+                                        <div class="boost-name">Festival de Bacchus</div>
+                                        <div class="boost-value">+25%</div>
+                                    </div>
+                                    <div class="boost-description">Bonus de production de vin</div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 60%;"></div>
+                                    </div>
+                                    <div class="boost-duration">Reste 2h 30min</div>
+                                </div>
+                                <div class="boost-card">
+                                    <div class="boost-header">
+                                        <div class="boost-name">Bénédiction de Minerve</div>
+                                        <div class="boost-value">+15%</div>
+                                    </div>
+                                    <div class="boost-description">Bonus de recherche</div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 30%;"></div>
+                                    </div>
+                                    <div class="boost-duration">Reste 4h 15min</div>
+                                </div>
+                            </div>
+
+                            <!-- Actions de boost -->
+                            <div class="panel-section">
+                                <h3 class="section-title">⚡ Booster Production</h3>
+                                <button class="action-btn" onclick="boostProduction('all')">
+                                    🚀 Boost Général (+50% - 1h)
+                                </button>
+                                <button class="action-btn secondary" onclick="boostProduction('gold')">
+                                    💰 Boost Or (+100% - 30min)
+                                </button>
+                                <button class="action-btn secondary" onclick="boostProduction('resources')">
+                                    📦 Boost Ressources (+75% - 45min)
+                                </button>
+                                <button class="action-btn secondary" onclick="boostProduction('research')">
+                                    🎓 Boost Recherche (+200% - 20min)
+                                </button>
+                            </div>
+
+                            <!-- Statistiques rapides -->
+                            <div class="panel-section">
+                                <h3 class="section-title">📊 Statistiques</h3>
+                                <div class="quick-stats">
+                                    <div class="quick-stat">
+                                        <div class="quick-stat-value">+3,285</div>
+                                        <div class="quick-stat-label">Total/heure</div>
+                                    </div>
+                                    <div class="quick-stat">
+                                        <div class="quick-stat-value">78,840</div>
+                                        <div class="quick-stat-label">Production/jour</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 1rem; text-align: center; background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 0.5rem;">
+                                    <div style="color: var(--gold-light); font-size: 1.5rem; font-weight: bold;">92%</div>
+                                    <div style="color: var(--text-muted); font-size: 0.8rem;">Efficacité Globale</div>
+                                </div>
+                            </div>
+
+                            <!-- Optimisations suggérées -->
+                            <div class="panel-section">
+                                <h3 class="section-title">💡 Optimisations</h3>
+                                <div style="color: var(--text-light); font-size: 0.9rem; line-height: 1.5;">
+                                    <p><strong>🏭 Scierie :</strong> Améliorer au niveau 7 (+60/h)</p>
+                                    <p><strong>💰 Revenus :</strong> Construire plus de tavernes</p>
+                                    <p><strong>🎓 Recherche :</strong> Améliorer l'Académie (+25/h)</p>
+                                    <p><strong>⚡ Efficacité :</strong> Réparer les bâtiments endommagés</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Données de production
+        let productionData = {
+            wood: { current: 320, base: 380, consumption: 60 },
+            stone: { current: 240, base: 290, consumption: 50 },
+            wine: { current: 150, base: 180, consumption: 30 },
+            iron: { current: 180, base: 220, consumption: 40 },
+            gold: { current: 2340, base: 2800, consumption: 460 },
+            research: { current: 85, base: 85, consumption: 0 }
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page Production par Heure chargée');
+            initializeProduction();
+            startProductionUpdates();
+        });
+
+        function initializeProduction() {
+            updateProductionDisplay();
+        }
+
+        function updateProductionDisplay() {
+            // Mise à jour des valeurs de production en temps réel
+            // Cette fonction serait connectée au moteur de jeu
+        }
+
+        function startProductionUpdates() {
+            // Démarrer les mises à jour automatiques
+            setInterval(() => {
+                updateProductionDisplay();
+                // Simuler de légères variations
+                Object.keys(productionData).forEach(resource => {
+                    const variation = Math.random() * 10 - 5; // -5 à +5
+                    productionData[resource].current = Math.max(0, 
+                        productionData[resource].base - productionData[resource].consumption + variation
+                    );
+                });
+            }, 5000);
+        }
+
+        function boostProduction(type) {
+            const boosts = {
+                all: {
+                    name: 'Boost Général',
+                    description: '+50% à toute la production pendant 1 heure',
+                    cost: '1000 or',
+                    duration: '1 heure'
+                },
+                gold: {
+                    name: 'Boost Or',
+                    description: '+100% à la production d\'or pendant 30 minutes',
+                    cost: '500 or',
+                    duration: '30 minutes'
+                },
+                resources: {
+                    name: 'Boost Ressources',
+                    description: '+75% aux ressources pendant 45 minutes',
+                    cost: '750 or',
+                    duration: '45 minutes'
+                },
+                research: {
+                    name: 'Boost Recherche',
+                    description: '+200% à la recherche pendant 20 minutes',
+                    cost: '300 or',
+                    duration: '20 minutes'
+                }
+            };
+
+            const boost = boosts[type];
+            
+            if (confirm(`Activer ${boost.name} ?\n\n${boost.description}\n\nCoût: ${boost.cost}\nDurée: ${boost.duration}`)) {
+                alert(`🚀 ${boost.name} activé !\n\nVotre production est maintenant boostée pour ${boost.duration}.`);
+            }
+        }
+    </script>
+
+    <script src="../../../../../../../link-buttons-to-functions.js"></script>
+</body>
+</html>
