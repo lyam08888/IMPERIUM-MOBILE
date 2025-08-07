@@ -287,3 +287,88 @@ setInterval(() => {
     updateResourcesDisplay();
     updatePlayerInfo();
 }, 5000); // Toutes les 5 secondes
+
+// ... (tout le code précédent reste inchangé)
+
+// Ajoutez ce bloc de code à la fin du fichier common-navigation.js
+
+// Fonction pour créer la structure HTML de base si elle n'existe pas
+function createBaseStructure() {
+    if (!document.querySelector('.imperium-ui')) {
+        const body = document.body;
+        body.innerHTML = `
+            <div class="imperium-ui">
+                <header class="imperium-header">
+                    <div class="header-content">
+                        <h1 class="imperium-logo">IMPERIUM</h1>
+                        <div id="resources-display" class="resources-display"></div>
+                        <div class="player-info">
+                            <div class="player-avatar" id="player-avatar"></div>
+                            <div>
+                                <div class="player-name" id="player-name"></div>
+                                <div class="player-level" id="player-title-level"></div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                <div class="imperium-body">
+                    <aside class="imperium-sidebar"></aside>
+                    <main class="main-content">${body.innerHTML}</main>
+                </div>
+            </div>
+            <div class="particles"></div>
+        ` + body.innerHTML;
+    }
+}
+
+// Fonction principale d'initialisation
+function initializeCommonElements() {
+    createBaseStructure();
+    createParticles();
+    initializeNavigation();
+    updateResourcesDisplay();
+    updatePlayerInfo();
+
+    const logo = document.querySelector('.imperium-logo');
+    if (logo) {
+        logo.addEventListener('click', navigateToHome);
+    }
+}
+
+// Appeler la fonction d'initialisation lorsque le DOM est chargé
+document.addEventListener('DOMContentLoaded', initializeCommonElements);
+
+// Mettre à jour les ressources et les informations du joueur périodiquement
+setInterval(() => {
+    updateResourcesDisplay();
+    updatePlayerInfo();
+}, 5000); // Toutes les 5 secondes
+
+// Ajouter les styles nécessaires
+const styles = `
+    .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+    }
+    .particle {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        animation: float linear infinite;
+    }
+    @keyframes float {
+        0% { transform: translateY(0); opacity: 1; }
+        100% { transform: translateY(-100vh); opacity: 0; }
+    }
+`;
+
+const styleElement = document.createElement('style');
+styleElement.textContent = styles;
+document.head.appendChild(styleElement);
