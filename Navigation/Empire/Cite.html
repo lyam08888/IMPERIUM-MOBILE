@@ -2,14 +2,29 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>IMPERIUM - Ma Cité</title>
     <meta name="description" content="Gérez votre cité romaine dans IMPERIUM - Construisez, développez, prospérez.">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="../../manifest.json">
+    <meta name="theme-color" content="#d97706">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="IMPERIUM">
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
     
     <!-- Scripts de navigation communs -->
     <script src="../common-navigation.js"></script>
+    
+    <!-- Scripts mobiles -->
+    <script src="../../mobile-navigation.js"></script>
+    <script src="../../mobile-touch-handler.js"></script>
+    
+    <!-- Styles mobiles -->
+    <link rel="stylesheet" href="../../mobile-styles.css">
+    <link rel="stylesheet" href="../../mobile-game-views.css">
 
     <style>
         /* =============================================================== */
@@ -678,7 +693,115 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeGlobalUI();
             initializeCityView();
+            
+            // Initialiser les systèmes mobiles
+            initializeMobileSupport();
         });
+        
+        // Initialisation du support mobile
+        function initializeMobileSupport() {
+            // Créer les instances des gestionnaires mobiles
+            if (typeof MobileTouchHandler !== 'undefined') {
+                window.mobileTouchHandler = new MobileTouchHandler();
+                console.log('🔥 Gestionnaire tactile mobile initialisé');
+            }
+            
+            if (typeof MobileNavigation !== 'undefined') {
+                window.mobileNav = new MobileNavigation();
+                console.log('🔥 Navigation mobile initialisée');
+            }
+            
+            // Adapter les interactions existantes pour mobile
+            adaptExistingInteractionsForMobile();
+        }
+        
+        // Adapter les interactions existantes pour mobile
+        function adaptExistingInteractionsForMobile() {
+            // Remplacer les onclick par des événements tactiles
+            const buildingSlots = document.querySelectorAll('.building-slot');
+            buildingSlots.forEach(slot => {
+                // Ajouter les classes pour la gestion tactile
+                slot.classList.add('touch-interactive');
+                
+                // Écouter les événements tactiles personnalisés
+                slot.addEventListener('mobileTap', (event) => {
+                    // Récupérer les données du bâtiment depuis l'élément
+                    const buildingName = slot.querySelector('.building-name')?.textContent;
+                    const buildingData = BUILDINGS_DATA.find(b => b.name === buildingName);
+                    if (buildingData) {
+                        handleBuildingClick(buildingData);
+                    }
+                });
+                
+                slot.addEventListener('mobileLongPress', (event) => {
+                    // Menu contextuel pour appui long
+                    const buildingName = slot.querySelector('.building-name')?.textContent;
+                    const buildingData = BUILDINGS_DATA.find(b => b.name === buildingName);
+                    if (buildingData && buildingData.occupied) {
+                        showBuildingContextMenu(buildingData, slot);
+                    }
+                });
+            });
+            
+            // Adapter les boutons d'action
+            const actionButtons = document.querySelectorAll('.action-btn');
+            actionButtons.forEach(btn => {
+                btn.classList.add('touch-interactive');
+            });
+        }
+        
+        // Menu contextuel pour les bâtiments
+        function showBuildingContextMenu(building, element) {
+            const contextMenu = document.createElement('div');
+            contextMenu.className = 'mobile-context-menu';
+            contextMenu.innerHTML = `
+                <div class="context-menu-item" onclick="upgradeBuildingMobile('${building.name}')">
+                    <span class="context-icon">⬆️</span>
+                    <span>Améliorer</span>
+                </div>
+                <div class="context-menu-item" onclick="manageBuildingMobile('${building.name}')">
+                    <span class="context-icon">⚙️</span>
+                    <span>Gérer</span>
+                </div>
+                <div class="context-menu-item" onclick="closeMobileContextMenu()">
+                    <span class="context-icon">❌</span>
+                    <span>Fermer</span>
+                </div>
+            `;
+            
+            // Positionner le menu
+            const rect = element.getBoundingClientRect();
+            contextMenu.style.position = 'fixed';
+            contextMenu.style.top = rect.top + 'px';
+            contextMenu.style.left = rect.right + 10 + 'px';
+            contextMenu.style.zIndex = '9999';
+            
+            document.body.appendChild(contextMenu);
+            
+            // Fermer automatiquement après 5 secondes
+            setTimeout(() => {
+                if (contextMenu.parentNode) {
+                    contextMenu.remove();
+                }
+            }, 5000);
+        }
+        
+        function upgradeBuildingMobile(buildingName) {
+            alert(`Amélioration de ${buildingName} en cours...`);
+            closeMobileContextMenu();
+        }
+        
+        function manageBuildingMobile(buildingName) {
+            alert(`Gestion de ${buildingName}...`);
+            closeMobileContextMenu();
+        }
+        
+        function closeMobileContextMenu() {
+            const contextMenu = document.querySelector('.mobile-context-menu');
+            if (contextMenu) {
+                contextMenu.remove();
+            }
+        }
     </script>
 </body>
 </html>
