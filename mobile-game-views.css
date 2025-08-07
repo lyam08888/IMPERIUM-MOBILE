@@ -738,3 +738,61 @@
         justify-content: center;
     }
 }
+
+/* Ergonomie mobile renforcée */
+.button-game, .btn-game, .unit-action-btn, .market-tab, .mobile-modal-actions .btn {
+    min-height: 48px;
+    min-width: 120px;
+    font-size: 1.15rem;
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
+    letter-spacing: 0.03em;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    outline: 2px solid transparent;
+}
+.button-game:focus, .btn-game:focus, .unit-action-btn:focus, .market-tab:focus, .mobile-modal-actions .btn:focus {
+    outline: 2px solid var(--gold-primary);
+    outline-offset: 2px;
+}
+
+.building-card, .resource-card, .unit-card, .feature-card, .mobile-modal-content {
+    border-radius: var(--border-radius-lg);
+    padding: 24px 18px;
+    font-size: 1.08rem;
+    margin-bottom: 12px;
+}
+
+.city-layout, .buildings-grid, .resources-grid, .units-grid {
+    gap: 20px !important;
+}
+
+.stat-item, .resource-card, .unit-card {
+    font-size: 1.08rem;
+    padding: 18px 10px;
+}
+
+/* Police plus lisible */
+body, .city-info, .feature-description, .news-content, .help-section {
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    font-size: 1.08rem;
+    line-height: 1.7;
+}
+
+/* Contraste renforcé */
+.building-card, .resource-card, .unit-card, .feature-card, .mobile-modal-content {
+    background: rgba(30, 41, 59, 0.95);
+    color: var(--marble-white);
+}
+
+/* Zones tactiles plus larges sur mobile */
+@media (max-width: 480px) {
+    .button-game, .btn-game, .unit-action-btn, .market-tab, .mobile-modal-actions .btn {
+        min-width: 90vw;
+        font-size: 1.2rem;
+        padding: 18px 0;
+    }
+    .building-card, .resource-card, .unit-card {
+        padding: 24px 8px;
+        font-size: 1.15rem;
+    }
+}
