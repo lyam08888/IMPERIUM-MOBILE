@@ -7,6 +7,14 @@
     <meta name="description" content="Incarnez un patricien romain et bâtissez votre empire. Gérez vos provinces, vos légions et dominez la Méditerranée.">
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#d97706">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="IMPERIUM">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='%23d97706' rx='20'/><text x='90' y='110' text-anchor='middle' fill='white' font-family='serif' font-size='110' font-weight='bold'>I</text></svg>">
 
     <!-- Styles et scripts communs -->
     <link rel="stylesheet" href="common-styles.css">
@@ -1243,6 +1251,9 @@
             logEvent(`🏛️ Bienvenue dans IMPERIUM, ${gameState.player.name} !`);
             updatePlayerInfo();
             updateAllUI();
+            
+            // Initialiser les adaptations mobiles
+            initializeMobileIntegration();
         }
         
         // Boucle de jeu principale
@@ -1779,7 +1790,9 @@
         function createParticles() {
             const container = safeGetElement('particles');
             if (!container) return;
-            for (let i = 0; i < 30; i++) {
+            // Réduire le nombre de particules sur mobile pour les performances
+            const particleCount = window.innerWidth <= 768 ? 15 : 30;
+            for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.left = `${Math.random() * 100}%`;
@@ -1788,6 +1801,241 @@
                 particle.style.transform = `scale(${0.5 + Math.random() * 0.5})`;
                 container.appendChild(particle);
             }
+        }
+
+        // Intégration mobile avec le jeu existant
+        function initializeMobileIntegration() {
+            if (window.innerWidth <= 768) {
+                console.log('🔥 Mode mobile détecté - Initialisation des adaptations');
+                
+                // Enregistrer le Service Worker pour PWA
+                registerServiceWorker();
+                
+                // Adapter les fonctions existantes pour mobile
+                const originalSwitchView = window.switchView;
+                window.switchView = function(viewName) {
+                    // Appeler la fonction originale
+                    if (originalSwitchView) {
+                        originalSwitchView(viewName);
+                    }
+                    
+                    // Adaptations mobiles supplémentaires
+                    setTimeout(() => {
+                        adaptViewForMobile(viewName);
+                    }, 100);
+                };
+
+                // Adapter les notifications pour mobile
+                const originalShowNotification = window.showNotification;
+                window.showNotification = function(message, type = 'info') {
+                    if (window.mobileNav && window.mobileNav.isMobileDevice()) {
+                        window.mobileNav.showMobileNotification(message, type);
+                    } else if (originalShowNotification) {
+                        originalShowNotification(message, type);
+                    }
+                };
+
+                // Optimiser les performances sur mobile
+                optimizeMobilePerformance();
+                
+                // Écouter les événements mobiles personnalisés
+                setupMobileEventListeners();
+                
+                // Proposer l'installation PWA
+                setupPWAInstallPrompt();
+            }
+        }
+
+        // Enregistrement du Service Worker
+        async function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('✅ Service Worker enregistré:', registration.scope);
+                    
+                    // Écouter les mises à jour
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // Nouvelle version disponible
+                                showUpdateAvailable();
+                            }
+                        });
+                    });
+                } catch (error) {
+                    console.error('❌ Erreur Service Worker:', error);
+                }
+            }
+        }
+
+        // Gestion de l'installation PWA
+        function setupPWAInstallPrompt() {
+            let deferredPrompt;
+            
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                
+                // Afficher un bouton d'installation personnalisé
+                showInstallButton(deferredPrompt);
+            });
+            
+            window.addEventListener('appinstalled', () => {
+                console.log('🎉 PWA installée avec succès');
+                if (window.mobileNav) {
+                    window.mobileNav.showMobileNotification('Application installée !', 'success');
+                }
+                deferredPrompt = null;
+            });
+        }
+
+        function showInstallButton(deferredPrompt) {
+            // Créer un bouton d'installation discret
+            const installButton = document.createElement('button');
+            installButton.className = 'pwa-install-button';
+            installButton.innerHTML = '📱 Installer l\'app';
+            installButton.style.cssText = `
+                position: fixed;
+                bottom: 80px;
+                right: 20px;
+                background: var(--gold-primary);
+                color: white;
+                border: none;
+                padding: 12px 16px;
+                border-radius: 25px;
+                font-size: 14px;
+                font-weight: bold;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 1500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            `;
+            
+            installButton.addEventListener('click', async () => {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    console.log('✅ Installation acceptée');
+                } else {
+                    console.log('❌ Installation refusée');
+                }
+                
+                installButton.remove();
+                deferredPrompt = null;
+            });
+            
+            document.body.appendChild(installButton);
+            
+            // Masquer automatiquement après 10 secondes
+            setTimeout(() => {
+                if (installButton.parentNode) {
+                    installButton.style.opacity = '0';
+                    setTimeout(() => installButton.remove(), 300);
+                }
+            }, 10000);
+        }
+
+        function showUpdateAvailable() {
+            if (window.mobileNav) {
+                window.mobileNav.showMobileNotification(
+                    'Nouvelle version disponible ! Rechargez la page.', 
+                    'info', 
+                    5000
+                );
+            }
+        }
+
+        function adaptViewForMobile(viewName) {
+            const viewContainer = document.querySelector('.view-container.active');
+            if (!viewContainer) return;
+
+            // Ajouter des classes spécifiques pour chaque vue mobile
+            viewContainer.classList.add(`mobile-view-${viewName}`);
+            
+            // Optimisations spécifiques par vue
+            switch(viewName) {
+                case 'city':
+                    adaptCityViewForMobile(viewContainer);
+                    break;
+                case 'military':
+                    adaptMilitaryViewForMobile(viewContainer);
+                    break;
+                case 'development':
+                    adaptDevelopmentViewForMobile(viewContainer);
+                    break;
+            }
+        }
+
+        function adaptCityViewForMobile(container) {
+            // Réorganiser les éléments de la vue cité pour mobile
+            const cityMap = container.querySelector('.city-map');
+            const cityInfo = container.querySelector('.city-info');
+            
+            if (cityMap && cityInfo) {
+                // S'assurer que l'info est au-dessus de la carte sur mobile
+                cityMap.parentNode.insertBefore(cityInfo, cityMap);
+            }
+        }
+
+        function adaptMilitaryViewForMobile(container) {
+            // Adaptations spécifiques pour la vue militaire
+            const unitCards = container.querySelectorAll('.unit-card');
+            unitCards.forEach(card => {
+                card.classList.add('mobile-unit-card');
+            });
+        }
+
+        function adaptDevelopmentViewForMobile(container) {
+            // Adaptations spécifiques pour la vue développement
+            const researchItems = container.querySelectorAll('.research-item');
+            researchItems.forEach(item => {
+                item.classList.add('mobile-research-item');
+            });
+        }
+
+        function optimizeMobilePerformance() {
+            // Désactiver les animations coûteuses sur mobile
+            if (window.innerWidth <= 768) {
+                document.body.classList.add('mobile-performance-mode');
+                
+                // Réduire la fréquence des mises à jour
+                if (window.gameLoop) {
+                    clearInterval(window.gameLoop);
+                    window.gameLoop = setInterval(updateAllUI, 2000); // 2s au lieu de 1s
+                }
+            }
+        }
+
+        function setupMobileEventListeners() {
+            // Écouter les événements de swipe pour la navigation
+            document.addEventListener('mobileSwipe', (event) => {
+                const { direction } = event.detail;
+                
+                if (direction === 'left' && window.mobileNav) {
+                    window.mobileNav.switchToNextTab();
+                } else if (direction === 'right' && window.mobileNav) {
+                    window.mobileNav.switchToPreviousTab();
+                }
+            });
+
+            // Écouter l'événement de refresh
+            document.addEventListener('mobileRefresh', () => {
+                updateAllUI();
+                updatePlayerInfo();
+                if (window.mobileNav) {
+                    window.mobileNav.showMobileNotification('Données actualisées !', 'success');
+                }
+            });
+
+            // Gérer les changements d'orientation
+            window.addEventListener('orientationchange', () => {
+                setTimeout(() => {
+                    updateAllUI();
+                    createParticles();
+                }, 300);
+            });
         }
     </script>
 
