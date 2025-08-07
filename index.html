@@ -303,6 +303,29 @@
     </style>
 </head>
 <body>
+    <!-- Modale de tutoriel (affichée au chargement) -->
+    <div id="tuto-modal" class="mobile-modal-overlay" style="display: flex;">
+      <div class="mobile-modal-content glass-panel animate-fade-in" style="max-width: 400px; margin: auto;">
+        <div class="mobile-modal-header">
+          <span class="mobile-modal-title">Bienvenue sur IMPERIUM !</span>
+          <button class="mobile-modal-close button-game" onclick="document.getElementById('tuto-modal').style.display='none'">✕</button>
+        </div>
+        <div class="mobile-modal-body">
+          <p>Construisez votre cité, développez vos ressources, formez des légions et partez à la conquête du monde méditerranéen !</p>
+          <ul style="text-align:left; margin:1em 0;">
+            <li>🏛️ <b>Bâtiments</b> : Cliquez sur les bâtiments pour les améliorer ou en construire de nouveaux.</li>
+            <li>⚔️ <b>Armée</b> : Entraînez des unités et partez à la conquête de nouvelles terres.</li>
+            <li>🤝 <b>Diplomatie</b> : Formez des alliances et négociez avec d'autres joueurs.</li>
+            <li>📚 <b>Recherche</b> : Débloquez des technologies pour progresser plus vite.</li>
+          </ul>
+          <p>Besoin d'aide ? Cherchez les icônes <span style="color:var(--gold-primary);">❓</span> pour obtenir des conseils à tout moment.</p>
+        </div>
+        <div class="mobile-modal-actions" style="text-align:center;">
+          <button class="button-game" onclick="document.getElementById('tuto-modal').style.display='none'">Commencer à jouer</button>
+        </div>
+      </div>
+    </div>
+    <!-- Fin modale tuto -->
     <main class="home-container">
         <!-- Section héro -->
         <section class="hero-section">

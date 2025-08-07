@@ -83,32 +83,39 @@ class ImperiumInteractions {
     bindButtons() {
         // Lier tous les boutons avec data-action
         document.querySelectorAll('[data-action]').forEach(element => {
+            // Pour éviter les doublons d'écouteurs
+            element.replaceWith(element.cloneNode(true));
+        });
+        document.querySelectorAll('[data-action]').forEach(element => {
             const action = element.getAttribute('data-action');
             const params = element.getAttribute('data-params');
-            
             element.addEventListener('click', (e) => {
                 e.preventDefault();
                 this.handleAction(action, params ? JSON.parse(params) : {});
             });
         });
-        
         // Lier tous les boutons avec onclick qui utilisent handleAction
         document.querySelectorAll('[onclick*="handleAction"]').forEach(element => {
             const onclickAttr = element.getAttribute('onclick');
             element.removeAttribute('onclick');
-            
             // Extraire l'action et les paramètres
-            const match = onclickAttr.match(/handleAction\(['"]([^'"]+)['"](?:,\s*([^)]+))?\)/);
+            const match = onclickAttr.match(/handleAction\(['"](\w+)['"],?\s*(\{.*\})?\)/);
             if (match) {
                 const action = match[1];
-                const params = match[2] ? eval(`(${match[2]})`) : {};
-                
+                const params = match[2] ? JSON.parse(match[2]) : {};
                 element.addEventListener('click', (e) => {
                     e.preventDefault();
                     this.handleAction(action, params);
                 });
             }
         });
+        // Ajout : rebinding automatique après chaque mutation du DOM
+        if (!this._mutationObserver) {
+            this._mutationObserver = new MutationObserver(() => {
+                this.bindButtons();
+            });
+            this._mutationObserver.observe(document.body, { childList: true, subtree: true });
+        }
     }
     
     setupEventListeners() {
