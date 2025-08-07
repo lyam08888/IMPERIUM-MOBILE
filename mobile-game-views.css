@@ -661,6 +661,58 @@
     }
 }
 
+/* Modernisation des boutons et cartes pour UI/UX 2025 */
+
+/* Boutons principaux du jeu */
+.button-game, .btn-game, .unit-action-btn, .market-tab, .mobile-modal-actions .btn {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold-primary));
+    color: var(--dark-stone);
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius-sm);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    box-shadow: var(--shadow-sm);
+    font-size: 1rem;
+    outline: none;
+    position: relative;
+    z-index: 1;
+}
+.button-game:hover, .btn-game:hover, .unit-action-btn:hover, .market-tab:hover, .mobile-modal-actions .btn:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: var(--shadow-md);
+    filter: brightness(1.08);
+}
+.button-game:active, .btn-game:active, .unit-action-btn:active, .market-tab:active, .mobile-modal-actions .btn:active {
+    transform: translateY(1px) scale(0.98);
+}
+
+/* Cartes modernes (bâtiments, ressources, unités, etc.) */
+.building-card, .resource-card, .unit-card, .feature-card, .mobile-modal-content {
+    background: rgba(38, 50, 56, 0.7);
+    backdrop-filter: var(--glass-effect);
+    -webkit-backdrop-filter: var(--glass-effect);
+    border-radius: var(--border-radius-md);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    box-shadow: var(--shadow-md);
+    transition: box-shadow var(--transition-speed) ease, transform var(--transition-speed) ease;
+}
+.building-card:hover, .resource-card:hover, .unit-card:hover, .feature-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: scale(1.03);
+}
+
+/* Ajout d'un effet de glow sur les éléments importants */
+.glow-gold {
+    box-shadow: 0 0 12px 2px var(--gold-primary), 0 2px 10px rgba(0,0,0,0.15);
+    animation: glow 2s infinite;
+}
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 12px 2px var(--gold-primary), 0 2px 10px rgba(0,0,0,0.15); }
+    50% { box-shadow: 0 0 24px 6px var(--gold-light), 0 4px 20px rgba(0,0,0,0.25); }
+}
+
 /* Styles pour très petits écrans */
 @media (max-width: 480px) {
     .buildings-grid {
