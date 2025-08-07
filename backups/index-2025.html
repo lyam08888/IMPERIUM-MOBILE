@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Jeu de Stratégie Romaine</title>
+    <meta name="description" content="Construisez votre empire romain, développez votre cité, formez des alliances et conquérez le monde méditerranéen dans ce jeu de stratégie mobile.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles et scripts communs -->
+    <link rel="stylesheet" href="Navigation/common-styles.css">
+    <link rel="stylesheet" href="mobile-2025.css">
+    
+    <!-- Scripts pour la barre commune et les interactions -->
+    <script src="common-header-2025.js"></script>
+    <script src="resource-updater.js"></script>
+    <script src="common-interactions.js"></script>
+    
+    <style>
+        /* Styles spécifiques à la page d'accueil */
+        .home-container {
+            padding: 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: calc(100vh - 120px);
+        }
+
+        .hero-section {
+            text-align: center;
+            margin: 2rem 0 4rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero-title {
+            color: var(--roman-gold);
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: bold;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+            font-family: 'Times New Roman', serif;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--roman-gold), #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+
+        .hero-subtitle {
+            color: var(--roman-marble);
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            opacity: 0.9;
+            font-style: italic;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-button {
+            background: linear-gradient(135deg, var(--roman-bronze), var(--roman-gold));
+            color: var(--roman-dark);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .hero-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .hero-button.primary {
+            background: linear-gradient(135deg, #b45309, var(--roman-gold));
+        }
+
+        .features-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, 
+                rgba(139, 0, 0, 0.1) 0%, 
+                rgba(0, 0, 0, 0.3) 100%);
+            border: 2px solid var(--roman-bronze);
+            border-radius: 1rem;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            animation: slideInUp 1s ease-out;
+            animation-fill-mode: both;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            border-color: var(--roman-gold);
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--roman-gold);
+        }
+
+        .feature-title {
+            color: var(--roman-gold);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .feature-description {
+            color: var(--roman-marble);
+            line-height: 1.6;
+        }
+
+        .news-section {
+            background: linear-gradient(135deg, 
+                rgba(139, 0, 0, 0.1) 0%, 
+                rgba(0, 0, 0, 0.3) 100%);
+            border: 2px solid var(--roman-bronze);
+            border-radius: 1rem;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            margin-bottom: 4rem;
+            animation: slideInUp 1.2s ease-out;
+        }
+
+        .news-title {
+            color: var(--roman-gold);
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-family: 'Times New Roman', serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .news-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .news-item:hover {
+            background: rgba(0, 0, 0, 0.3);
+            transform: translateX(5px);
+        }
+
+        .news-date {
+            color: var(--roman-gold);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .news-item-title {
+            color: var(--roman-marble);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .news-content {
+            color: var(--roman-marble);
+            opacity: 0.9;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .cta-title {
+            color: var(--roman-gold);
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .cta-description {
+            color: var(--roman-marble);
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--roman-marble);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Animation pour les cartes de fonctionnalités */
+        .features-section .feature-card:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+        .features-section .feature-card:nth-child(2) {
+            animation-delay: 0.4s;
+        }
+        .features-section .feature-card:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+        .features-section .feature-card:nth-child(4) {
+            animation-delay: 0.8s;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .home-container {
+                padding: 0.5rem;
+            }
+
+            .hero-section {
+                margin: 1rem 0 2rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .hero-button {
+                width: 100%;
+                max-width: 300px;
+                text-align: center;
+            }
+
+            .features-section {
+                gap: 1rem;
+            }
+
+            .feature-card {
+                padding: 1.5rem;
+            }
+
+            .news-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="home-container">
+        <!-- Section héro -->
+        <section class="hero-section">
+            <h1 class="hero-title">IMPERIUM</h1>
+            <p class="hero-subtitle">Bâtissez votre empire, conquérez le monde méditerranéen et écrivez votre propre histoire romaine dans ce jeu de stratégie épique.</p>
+            
+            <div class="hero-buttons">
+                <a href="Navigation/Empire/Cite.html" class="hero-button primary">Commencer à jouer</a>
+                <a href="Navigation/Premium/Premium.html" class="hero-button">Devenir Premium</a>
+            </div>
+        </section>
+        
+        <!-- Section fonctionnalités -->
+        <section class="features-section">
+            <div class="feature-card">
+                <div class="feature-icon">🏛️</div>
+                <h2 class="feature-title">Construisez votre Cité</h2>
+                <p class="feature-description">Érigez des bâtiments emblématiques, développez votre économie et faites prospérer votre population.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⚔️</div>
+                <h2 class="feature-title">Formez vos Légions</h2>
+                <p class="feature-description">Entraînez différentes unités militaires, développez des tactiques et menez vos armées à la victoire.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🤝</div>
+                <h2 class="feature-title">Diplomatie</h2>
+                <p class="feature-description">Forgez des alliances, négociez des traités commerciaux ou déclarez la guerre à vos ennemis.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📚</div>
+                <h2 class="feature-title">Recherche</h2>
+                <p class="feature-description">Développez de nouvelles technologies pour faire progresser votre civilisation et surpasser vos rivaux.</p>
+            </div>
+        </section>
+        
+        <!-- Section actualités -->
+        <section class="news-section">
+            <h2 class="news-title">Dernières Nouvelles</h2>
+            
+            <div class="news-list">
+                <div class="news-item">
+                    <div class="news-date">7 Août 2025</div>
+                    <h3 class="news-item-title">Nouvelle Interface Mobile</h3>
+                    <p class="news-content">L'interface mobile a été entièrement repensée pour offrir une expérience de jeu optimale sur tous les appareils. Découvrez la nouvelle barre supérieure commune et profitez d'une navigation fluide entre toutes les pages.</p>
+                </div>
+                
+                <div class="news-item">
+                    <div class="news-date">1 Août 2025</div>
+                    <h3 class="news-item-title">Événement Spécial : Les Jeux du Colisée</h3>
+                    <p class="news-content">Participez aux Jeux du Colisée et gagnez des récompenses exclusives ! L'événement se déroulera du 10 au 20 août. Préparez vos gladiateurs et impressionnez la foule !</p>
+                </div>
+                
+                <div class="news-item">
+                    <div class="news-date">25 Juillet 2025</div>
+                    <h3 class="news-item-title">Mise à Jour : Nouvelles Unités Militaires</h3>
+                    <p class="news-content">De nouvelles unités militaires ont été ajoutées au jeu : les Prétoriens, les Catapultes et les Navires de Guerre. Améliorez votre arsenal et dominez vos adversaires !</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section appel à l'action -->
+        <section class="cta-section">
+            <h2 class="cta-title">Rejoignez des Milliers de Joueurs</h2>
+            <p class="cta-description">Plus de 100 000 joueurs ont déjà commencé à bâtir leur empire. Ne restez pas à l'écart de cette aventure épique !</p>
+            
+            <a href="Navigation/Empire/Cite.html" class="hero-button primary">Commencer l'Aventure</a>
+        </section>
+        
+        <!-- Pied de page -->
+        <footer class="footer">
+            <p>© 2025 IMPERIUM - Tous droits réservés</p>
+            <p>Un jeu développé avec passion par l'équipe IMPERIUM</p>
+        </footer>
+    </main>
+
+    <script>
+        // Initialisation de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page d\'accueil initialisée');
+            
+            // Ajouter un log de bienvenue
+            if (window.imperiumHeader2025) {
+                window.imperiumHeader2025.addLog('Bienvenue sur IMPERIUM !', 'info');
+                window.imperiumHeader2025.addLog('Interface mobile 2025 activée', 'success');
+            }
+            
+            // Initialiser les ressources si c'est la première visite
+            if (window.resourceUpdater && !localStorage.getItem('imperium_resources_2025')) {
+                // Ressources de départ
+                const startingResources = {
+                    food: 1000,
+                    stone: 1000,
+                    iron: 1000,
+                    gold: 1000,
+                    wood: 1000,
+                    population: 100,
+                    research: 0
+                };
+                
+                // Capacités maximales
+                const maxResources = {
+                    food: 2000,
+                    stone: 2000,
+                    iron: 2000,
+                    gold: 2000,
+                    wood: 2000,
+                    population: 200,
+                    research: 100
+                };
+                
+                // Taux de production
+                const productionRates = {
+                    food: 10,
+                    stone: 5,
+                    iron: 8,
+                    gold: 15,
+                    wood: 7,
+                    research: 1
+                };
+                
+                // Mettre à jour les ressources
+                window.resourceUpdater.resources = startingResources;
+                window.resourceUpdater.maxResources = maxResources;
+                window.resourceUpdater.productionRates = productionRates;
+                window.resourceUpdater.saveToStorage();
+                
+                if (window.imperiumHeader2025) {
+                    window.imperiumHeader2025.updateResources(startingResources);
+                    window.imperiumHeader2025.addLog('Ressources initiales attribuées', 'resource');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

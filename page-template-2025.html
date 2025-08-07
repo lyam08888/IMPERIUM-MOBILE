@@ -1,0 +1,531 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - [PAGE_TITLE]</title>
+    <meta name="description" content="[PAGE_DESCRIPTION]">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles et scripts communs -->
+    <link rel="stylesheet" href="../common-styles.css">
+    <link rel="stylesheet" href="../mobile-2025.css">
+    
+    <!-- Scripts pour la barre commune et les interactions -->
+    <script src="../common-header-2025.js"></script>
+    <script src="../resource-updater.js"></script>
+    <script src="../common-interactions.js"></script>
+    
+    <style>
+        /* Styles spécifiques à cette page */
+        .page-container {
+            padding: 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: calc(100vh - 120px);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .page-title {
+            color: var(--roman-gold);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: bold;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+            font-family: 'Times New Roman', serif;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--roman-gold), #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            color: var(--roman-marble);
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .content-section {
+            background: linear-gradient(135deg, 
+                rgba(139, 0, 0, 0.1) 0%, 
+                rgba(0, 0, 0, 0.3) 100%);
+            border: 2px solid var(--roman-bronze);
+            border-radius: 1rem;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            animation: slideInUp 0.8s ease-out;
+            margin-bottom: 2rem;
+        }
+
+        .content-section:hover {
+            border-color: var(--roman-gold);
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            color: var(--roman-gold);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-family: 'Times New Roman', serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        /* Grille pour les éléments */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        /* Carte d'élément */
+        .item-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--roman-bronze);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .item-card:hover {
+            border-color: var(--roman-gold);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .item-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .item-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+        
+        .item-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--roman-gold);
+        }
+        
+        .item-description {
+            color: var(--roman-marble);
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+        
+        .item-cost {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .cost-item {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+        
+        .cost-icon {
+            margin-right: 0.25rem;
+        }
+        
+        .item-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+        
+        .button-2025 {
+            background: linear-gradient(135deg, var(--roman-bronze), var(--roman-gold));
+            color: var(--roman-dark);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-grow: 1;
+            text-align: center;
+        }
+        
+        .button-2025:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+        }
+        
+        .button-2025.primary {
+            background: linear-gradient(135deg, #b45309, var(--roman-gold));
+        }
+        
+        .button-2025.secondary {
+            background: linear-gradient(135deg, #4b5563, #9ca3af);
+        }
+        
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 0.5rem;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+            
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page-container">
+        <!-- En-tête de la page -->
+        <div class="page-header">
+            <h1 class="page-title">[PAGE_ICON] [PAGE_TITLE]</h1>
+            <p class="page-subtitle">[PAGE_SUBTITLE]</p>
+        </div>
+
+        <!-- Section principale -->
+        <div class="content-section">
+            <h2 class="section-title">[SECTION_TITLE]</h2>
+            
+            <div class="grid-container">
+                <!-- Élément 1 -->
+                <div class="item-card">
+                    <div class="item-header">
+                        <div class="item-icon">🏛️</div>
+                        <div class="item-title">Forum</div>
+                    </div>
+                    <div class="item-description">
+                        Centre administratif de votre cité. Augmente la production d'or et le bonheur des citoyens.
+                    </div>
+                    <div class="item-cost">
+                        <div class="cost-item">
+                            <span class="cost-icon">🌲</span>
+                            <span>100</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">🪨</span>
+                            <span>200</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">💰</span>
+                            <span>50</span>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="button-2025 primary" data-action="build" data-params="{&quot;buildingType&quot;:&quot;forum&quot;,&quot;cost&quot;:{&quot;wood&quot;:100,&quot;stone&quot;:200,&quot;gold&quot;:50},&quot;time&quot;:5000}">
+                            Construire
+                        </button>
+                        <button class="button-2025 secondary" data-action="upgrade" data-params="{&quot;buildingType&quot;:&quot;forum&quot;,&quot;cost&quot;:{&quot;wood&quot;:150,&quot;stone&quot;:300,&quot;gold&quot;:75},&quot;time&quot;:8000}">
+                            Améliorer
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Élément 2 -->
+                <div class="item-card">
+                    <div class="item-header">
+                        <div class="item-icon">⛲</div>
+                        <div class="item-title">Aqueduc</div>
+                    </div>
+                    <div class="item-description">
+                        Fournit de l'eau propre à votre cité. Augmente la santé et le bonheur des citoyens.
+                    </div>
+                    <div class="item-cost">
+                        <div class="cost-item">
+                            <span class="cost-icon">🪨</span>
+                            <span>300</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">⛏️</span>
+                            <span>50</span>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="button-2025 primary" data-action="build" data-params="{&quot;buildingType&quot;:&quot;aqueduct&quot;,&quot;cost&quot;:{&quot;stone&quot;:300,&quot;iron&quot;:50},&quot;time&quot;:5000}">
+                            Construire
+                        </button>
+                        <button class="button-2025 secondary" data-action="upgrade" data-params="{&quot;buildingType&quot;:&quot;aqueduct&quot;,&quot;cost&quot;:{&quot;stone&quot;:450,&quot;iron&quot;:75},&quot;time&quot;:8000}">
+                            Améliorer
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Élément 3 -->
+                <div class="item-card">
+                    <div class="item-header">
+                        <div class="item-icon">🏛️</div>
+                        <div class="item-title">Temple</div>
+                    </div>
+                    <div class="item-description">
+                        Centre religieux de votre cité. Augmente le bonheur et la loyauté des citoyens.
+                    </div>
+                    <div class="item-cost">
+                        <div class="cost-item">
+                            <span class="cost-icon">🌲</span>
+                            <span>150</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">🪨</span>
+                            <span>300</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">💰</span>
+                            <span>100</span>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="button-2025 primary" data-action="build" data-params="{&quot;buildingType&quot;:&quot;temple&quot;,&quot;cost&quot;:{&quot;wood&quot;:150,&quot;stone&quot;:300,&quot;gold&quot;:100},&quot;time&quot;:5000}">
+                            Construire
+                        </button>
+                        <button class="button-2025 secondary" data-action="upgrade" data-params="{&quot;buildingType&quot;:&quot;temple&quot;,&quot;cost&quot;:{&quot;wood&quot;:225,&quot;stone&quot;:450,&quot;gold&quot;:150},&quot;time&quot;:8000}">
+                            Améliorer
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Élément 4 -->
+                <div class="item-card">
+                    <div class="item-header">
+                        <div class="item-icon">🏪</div>
+                        <div class="item-title">Marché</div>
+                    </div>
+                    <div class="item-description">
+                        Centre commercial de votre cité. Augmente les revenus et permet le commerce.
+                    </div>
+                    <div class="item-cost">
+                        <div class="cost-item">
+                            <span class="cost-icon">🌲</span>
+                            <span>200</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">🪨</span>
+                            <span>100</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">💰</span>
+                            <span>150</span>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="button-2025 primary" data-action="build" data-params="{&quot;buildingType&quot;:&quot;market&quot;,&quot;cost&quot;:{&quot;wood&quot;:200,&quot;stone&quot;:100,&quot;gold&quot;:150},&quot;time&quot;:5000}">
+                            Construire
+                        </button>
+                        <button class="button-2025 secondary" data-action="upgrade" data-params="{&quot;buildingType&quot;:&quot;market&quot;,&quot;cost&quot;:{&quot;wood&quot;:300,&quot;stone&quot;:150,&quot;gold&quot;:225},&quot;time&quot;:8000}">
+                            Améliorer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section secondaire -->
+        <div class="content-section">
+            <h2 class="section-title">[SECTION_TITLE_2]</h2>
+            
+            <div class="grid-container">
+                <!-- Élément 1 -->
+                <div class="item-card">
+                    <div class="item-header">
+                        <div class="item-icon">⚔️</div>
+                        <div class="item-title">Légionnaire</div>
+                    </div>
+                    <div class="item-description">
+                        Soldat d'infanterie de base. Efficace en grand nombre.
+                    </div>
+                    <div class="item-cost">
+                        <div class="cost-item">
+                            <span class="cost-icon">🍇</span>
+                            <span>50</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">⛏️</span>
+                            <span>30</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">💰</span>
+                            <span>20</span>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="button-2025 primary" data-action="train" data-params="{&quot;unitType&quot;:&quot;legionnaire&quot;,&quot;count&quot;:10,&quot;cost&quot;:{&quot;food&quot;:50,&quot;iron&quot;:30,&quot;gold&quot;:20},&quot;time&quot;:5000}">
+                            Recruter (10)
+                        </button>
+                        <button class="button-2025 secondary" data-action="train" data-params="{&quot;unitType&quot;:&quot;legionnaire&quot;,&quot;count&quot;:50,&quot;cost&quot;:{&quot;food&quot;:250,&quot;iron&quot;:150,&quot;gold&quot;:100},&quot;time&quot;:15000}">
+                            Recruter (50)
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Élément 2 -->
+                <div class="item-card">
+                    <div class="item-header">
+                        <div class="item-icon">🏹</div>
+                        <div class="item-title">Archer</div>
+                    </div>
+                    <div class="item-description">
+                        Unité à distance. Efficace contre l'infanterie légère.
+                    </div>
+                    <div class="item-cost">
+                        <div class="cost-item">
+                            <span class="cost-icon">🍇</span>
+                            <span>40</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">🌲</span>
+                            <span>50</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">💰</span>
+                            <span>15</span>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="button-2025 primary" data-action="train" data-params="{&quot;unitType&quot;:&quot;archer&quot;,&quot;count&quot;:10,&quot;cost&quot;:{&quot;food&quot;:40,&quot;wood&quot;:50,&quot;gold&quot;:15},&quot;time&quot;:5000}">
+                            Recruter (10)
+                        </button>
+                        <button class="button-2025 secondary" data-action="train" data-params="{&quot;unitType&quot;:&quot;archer&quot;,&quot;count&quot;:50,&quot;cost&quot;:{&quot;food&quot;:200,&quot;wood&quot;:250,&quot;gold&quot;:75},&quot;time&quot;:15000}">
+                            Recruter (50)
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Élément 3 -->
+                <div class="item-card">
+                    <div class="item-header">
+                        <div class="item-icon">🐎</div>
+                        <div class="item-title">Cavalier</div>
+                    </div>
+                    <div class="item-description">
+                        Unité rapide et puissante. Efficace pour les raids et contre les archers.
+                    </div>
+                    <div class="item-cost">
+                        <div class="cost-item">
+                            <span class="cost-icon">🍇</span>
+                            <span>80</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">⛏️</span>
+                            <span>40</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">💰</span>
+                            <span>30</span>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="button-2025 primary" data-action="train" data-params="{&quot;unitType&quot;:&quot;cavalry&quot;,&quot;count&quot;:10,&quot;cost&quot;:{&quot;food&quot;:80,&quot;iron&quot;:40,&quot;gold&quot;:30},&quot;time&quot;:5000}">
+                            Recruter (10)
+                        </button>
+                        <button class="button-2025 secondary" data-action="train" data-params="{&quot;unitType&quot;:&quot;cavalry&quot;,&quot;count&quot;:50,&quot;cost&quot;:{&quot;food&quot;:400,&quot;iron&quot;:200,&quot;gold&quot;:150},&quot;time&quot;:15000}">
+                            Recruter (50)
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Élément 4 -->
+                <div class="item-card">
+                    <div class="item-header">
+                        <div class="item-icon">🛡️</div>
+                        <div class="item-title">Centurion</div>
+                    </div>
+                    <div class="item-description">
+                        Unité d'élite. Puissant en attaque et en défense.
+                    </div>
+                    <div class="item-cost">
+                        <div class="cost-item">
+                            <span class="cost-icon">🍇</span>
+                            <span>100</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">⛏️</span>
+                            <span>60</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-icon">💰</span>
+                            <span>40</span>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="button-2025 primary" data-action="train" data-params="{&quot;unitType&quot;:&quot;centurion&quot;,&quot;count&quot;:10,&quot;cost&quot;:{&quot;food&quot;:100,&quot;iron&quot;:60,&quot;gold&quot;:40},&quot;time&quot;:5000}">
+                            Recruter (10)
+                        </button>
+                        <button class="button-2025 secondary" data-action="train" data-params="{&quot;unitType&quot;:&quot;centurion&quot;,&quot;count&quot;:50,&quot;cost&quot;:{&quot;food&quot;:500,&quot;iron&quot;:300,&quot;gold&quot;:200},&quot;time&quot;:15000}">
+                            Recruter (50)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialisation de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Logique spécifique à cette page
+            console.log('Page [PAGE_TITLE] initialisée');
+            
+            // Écouter les événements personnalisés
+            document.addEventListener('imperium:buildingComplete', function(e) {
+                console.log('Construction terminée:', e.detail);
+                // Mettre à jour l'interface si nécessaire
+            });
+            
+            document.addEventListener('imperium:upgradeComplete', function(e) {
+                console.log('Amélioration terminée:', e.detail);
+                // Mettre à jour l'interface si nécessaire
+            });
+            
+            document.addEventListener('imperium:trainingComplete', function(e) {
+                console.log('Entraînement terminé:', e.detail);
+                // Mettre à jour l'interface si nécessaire
+            });
+            
+            document.addEventListener('imperium:researchComplete', function(e) {
+                console.log('Recherche terminée:', e.detail);
+                // Mettre à jour l'interface si nécessaire
+            });
+        });
+    </script>
+
+</body></html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - [PAGE_TITLE]</title>
+    <meta name="description" content="[PAGE_DESCRIPTION]">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles communs -->
+    <link rel="stylesheet" href="../../common-styles.css">
+    <link rel="stylesheet" href="../../common-header.css">
+    <link rel="stylesheet" href="ma-cite-navigation.css">
+    
+    <!-- Scripts communs -->
+    <script src="../../common-navigation.js"></script>
+    <script src="../../common-header.js"></script>
+    <script src="ma-cite-navigation.js"></script>
+    <script src="../../game-engine.js"></script>
+    <script src="../../advanced-game-systems.js"></script>
+    <script src="../../save-system.js"></script>
+    <script src="../../ui-manager.js"></script>
+    <script src="../../global-console.js"></script>
+
+    <style>
+        /* Styles spécifiques à cette page */
+        .page-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: calc(100vh - 200px);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .page-title {
+            color: var(--roman-gold);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: bold;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+            font-family: 'Times New Roman', serif;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--roman-gold), #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            color: var(--roman-marble);
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .content-section {
+            background: linear-gradient(135deg, 
+                rgba(139, 0, 0, 0.1) 0%, 
+                rgba(0, 0, 0, 0.3) 100%);
+            border: 2px solid var(--roman-bronze);
+            border-radius: 1rem;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            animation: slideInUp 0.8s ease-out;
+            margin-bottom: 2rem;
+        }
+
+        .content-section:hover {
+            border-color: var(--roman-gold);
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            color: var(--roman-gold);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-family: 'Times New Roman', serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .coming-soon {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--roman-marble);
+        }
+
+        .coming-soon-icon {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+            opacity: 0.7;
+            animation: pulse 2s infinite;
+        }
+
+        .coming-soon-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: var(--roman-gold);
+        }
+
+        .coming-soon-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Grille de contenu */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .content-card {
+            background: linear-gradient(135deg, 
+                rgba(30, 41, 59, 0.8) 0%, 
+                rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid var(--roman-bronze);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .content-card:hover {
+            border-color: var(--roman-gold);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.2);
+        }
+
+        .card-title {
+            color: var(--roman-gold);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-content {
+            color: var(--roman-marble);
+            line-height: 1.6;
+        }
+
+        /* Boutons d'action */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, var(--roman-bronze), #8B4513);
+            border: 2px solid var(--roman-gold);
+            color: var(--roman-marble);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(135deg, var(--roman-gold), #FFA500);
+            color: var(--roman-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--roman-gold), #FFA500);
+            color: var(--roman-dark);
+        }
+
+        .action-btn.primary:hover {
+            background: linear-gradient(135deg, #FFA500, #FF8C00);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 1rem;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+
+            .coming-soon {
+                padding: 2rem 1rem;
+            }
+
+            .coming-soon-icon {
+                font-size: 3rem;
+            }
+
+            .coming-soon-title {
+                font-size: 1.5rem;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .action-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../../../mobile-2025.css">
+    <script src="../../../common-header-2025.js"></script>
+    <script src="../../../resource-updater.js"></script>
+</head>
+<body>
+    <!-- Le header commun sera injecté automatiquement par common-header.js -->
+    <!-- La navigation Ma Cité sera injectée automatiquement par ma-cite-navigation.js -->
+    
+    <!-- Particules d'ambiance -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Contenu principal -->
+    <main class="page-container">
+        <!-- En-tête de la page -->
+        <div class="page-header">
+            <h1 class="page-title">[PAGE_ICON] [PAGE_TITLE] [PAGE_ICON]</h1>
+            <p class="page-subtitle">[PAGE_SUBTITLE]</p>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="content-section">
+            <div class="coming-soon">
+                <div class="coming-soon-icon">🚧</div>
+                <h2 class="coming-soon-title">Bientôt Disponible</h2>
+                <p class="coming-soon-description">
+                    Cette section est en cours de développement. 
+                    Nos architectes romains travaillent sans relâche pour vous offrir 
+                    une expérience exceptionnelle. Revenez bientôt pour découvrir 
+                    toutes les fonctionnalités de cette page !
+                </p>
+            </div>
+        </div>
+
+        <!-- Exemple de grille de contenu -->
+        <div class="content-grid" style="display: none;">
+            <div class="content-card">
+                <h3 class="card-title">
+                    <span>🏛️</span>
+                    Fonctionnalité 1
+                </h3>
+                <div class="card-content">
+                    Description de la fonctionnalité...
+                </div>
+            </div>
+            
+            <div class="content-card">
+                <h3 class="card-title">
+                    <span>⚔️</span>
+                    Fonctionnalité 2
+                </h3>
+                <div class="card-content">
+                    Description de la fonctionnalité...
+                </div>
+            </div>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="action-buttons">
+            <button class="action-btn primary" onclick="showNotification('Fonctionnalité bientôt disponible !', 'info')">
+                <span>🚀</span>
+                Action Principale
+            </button>
+            <button class="action-btn" onclick="navigateToMaCitePage('ma-cite-romaine')">
+                <span>🏛️</span>
+                Retour à Ma Cité
+            </button>
+        </div>
+    </main>
+
+    <script>
+        // Initialisation de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            initializePage();
+            
+            // Ajouter un log pour cette page
+            setTimeout(() => {
+                if (window.addImperiumLog) {
+                    window.addImperiumLog('Page [PAGE_TITLE] chargée', 'info');
+                }
+            }, 1000);
+        });
+
+        function initializePage() {
+            // Logique spécifique à cette page
+            console.log('Page [PAGE_TITLE] initialisée');
+            
+            // Exemple d'interaction avec les ressources
+            // window.addImperiumResource('gold', 100);
+        }
+
+        // Particules d'ambiance
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
+            
+            const particleCount = 15;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Notifications
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 120px;
+                right: 20px;
+                background: ${type === 'success' ? '#22c55e' : type === 'error' ? '#dc2626' : '#3b82f6'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 0.5rem;
+                font-weight: bold;
+                z-index: 10000;
+                animation: slideInRight 0.3s ease-out;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                backdrop-filter: blur(10px);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-in forwards';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Animations CSS supplémentaires
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

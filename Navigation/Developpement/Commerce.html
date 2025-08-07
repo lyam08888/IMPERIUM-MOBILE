@@ -1,6 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="fr">
-<head>
+<html lang="fr"><head><script src="../common-interactions.js"></script></head><body>﻿
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMPERIUM - Marché Impérial</title>
@@ -407,8 +407,11 @@
             }
         }
     </style>
-</head>
-<body>
+    <link rel="stylesheet" href="../../mobile-2025.css">
+    <script src="../../common-header-2025.js"></script>
+    <script src="../../resource-updater.js"></script>
+
+
     <!-- Particules d'arrière-plan -->
     <div class="particles"></div>
 
@@ -507,7 +510,7 @@
                                     </div>
                                 </div>
                                 
-                                <button class="place-order-btn buy" id="place-buy-order">
+                                <button class="place-order-btn buy" id="place-buy-order" data-action="buy" data-params="{&quot;resourceType&quot;:&quot;gold&quot;,&quot;amount&quot;:100,&quot;price&quot;:2}">
                                     💰 Placer l'ordre d'achat
                                 </button>
                             </div>
@@ -555,7 +558,7 @@
                                     </div>
                                 </div>
                                 
-                                <button class="place-order-btn sell" id="place-sell-order">
+                                <button class="place-order-btn sell" id="place-sell-order" data-action="sell" data-params="{&quot;resourceType&quot;:&quot;gold&quot;,&quot;amount&quot;:100,&quot;price&quot;:2}">
                                     💎 Placer l'ordre de vente
                                 </button>
                             </div>
@@ -991,5 +994,6 @@
     </script>
 
     <script src="../../../../../../link-buttons-to-functions.js"></script>
-</body>
-</html>
+
+
+</body></html>

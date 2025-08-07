@@ -1,7 +1,7 @@
-﻿
-<!DOCTYPE html>
-<html lang="fr">
-<head>
+<html lang="fr"><head><script src="../../common-interactions.js"></script></head><body>﻿
+
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMPERIUM - Ma Cité Romaine</title>
@@ -277,8 +277,11 @@
             }
         }
     </style>
-</head>
-<body>
+    <link rel="stylesheet" href="../../../mobile-2025.css">
+    <script src="../../../common-header-2025.js"></script>
+    <script src="../../../resource-updater.js"></script>
+
+
     <!-- Le header commun sera injecté automatiquement par common-header.js -->
     <!-- La navigation Ma Cité sera injectée automatiquement par ma-cite-navigation.js -->
     
@@ -366,12 +369,12 @@
                 <span class="quick-action-text">Production</span>
             </a>
             
-            <a href="Collecter Impôts.html" class="quick-action-btn">
+            <a href="Collecter Impôts.html" class="quick-action-btn" data-action="collect" data-params="{&quot;resourceType&quot;:&quot;generic_resource&quot;,&quot;amount&quot;:100}">
                 <span class="quick-action-icon">💰</span>
                 <span class="quick-action-text">Collecter Impôts</span>
             </a>
             
-            <a href="Recruter Soldats.html" class="quick-action-btn">
+            <a href="Recruter Soldats.html" class="quick-action-btn" data-action="train" data-params="{&quot;unitType&quot;:&quot;generic_unit&quot;,&quot;count&quot;:10,&quot;cost&quot;:{&quot;food&quot;:50,&quot;iron&quot;:30,&quot;gold&quot;:20},&quot;time&quot;:5000}">
                 <span class="quick-action-icon">⚔️</span>
                 <span class="quick-action-text">Recruter Soldats</span>
             </a>
@@ -459,5 +462,6 @@
             }
         }
     </script>
-</body>
-</html>
+
+
+</body></html>

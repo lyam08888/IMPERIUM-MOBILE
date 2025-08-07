@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Académie</title>
+    <meta name="description" content="Recherchez de nouvelles technologies pour développer votre empire romain.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Scripts de navigation communs -->
+    <script src="../common-navigation.js"></script>
+    <style>
+        /* =============================================================== */
+        /* STYLES COMMUNS (SIMULATION DE common-style.css)     */
+        /* =============================================================== */
+        :root {
+            --gold-primary: #d97706;
+            --gold-secondary: #f59e0b;
+            --gold-light: #fbbf24;
+            --marble-white: #f8fafc;
+            --roman-red: #dc2626;
+            --roman-purple: #7c3aed;
+            --dark-stone: #1e293b;
+            --dark-marble: #334155;
+            --dark-bg: #0f172a;
+            --text-light: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-gold: rgba(217, 119, 6, 0.3);
+            --shadow-gold: rgba(217, 119, 6, 0.4);
+            --success-green: #22c55e;
+            --storage-full-red: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(217, 119, 6, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-stone) 100%);
+            color: var(--text-light);
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- Structure et Navigation --- */
+        .imperium-ui { display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 10; }
+        .imperium-header { background: linear-gradient(135deg, var(--dark-marble) 0%, var(--dark-stone) 100%); backdrop-filter: blur(10px); border-bottom: 2px solid var(--border-gold); padding: 1rem 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 100; }
+        .header-content { max-width: 1600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .imperium-logo { font-size: 2.5rem; font-weight: bold; background: linear-gradient(135deg, var(--gold-primary), var(--gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); letter-spacing: 2px; cursor: pointer; transition: all 0.3s ease; }
+        .resources-display { display: flex; gap: 1.5rem; background: rgba(15, 23, 42, 0.7); padding: 0.75rem 1.5rem; border-radius: 1rem; border: 1px solid var(--border-gold); }
+        .resource-item { display: flex; align-items: center; gap: 0.5rem; font-weight: bold; font-size: 1rem; }
+        .player-info { display: flex; align-items: center; gap: 1rem; }
+        .player-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--roman-red), var(--roman-purple)); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 2px solid var(--gold-primary); }
+        .player-name { color: var(--gold-light); font-weight: bold; }
+        .player-level { color: var(--text-muted); }
+        .imperium-body { display: flex; flex-grow: 1; max-width: 1600px; margin: 0 auto; width: 100%; gap: 1.5rem; padding: 1.5rem 2rem; overflow: hidden; }
+        .imperium-sidebar { width: 280px; flex-shrink: 0; background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%); border-radius: 1rem; border: 1px solid var(--border-gold); padding: 1.5rem; overflow-y: auto; box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+        .nav-section { margin-bottom: 2rem; }
+        .nav-title { color: var(--gold-primary); font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border-gold); padding-bottom: 0.5rem; }
+        .nav-list { list-style: none; }
+        .nav-item a { display: flex; align-items: center; gap: 1rem; color: var(--text-light); text-decoration: none; padding: 0.75rem 1rem; margin-bottom: 0.5rem; border-radius: 0.5rem; transition: all 0.3s ease; border: 1px solid transparent; cursor: pointer; }
+        .nav-item a:hover, .nav-item a.active { background: linear-gradient(135deg, rgba(217, 119, 6, 0.2), rgba(245, 158, 11, 0.1)); border-color: var(--gold-primary); transform: translateX(5px); color: var(--gold-light); }
+        .nav-icon { font-size: 1.3rem; width: 24px; text-align: center; }
+        .main-content { flex-grow: 1; position: relative; overflow: hidden; }
+        .view-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%); border-radius: 1rem; border: 1px solid var(--border-gold); overflow-y: auto; padding: 2rem; box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+        .view-title { font-size: 2.2rem; font-weight: bold; color: var(--gold-primary); margin-bottom: 2rem; text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .panel-section { background: rgba(30, 41, 59, 0.6); border-radius: 0.5rem; padding: 1rem; border: 1px solid var(--border-gold); }
+        .section-title { color: var(--gold-primary); font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .queue-container { margin-top: 1rem; }
+        .queue-empty { text-align: center; color: var(--text-muted); font-style: italic; }
+        .queue-item { display: flex; align-items: center; gap: 1rem; background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border-gold); }
+        .queue-icon { font-size: 2rem; }
+        .queue-info { flex-grow: 1; }
+        .queue-name { font-weight: bold; color: var(--gold-light); }
+        .timer-progress { width: 100%; height: 6px; background: rgba(0,0,0,0.3); border-radius: 3px; overflow: hidden; margin: 0.5rem 0; }
+        .timer-progress-bar { height: 100%; background: linear-gradient(90deg, var(--gold-primary), var(--gold-light)); border-radius: 3px; transition: width 0.3s ease; }
+        .timer-remaining { font-size: 0.9rem; color: var(--gold-light); }
+        
+        /* =============================================================== */
+        /* STYLES SPÉCIFIQUES À L'ACADÉMIE                   */
+        /* =============================================================== */
+        .tech-tree { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; }
+        .tech-branch { background: rgba(15, 23, 42, 0.8); border-radius: 1rem; border: 2px solid var(--border-gold); padding: 1.5rem; }
+        .tech-branch-title { color: var(--gold-primary); font-size: 1.3rem; font-weight: bold; margin-bottom: 1rem; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .tech-branch-description { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; text-align: center; font-style: italic; }
+        .tech-item { background: rgba(30, 41, 59, 0.6); border-radius: 0.8rem; border: 1px solid var(--border-gold); padding: 1rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease; position: relative; }
+        .tech-item:hover { transform: translateY(-2px); box-shadow: 0 5px 15px var(--shadow-gold); border-color: var(--gold-light); }
+        .tech-item.researched { background: rgba(34, 197, 94, 0.2); border-color: #22c55e; cursor: default; }
+        .tech-item.researching { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; cursor: default; }
+        .tech-item.locked { opacity: 0.5; cursor: not-allowed; }
+        .tech-name { color: var(--gold-light); font-weight: bold; margin-bottom: 0.5rem; }
+        .tech-description { color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem; }
+        .tech-cost { display: flex; gap: 1rem; margin-bottom: 0.5rem; }
+        .tech-cost-item { display: flex; align-items: center; gap: 0.3rem; color: var(--text-muted); font-size: 0.8rem; }
+        .tech-status { position: absolute; top: 0.5rem; right: 0.5rem; width: 12px; height: 12px; border-radius: 50%; }
+        .tech-status.researched { background: #22c55e; }
+        .tech-status.researching { background: #3b82f6; animation: pulse 2s infinite; }
+        .tech-requirements { margin-top: 0.5rem; color: var(--text-muted); font-size: 0.8rem; }
+        .tech-effects { margin-top: 0.8rem; color: var(--gold-light); font-size: 0.8rem; }
+        
+        /* --- Styles pour la modale --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: rgba(15, 23, 42, 0.95); border: 2px solid var(--gold-primary); border-radius: 1rem; padding: 2rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; transform: scale(0.8); transition: transform 0.3s ease; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-title { color: var(--gold-primary); font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; text-align: center; }
+        .modal-body { color: var(--text-light); margin-bottom: 2rem; }
+        .modal-actions { display: flex; gap: 1rem; justify-content: center; }
+        .modal-btn { padding: 0.8rem 2rem; border: none; border-radius: 0.5rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; font-family: 'Times New Roman', serif; }
+        .modal-btn.primary { background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary)); color: white; }
+        .modal-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px var(--shadow-gold); }
+        .modal-btn.secondary { background: rgba(30, 41, 59, 0.8); color: var(--text-light); border: 1px solid var(--border-gold); }
+        .cost-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 0.5rem; }
+        .cost-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: rgba(30, 41, 59, 0.6); border-radius: 0.3rem; border: 1px solid var(--border-gold); }
+        .cost-item.sufficient { border-color: var(--success-green); background: rgba(34, 197, 94, 0.1); }
+        .cost-item.insufficient { border-color: var(--roman-red); background: rgba(220, 38, 38, 0.1); }
+        .cost-icon { font-size: 1.2rem; }
+        .cost-amount { font-weight: bold; color: var(--gold-light); }
+        .cost-current { font-size: 0.8rem; color: var(--text-muted); }
+        
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+    <link rel="stylesheet" href="../../mobile-2025.css">
+    <script src="../../common-header-2025.js"></script>
+    <script src="../../resource-updater.js"></script>
+</head>
+<body>
+    <div class="imperium-ui">
+        <header class="imperium-header">
+            <div class="header-content">
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display"></div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar"></div>
+                    <div class="player-details">
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="imperium-body">
+            <aside class="imperium-sidebar"></aside>
+
+            <main class="main-content">
+                <div class="view-container">
+                    <h2 class="view-title">Académie Impériale</h2>
+                    
+                    <div class="panel-section" style="margin-bottom: 2rem;">
+                        <h3 class="section-title">🔬 Recherche en cours</h3>
+                        <div id="research-queue" class="queue-container">
+                            <p class="queue-empty">Aucune recherche en cours</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tech-tree" id="tech-tree">
+                        <!-- Généré par JavaScript -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // ===============================================================
+        // SIMULATION DU MOTEUR DE JEU ET DES DONNÉES
+        // ===============================================================
+        const RESOURCES_CONFIG = {
+            wood: { name: 'Bois', icon: '🌲' },
+            stone: { name: 'Pierre', icon: '🪨' },
+            food: { name: 'Nourriture', icon: '🍇' },
+            iron: { name: 'Fer', icon: '⛏️' },
+            gold: { name: 'Or', icon: '💰' },
+            research: { name: 'Points de recherche', icon: '📚' }
+        };
+
+        const BUILDINGS_CONFIG = {
+            academy: { name: 'Académie' }
+        };
+
+        const TECH_TREE = {
+            urbanisme: {
+                name: 'Urbanisme', icon: '🏛️', description: 'Améliore la gestion et la croissance de vos cités.',
+                techs: {
+                    aqueducs: { name: 'Aqueducs', description: 'Augmente le bonheur et la croissance de la population.', cost: { stone: 100, research: 50 }, effects: { populationGrowth: 0.05, happiness: 5 } },
+                    architecture: { name: 'Architecture', description: 'Réduit le coût en pierre des bâtiments.', cost: { wood: 150, research: 80 }, requirements: { tech: 'urbanisme.aqueducs' }, effects: { stoneCostReduction: 0.10 } }
+                }
+            },
+            militaire: {
+                name: 'Militaire', icon: '⚔️', description: 'Débloque et améliore vos unités militaires.',
+                techs: {
+                    phalanges: { name: 'Phalanges', description: 'Débloque l\'unité Hoplite.', cost: { iron: 100, research: 60 }, effects: { unitsUnlocked: 'Hoplite' } },
+                    tactiques: { name: 'Tactiques de siège', description: 'Augmente les dégâts contre les murailles.', cost: { iron: 200, research: 120 }, requirements: { tech: 'militaire.phalanges' }, effects: { siegeBonus: 0.15 } }
+                }
+            },
+            economie: {
+                name: 'Économie', icon: '💰', description: 'Augmente vos revenus et votre efficacité commerciale.',
+                techs: {
+                    monnaie: { name: 'Monnaie', description: 'Augmente la production d\'or.', cost: { gold: 500, research: 70 }, effects: { goldProductionBonus: 0.10 } },
+                    routes_commerciales: { name: 'Routes Commerciales', description: 'Permet d\'établir plus de routes commerciales.', cost: { wood: 200, gold: 300, research: 100 }, requirements: { tech: 'economie.monnaie' }, effects: { tradeRoutes: 1 } }
+                }
+            }
+        };
+
+        const gameEngine = {
+            gameState: {
+                resources: { wood: 1000, stone: 1000, food: 1000, iron: 1000, gold: 1000, research: 500 },
+                technologies: [],
+                researchQueue: [],
+                buildings: { main: { academy: { level: 1 } } }
+            },
+            getGameState: function() { return this.gameState; },
+            canAfford: function(cost) { return Object.keys(cost).every(res => this.gameState.resources[res] >= cost[res]); },
+            checkRequirements: function(cityId, requirements) {
+                if (requirements.tech) return this.gameState.technologies.includes(requirements.tech);
+                return true; // Simplifié
+            },
+            startResearch: function(branchKey, techKey) {
+                const tech = TECH_TREE[branchKey].techs[techKey];
+                if (!this.canAfford(tech.cost)) throw new Error("Ressources insuffisantes.");
+                
+                Object.keys(tech.cost).forEach(res => { this.gameState.resources[res] -= tech.cost[res]; });
+                
+                const researchTime = (tech.cost.research * 10) * 1000; // en ms
+                this.gameState.researchQueue.push({
+                    branch: branchKey, id: techKey, name: tech.name,
+                    startTime: Date.now(), endTime: Date.now() + researchTime
+                });
+            },
+            update: function() {
+                const now = Date.now();
+                const completed = [];
+                this.gameState.researchQueue.forEach((item, index) => {
+                    if (now >= item.endTime) {
+                        this.gameState.technologies.push(`${item.branch}.${item.id}`);
+                        completed.push(index);
+                    }
+                });
+                completed.reverse().forEach(index => this.gameState.researchQueue.splice(index, 1));
+            }
+        };
+
+        // ===============================================================
+        // Les fonctions de navigation sont maintenant fournies par common-navigation.js
+        // ===============================================================
+        
+        function initializeGlobalUI() {
+            // La navigation est maintenant gérée par common-navigation.js via initializeNavigation()
+            // On met juste à jour les informations spécifiques à cette page
+            
+            const playerName = document.querySelector('.player-name');
+            const playerLevel = document.querySelector('.player-level');
+            const playerAvatar = document.querySelector('.player-avatar');
+
+            if (playerName) playerName.textContent = 'Marcus Aurelius';
+            if (playerLevel) playerLevel.textContent = 'Consul - Niv. 12';
+            if (playerAvatar) playerAvatar.textContent = 'M';
+            updateResourcesDisplay();
+        }
+
+        function updateResourcesDisplay() {
+            const resources = gameEngine.getGameState().resources;
+            document.querySelector('.resources-display').innerHTML = Object.keys(RESOURCES_CONFIG)
+                .filter(res => res !== 'research')
+                .map(res => `<div class="resource-item"><span class="resource-icon">${RESOURCES_CONFIG[res].icon}</span><span class="resource-value">${Math.floor(resources[res])}</span></div>`)
+                .join('');
+        }
+
+        // ===============================================================
+        // SCRIPT SPÉCIFIQUE À L'ACADÉMIE
+        // ===============================================================
+        function generateTechTree() {
+            const techTreeContainer = document.getElementById('tech-tree');
+            const gameState = gameEngine.getGameState();
+            const researchedTechs = gameState.technologies;
+            const researchingTechs = gameState.researchQueue.map(r => `${r.branch}.${r.id}`);
+            
+            techTreeContainer.innerHTML = Object.keys(TECH_TREE).map(branchKey => {
+                const branch = TECH_TREE[branchKey];
+                return `
+                    <div class="tech-branch">
+                        <h3 class="tech-branch-title"><span>${branch.icon}</span><span>${branch.name}</span></h3>
+                        <div class="tech-branch-description">${branch.description}</div>
+                        ${Object.keys(branch.techs).map(techKey => {
+                            const tech = branch.techs[techKey];
+                            const techId = `${branchKey}.${techKey}`;
+                            const isResearched = researchedTechs.includes(techId);
+                            const isResearching = researchingTechs.includes(techId);
+                            const isLocked = !isResearched && !isResearching && !gameEngine.checkRequirements('main', tech.requirements || {});
+                            
+                            let statusClass = isResearched ? 'researched' : isResearching ? 'researching' : isLocked ? 'locked' : '';
+                            
+                            return `
+                                <div class="tech-item ${statusClass}" data-branch="${branchKey}" data-tech="${techKey}">
+                                    <div class="tech-status ${statusClass}"></div>
+                                    <div class="tech-name">${tech.name}</div>
+                                    <div class="tech-description">${tech.description}</div>
+                                    <div class="tech-cost">${Object.keys(tech.cost).map(res => `<div class="tech-cost-item"><span>${RESOURCES_CONFIG[res].icon}</span><span>${tech.cost[res]}</span></div>`).join('')}</div>
+                                </div>`;
+                        }).join('')}
+                    </div>`;
+            }).join('');
+            
+            document.querySelectorAll('.tech-item').forEach(item => item.addEventListener('click', handleTechClick));
+        }
+
+        function handleTechClick(event) {
+            const item = event.currentTarget;
+            if (item.classList.contains('locked') || item.classList.contains('researched') || item.classList.contains('researching')) return;
+            showTechResearchModal(item.dataset.branch, item.dataset.tech);
+        }
+
+        function showTechResearchModal(branchKey, techKey) {
+            const tech = TECH_TREE[branchKey].techs[techKey];
+            const canAfford = gameEngine.canAfford(tech.cost);
+            const researchTime = (tech.cost.research * 10);
+            
+            const modalContent = `
+                <h3 class="modal-title">Rechercher ${tech.name}</h3>
+                <div class="modal-body">
+                    <p>${tech.description}</p>
+                    <h4>Coût:</h4>
+                    <div class="cost-grid">
+                        ${Object.keys(tech.cost).map(res => {
+                            const needed = tech.cost[res];
+                            const current = gameEngine.getGameState().resources[res];
+                            return `<div class="cost-item ${current >= needed ? 'sufficient' : 'insufficient'}">
+                                <span class="cost-icon">${RESOURCES_CONFIG[res].icon}</span>
+                                <span class="cost-amount">${needed}</span>
+                                <span class="cost-current">(${Math.floor(current)} dispo.)</span>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                    <h4>Temps de recherche: ⏱️ ${researchTime}s</h4>
+                </div>
+                <div class="modal-actions">
+                    ${canAfford ? `<button class="modal-btn primary" id="start-research-btn">🔬 Commencer</button>` : `<button class="modal-btn primary" disabled>Ressources insuffisantes</button>`}
+                    <button class="modal-btn secondary" id="close-modal-btn">Fermer</button>
+                </div>`;
+            
+            showModal(modalContent);
+            document.getElementById('close-modal-btn').onclick = closeModal;
+            if (canAfford) {
+                document.getElementById('start-research-btn').onclick = () => startResearch(branchKey, techKey);
+            }
+        }
+
+        function startResearch(branchKey, techKey) {
+            try {
+                gameEngine.startResearch(branchKey, techKey);
+                closeModal();
+                updateAllUI();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        function updateResearchQueue() {
+            const queue = gameEngine.getGameState().researchQueue;
+            const container = document.getElementById('research-queue');
+            if (queue.length === 0) {
+                container.innerHTML = '<p class="queue-empty">Aucune recherche en cours</p>';
+                return;
+            }
+            container.innerHTML = queue.map(research => {
+                const now = Date.now();
+                const progress = Math.min(100, (now - research.startTime) / (research.endTime - research.startTime) * 100);
+                const remaining = Math.max(0, (research.endTime - now) / 1000);
+                return `
+                    <div class="queue-item">
+                        <div class="queue-icon">🔬</div>
+                        <div class="queue-info">
+                            <div class="queue-name">${research.name}</div>
+                            <div class="timer-progress"><div class="timer-progress-bar" style="width: ${progress}%"></div></div>
+                            <div class="timer-remaining">⏱️ ${Math.floor(remaining)}s</div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function showModal(content) {
+            let overlay = document.getElementById('modal-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'modal-overlay';
+                overlay.className = 'modal-overlay';
+                overlay.onclick = (e) => { if (e.target.id === 'modal-overlay') closeModal(); };
+                document.body.appendChild(overlay);
+            }
+            overlay.innerHTML = `<div class="modal-content">${content}</div>`;
+            overlay.classList.add('active');
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('modal-overlay');
+            if (overlay) overlay.classList.remove('active');
+        }
+        
+        function updateAllUI() {
+            gameEngine.update();
+            updateResourcesDisplay();
+            updateResearchQueue();
+            generateTechTree();
+        }
+
+        // Initialisation et boucle de mise à jour
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeGlobalUI();
+            updateAllUI();
+            setInterval(updateAllUI, 1000);
+        });
+    </script>
+</body>
+</html>

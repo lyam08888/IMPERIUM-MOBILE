@@ -1,0 +1,782 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Diplomatie</title>
+    <meta name="description" content="Gérez vos relations diplomatiques et alliances dans IMPERIUM.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+    
+    <!-- Scripts de navigation communs -->
+    <script src="../common-navigation.js"></script>
+
+    <style>
+        /* =============================================================== */
+        /* STYLES COMMUNS DE L'APPLICATION (common-style.css)            */
+        /* =============================================================== */
+        :root {
+            --gold-primary: #d97706;
+            --gold-secondary: #f59e0b;
+            --gold-light: #fbbf24;
+            --marble-white: #f8fafc;
+            --roman-red: #dc2626;
+            --roman-purple: #7c3aed;
+            --dark-stone: #1e293b;
+            --dark-marble: #334155;
+            --dark-bg: #0f172a;
+            --text-light: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-gold: rgba(217, 119, 6, 0.3);
+            --shadow-gold: rgba(217, 119, 6, 0.4);
+            --success-green: #22c55e;
+            --storage-full-red: #ef4444;
+            /* Variables pour le thème diplomatique */
+            --diplomatic-blue: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(217, 119, 6, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-stone) 100%);
+            color: var(--text-light);
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: var(--gold-light);
+            border-radius: 50%;
+            animation: float 8s infinite linear;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        .imperium-ui {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+
+        .imperium-header {
+            background: linear-gradient(135deg, var(--dark-marble) 0%, var(--dark-stone) 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--border-gold);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .imperium-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .imperium-logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 10px var(--shadow-gold));
+        }
+
+        .resources-display {
+            display: flex;
+            gap: 1.5rem;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 0.75rem 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            font-size: 1rem;
+            position: relative;
+        }
+
+        .resource-icon {
+            font-size: 1.2rem;
+            filter: drop-shadow(0 0 5px var(--shadow-gold));
+        }
+
+        .resource-value {
+            color: var(--gold-light);
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--roman-red), var(--roman-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 2px solid var(--gold-primary);
+        }
+
+        .player-details {
+            font-size: 0.9rem;
+        }
+
+        .player-name {
+            color: var(--gold-light);
+            font-weight: bold;
+        }
+
+        .player-level {
+            color: var(--text-muted);
+        }
+
+        .imperium-body {
+            display: flex;
+            flex-grow: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            gap: 1.5rem;
+            padding: 1.5rem 2rem;
+            overflow: hidden;
+        }
+
+        .imperium-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            overflow-y: auto;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-title {
+            color: var(--gold-primary);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item a:hover, .nav-item a.active {
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.2), rgba(245, 158, 11, 0.1));
+            border-color: var(--gold-primary);
+            transform: translateX(5px);
+            color: var(--gold-light);
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .view-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            overflow-y: auto;
+            padding: 2rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .view-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--gold-primary);
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* =============================================================== */
+        /* STYLES SPÉCIFIQUES À LA PAGE DIPLOMATIE                       */
+        /* =============================================================== */
+        .diplomacy-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 1rem;
+            padding: 0.5rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .diplomacy-tab {
+            flex: 1;
+            max-width: 200px;
+            padding: 0.8rem;
+            background: transparent;
+            color: var(--text-light);
+            border: none;
+            border-radius: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .diplomacy-tab:hover {
+            color: var(--gold-light);
+            background: rgba(217, 119, 6, 0.1);
+        }
+
+        .diplomacy-tab.active {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            box-shadow: 0 4px 15px var(--shadow-gold);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .diplomacy-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .diplomacy-layout {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            }
+        }
+
+        .diplomacy-section {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-gold);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--gold-primary);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .relations-list, .proposals-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .relation-item, .proposal-item {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            padding: 1rem;
+            border: 1px solid var(--border-gold);
+            transition: all 0.3s ease;
+        }
+
+        .relation-item:hover, .proposal-item:hover {
+            border-color: var(--gold-light);
+            transform: translateY(-2px);
+        }
+
+        .relation-header, .proposal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .nation-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nation-flag {
+            font-size: 1.8rem;
+        }
+
+        .nation-name {
+            color: var(--gold-light);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .nation-leader {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .relation-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-ally { background-color: rgba(34, 197, 94, 0.2); color: var(--success-green); }
+        .status-neutral { background-color: rgba(107, 114, 128, 0.2); color: var(--text-muted); }
+        .status-enemy { background-color: rgba(220, 38, 38, 0.2); color: var(--roman-red); }
+        .status-trade { background-color: rgba(59, 130, 246, 0.2); color: var(--diplomatic-blue); }
+
+        .relation-actions, .proposal-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .relation-btn, .proposal-btn, .submit-btn {
+            flex: 1;
+            padding: 0.6rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            color: white;
+        }
+
+        .btn-negotiate { background: var(--diplomatic-blue); }
+        .btn-trade { background: var(--success-green); }
+        .btn-declare-war { background: var(--roman-red); }
+        .btn-accept { background: var(--success-green); }
+        .btn-decline { background: var(--roman-red); }
+        .btn-counter { background: var(--gold-primary); }
+        .submit-btn { background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary)); padding: 0.8rem; }
+
+        .relation-btn:hover, .proposal-btn:hover, .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .proposal-type {
+            padding: 0.3rem 0.8rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .type-alliance { background-color: rgba(34, 197, 94, 0.2); color: var(--success-green); }
+        .type-trade { background-color: rgba(59, 130, 246, 0.2); color: var(--diplomatic-blue); }
+        .type-peace { background-color: rgba(139, 92, 246, 0.2); color: var(--roman-purple); }
+
+        .new-proposal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-label {
+            color: var(--text-light);
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-select, .form-textarea {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            padding: 0.8rem;
+            color: var(--text-light);
+            width: 100%;
+        }
+
+        .form-select:focus, .form-textarea:focus {
+            border-color: var(--gold-light);
+            outline: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+        .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+    <link rel="stylesheet" href="../../mobile-2025.css">
+    <script src="../../common-header-2025.js"></script>
+    <script src="../../resource-updater.js"></script>
+</head>
+<body>
+    <div class="particles"></div>
+
+    <div class="imperium-ui">
+        <header class="imperium-header">
+            <div class="header-content">
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display"></div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar"></div>
+                    <div class="player-details">
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="imperium-body">
+            <aside class="imperium-sidebar"></aside>
+
+            <main class="main-content">
+                <div class="view-container">
+                    <h2 class="view-title">🤝 Diplomatie Romaine</h2>
+                    
+                    <div class="diplomacy-tabs">
+                        <button class="diplomacy-tab active" onclick="switchTab(event, 'relations')">Relations</button>
+                        <button class="diplomacy-tab" onclick="switchTab(event, 'proposals')">Propositions</button>
+                        <button class="diplomacy-tab" onclick="switchTab(event, 'negotiate')">Négocier</button>
+                        <button class="diplomacy-tab" onclick="switchTab(event, 'history')">Historique</button>
+                    </div>
+
+                    <div id="relations-tab" class="tab-content active">
+                        <div class="diplomacy-layout">
+                            <div class="diplomacy-section">
+                                <h3 class="section-title">Alliés</h3>
+                                <div class="relations-list" id="allies-list"></div>
+                            </div>
+                            <div class="diplomacy-section">
+                                <h3 class="section-title">Relations Neutres</h3>
+                                <div class="relations-list" id="neutral-list"></div>
+                            </div>
+                            <div class="diplomacy-section">
+                                <h3 class="section-title">Ennemis</h3>
+                                <div class="relations-list" id="enemies-list"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="proposals-tab" class="tab-content">
+                        <div class="diplomacy-section">
+                            <h3 class="section-title">Propositions Reçues</h3>
+                            <div class="proposals-list" id="received-proposals"></div>
+                        </div>
+                    </div>
+
+                    <div id="negotiate-tab" class="tab-content">
+                        <div class="diplomacy-section">
+                            <h3 class="section-title">Nouvelle Proposition</h3>
+                            <form class="new-proposal-form" onsubmit="submitProposal(event)">
+                                <div class="form-group">
+                                    <label class="form-label" for="target-nation">Nation Destinataire</label>
+                                    <select class="form-select" id="target-nation" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="proposal-type">Type de Proposition</label>
+                                    <select class="form-select" id="proposal-type" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="proposal-message">Message</label>
+                                    <textarea class="form-textarea" id="proposal-message" placeholder="Rédigez votre proposition..." required></textarea>
+                                </div>
+                                <button type="submit" class="submit-btn">📜 Envoyer</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="history-tab" class="tab-content">
+                        <div class="diplomacy-section">
+                            <h3 class="section-title">Historique Diplomatique</h3>
+                            <div class="proposals-list" id="history-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // ===============================================================
+        // SCRIPTS GLOBAUX (navigation, UI, etc.)
+        // ===============================================================
+        const NAVIGATION_CONFIG = {
+            'index':      { title: 'Accueil', file: 'index.html', section: 'Empire', icon: '🏛️' },
+            'cite':       { title: 'Ma Cité', file: 'Empire/Cite.html', section: 'Empire', icon: '🏘️' },
+            'monde':      { title: 'Monde', file: 'Empire/Monde.html', section: 'Empire', icon: '🌍' },
+            'province':   { title: 'Province', file: 'Empire/Province.html', section: 'Empire', icon: '🏝️' },
+            'academie':   { title: 'Académie', file: 'Developpement/Academie.html', section: 'Développement', icon: '📚' },
+            'commerce':   { title: 'Commerce', file: 'Developpement/Commerce.html', section: 'Développement', icon: '⚖️' },
+            'legions':    { title: 'Légions', file: 'Militaire/Légions.html', section: 'Militaire', icon: '⚔️' },
+            'flotte':     { title: 'Flotte', file: 'Militaire/Flotte.html', section: 'Militaire', icon: '🚢' },
+            'simulateur': { title: 'Simulateur', file: 'Militaire/Simulateur.html', section: 'Militaire', icon: '💥' },
+            'diplomatie': { title: 'Diplomatie', file: 'Social/Diplomatie.html', section: 'Social', icon: '🤝' },
+            'alliance':   { title: 'Alliance', file: 'Social/Alliance.html', section: 'Social', icon: '🛡️' },
+            'messages':   { title: 'Messages', file: 'Social/Messsages.html', section: 'Social', icon: '✉️' },
+            'premium':    { title: 'Premium', file: 'Premium/Premium.html', section: 'Premium', icon: '👑' }
+        };
+
+        function generateNavigationHTML() {
+            const sections = {};
+            Object.entries(NAVIGATION_CONFIG).forEach(([key, config]) => {
+                if (key === 'index') return;
+                if (!sections[config.section]) sections[config.section] = [];
+                sections[config.section].push({ key, ...config });
+            });
+            
+            let html = '';
+            Object.entries(sections).forEach(([sectionName, pages]) => {
+                html += `<div class="nav-section"><h2 class="nav-title">${sectionName}</h2><ul class="nav-list">`;
+                pages.forEach(page => {
+                    html += `<li class="nav-item"><a href="#" data-page="${page.key}" onclick="navigateTo('${page.key}'); return false;"><span class="nav-icon">${page.icon}</span> ${page.title}</a></li>`;
+                });
+                html += `</ul></div>`;
+            });
+            return html;
+        }
+        
+        function navigateTo(pageKey) {
+            const config = NAVIGATION_CONFIG[pageKey];
+            console.log(`Navigation vers : ${config.title} (${config.file})`);
+            alert(`Simulation de navigation vers : ${config.title}`);
+        }
+
+        function initializeGlobalUI() {
+            document.querySelector('.imperium-sidebar').innerHTML = generateNavigationHTML();
+            
+            const currentPage = 'diplomatie'; // Page active
+            document.querySelectorAll('.nav-item a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-page') === currentPage) {
+                    link.classList.add('active');
+                }
+            });
+
+            document.getElementById('player-name').textContent = 'Marcus Aurelius';
+            document.getElementById('player-title-level').textContent = 'Consul - Niv. 12';
+            document.getElementById('player-avatar').textContent = 'M';
+            document.getElementById('resources-display').innerHTML = `
+                <div class="resource-item"><span class="resource-icon">🍇</span><span class="resource-value">4,560</span></div>
+                <div class="resource-item"><span class="resource-icon">🏛️</span><span class="resource-value">2,340</span></div>
+                <div class="resource-item"><span class="resource-icon">⚔️</span><span class="resource-value">8,900</span></div>
+                <div class="resource-item"><span class="resource-icon">💰</span><span class="resource-value">15,200</span></div>`;
+        }
+
+        // ===============================================================
+        // SCRIPTS SPÉCIFIQUES À LA PAGE DIPLOMATIE
+        // ===============================================================
+        const DIPLOMATIC_DATA = {
+            allies: [{ id: 'athens', name: 'Athènes', leader: 'Périclès', flag: '🏛️', status: 'ally' }],
+            neutral: [
+                { id: 'egypt', name: 'Égypte', leader: 'Cléopâtre', flag: '🐪', status: 'neutral' },
+                { id: 'persia', name: 'Perse', leader: 'Darius', flag: '🏺', status: 'trade' }
+            ],
+            enemies: [{ id: 'carthage', name: 'Carthage', leader: 'Hannibal', flag: '🐘', status: 'enemy' }]
+        };
+
+        const PROPOSALS_DATA = [
+            { id: 1, from: 'Égypte', type: 'trade', message: 'Nous proposons un accord commercial avantageux.', time: '2 heures' },
+            { id: 2, from: 'Gaule', type: 'alliance', message: 'Unissons nos forces !', time: '1 jour' }
+        ];
+
+        const HISTORY_DATA = [
+            { id: 1, with: 'Athènes', type: 'alliance', action: 'Accepté', date: '15 Mars', result: 'Alliance formée' },
+            { id: 2, with: 'Carthage', type: 'peace', action: 'Refusé', date: '10 Mars', result: 'Guerre continue' }
+        ];
+
+        function switchTab(event, tabName) {
+            document.querySelectorAll('.diplomacy-tab').forEach(tab => tab.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        function renderRelationsList(containerId, relations) {
+            const container = document.getElementById(containerId);
+            if (relations.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="empty-icon">🕊️</div><div>Aucune nation ici.</div></div>`;
+                return;
+            }
+            container.innerHTML = relations.map(rel => `
+                <div class="relation-item">
+                    <div class="relation-header">
+                        <div class="nation-info">
+                            <div class="nation-flag">${rel.flag}</div>
+                            <div>
+                                <div class="nation-name">${rel.name}</div>
+                                <div class="nation-leader">Dirigé par ${rel.leader}</div>
+                            </div>
+                        </div>
+                        <div class="relation-status status-${rel.status}">${getStatusText(rel.status)}</div>
+                    </div>
+                    <div class="relation-actions">
+                        <button class="relation-btn btn-negotiate">Négocier</button>
+                        <button class="relation-btn btn-trade">Commerce</button>
+                        ${rel.status !== 'enemy' ? `<button class="relation-btn btn-declare-war">Guerre</button>` : ''}
+                    </div>
+                </div>`).join('');
+        }
+
+        function renderProposals() {
+            const container = document.getElementById('received-proposals');
+            if (PROPOSALS_DATA.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="empty-icon">📜</div><div>Aucune proposition reçue.</div></div>`;
+                return;
+            }
+            container.innerHTML = PROPOSALS_DATA.map(p => `
+                <div class="proposal-item">
+                    <div class="proposal-header">
+                        <div class="proposal-type type-${p.type}">${getProposalTypeText(p.type)}</div>
+                        <div class="nation-name">De: ${p.from}</div>
+                    </div>
+                    <p>${p.message}</p>
+                    <div class="proposal-actions">
+                        <button class="proposal-btn btn-accept">Accepter</button>
+                        <button class="proposal-btn btn-counter">Contre-offre</button>
+                        <button class="proposal-btn btn-decline">Refuser</button>
+                    </div>
+                </div>`).join('');
+        }
+
+        function renderHistory() {
+             const container = document.getElementById('history-list');
+            if (HISTORY_DATA.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><div>Aucun historique.</div></div>`;
+                return;
+            }
+            container.innerHTML = HISTORY_DATA.map(h => `
+                <div class="proposal-item">
+                    <div class="proposal-header">
+                         <div class="proposal-type type-${h.type}">${getProposalTypeText(h.type)}</div>
+                        <div>Avec: ${h.with}</div>
+                        <div style="color: ${h.action === 'Accepté' ? 'var(--success-green)' : 'var(--roman-red)'}">${h.action}</div>
+                    </div>
+                    <p>${h.result} - ${h.date}</p>
+                </div>`).join('');
+        }
+        
+        function populateForms() {
+            const nationSelect = document.getElementById('target-nation');
+            const allNations = [...DIPLOMATIC_DATA.allies, ...DIPLOMATIC_DATA.neutral, ...DIPLOMATIC_DATA.enemies];
+            nationSelect.innerHTML = '<option value="">Sélectionnez une nation...</option>' + allNations.map(n => `<option value="${n.id}">${n.flag} ${n.name}</option>`).join('');
+
+            const proposalTypeSelect = document.getElementById('proposal-type');
+            const proposalTypes = { alliance: '🤝 Alliance', trade: '💰 Accord Commercial', peace: '☮️ Traité de Paix' };
+            proposalTypeSelect.innerHTML = '<option value="">Sélectionnez un type...</option>' + Object.entries(proposalTypes).map(([key, value]) => `<option value="${key}">${value}</option>`).join('');
+        }
+        
+        function submitProposal(event) {
+            event.preventDefault();
+            alert('Proposition envoyée !');
+            event.target.reset();
+        }
+
+        function getStatusText(status) {
+            const map = { ally: 'Allié', neutral: 'Neutre', enemy: 'Ennemi', trade: 'Commerce' };
+            return map[status] || 'N/A';
+        }
+
+        function getProposalTypeText(type) {
+            const map = { alliance: 'Alliance', trade: 'Commerce', peace: 'Paix' };
+            return map[type] || 'N/A';
+        }
+
+        // ===============================================================
+        // INITIALISATION DE LA PAGE
+        // ===============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeGlobalUI();
+            renderRelationsList('allies-list', DIPLOMATIC_DATA.allies);
+            renderRelationsList('neutral-list', DIPLOMATIC_DATA.neutral);
+            renderRelationsList('enemies-list', DIPLOMATIC_DATA.enemies);
+            renderProposals();
+            renderHistory();
+            populateForms();
+        });
+    </script>
+</body>
+</html>

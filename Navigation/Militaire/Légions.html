@@ -1,6 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="fr">
-<head>
+<html lang="fr"><head><script src="../common-interactions.js"></script></head><body>﻿
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMPERIUM - Légions</title>
@@ -321,8 +321,11 @@
             transition: width 0.3s ease;
         }
     </style>
-</head>
-<body>
+    <link rel="stylesheet" href="../../mobile-2025.css">
+    <script src="../../common-header-2025.js"></script>
+    <script src="../../resource-updater.js"></script>
+
+
     <!-- Particules d'arrière-plan -->
     <div class="particles"></div>
 
@@ -427,7 +430,7 @@
                                             <div class="stat-item">Temps: <span class="stat-value">2h</span></div>
                                             <div class="stat-item">Caserne: <span class="stat-value">Niv. 3</span></div>
                                         </div>
-                                        <button class="recruit-btn">Recruter</button>
+                                        <button class="recruit-btn" data-action="train" data-params="{&quot;unitType&quot;:&quot;generic_unit&quot;,&quot;count&quot;:10,&quot;cost&quot;:{&quot;food&quot;:50,&quot;iron&quot;:30,&quot;gold&quot;:20},&quot;time&quot;:5000}">Recruter</button>
                                     </div>
 
                                     <div class="unit-card">
@@ -441,7 +444,7 @@
                                             <div class="stat-item">Temps: <span class="stat-value">1h 30min</span></div>
                                             <div class="stat-item">Champ de tir: <span class="stat-value">Niv. 2</span></div>
                                         </div>
-                                        <button class="recruit-btn">Recruter</button>
+                                        <button class="recruit-btn" data-action="train" data-params="{&quot;unitType&quot;:&quot;generic_unit&quot;,&quot;count&quot;:10,&quot;cost&quot;:{&quot;food&quot;:50,&quot;iron&quot;:30,&quot;gold&quot;:20},&quot;time&quot;:5000}">Recruter</button>
                                     </div>
 
                                     <div class="unit-card">
@@ -455,7 +458,7 @@
                                             <div class="stat-item">Temps: <span class="stat-value">4h</span></div>
                                             <div class="stat-item">Écuries: <span class="stat-value">Niv. 2</span></div>
                                         </div>
-                                        <button class="recruit-btn">Recruter</button>
+                                        <button class="recruit-btn" data-action="train" data-params="{&quot;unitType&quot;:&quot;generic_unit&quot;,&quot;count&quot;:10,&quot;cost&quot;:{&quot;food&quot;:50,&quot;iron&quot;:30,&quot;gold&quot;:20},&quot;time&quot;:5000}">Recruter</button>
                                     </div>
 
                                     <div class="unit-card">
@@ -470,7 +473,7 @@
                                             <div class="stat-item">Temps: <span class="stat-value">8h</span></div>
                                             <div class="stat-item">Atelier: <span class="stat-value">Niv. 3</span></div>
                                         </div>
-                                        <button class="recruit-btn" disabled>Bâtiment requis</button>
+                                        <button class="recruit-btn" disabled="">Bâtiment requis</button>
                                     </div>
                                 </div>
                             </div>
@@ -564,7 +567,7 @@
                                 <h3 class="section-title">⚡ Actions Rapides</h3>
                                 <div class="quick-actions">
                                     <button class="quick-btn">Nouvelle Campagne</button>
-                                    <button class="quick-btn">Défendre Cité</button>
+                                    <button class="quick-btn" data-action="defend" data-params="{&quot;units&quot;:{&quot;legionnaire&quot;:30,&quot;archer&quot;:15}}">Défendre Cité</button>
                                     <button class="quick-btn">Entraînement Rapide</button>
                                     <button class="quick-btn">Rapport de Bataille</button>
                                 </div>
@@ -577,5 +580,6 @@
     </div>
 
     <script src="../../../../../../link-buttons-to-functions.js"></script>
-</body>
-</html>
+
+
+</body></html>

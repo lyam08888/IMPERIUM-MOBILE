@@ -1,0 +1,847 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Explorer le Monde</title>
+    <meta name="description" content="Explorez de nouvelles terres et découvrez des territoires inconnus.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles et scripts communs -->
+    <link rel="stylesheet" href="../common-styles.css">
+    <script src="../common-navigation.js"></script>
+    <script src="../game-engine.js"></script>
+    <script src="../advanced-game-systems.js"></script>
+    <script src="../save-system.js"></script>
+    <script src="../ui-manager.js"></script>
+    <script src="../global-console.js"></script>
+
+    <style>
+        .exploration-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        .exploration-main {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .exploration-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .world-map {
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%);
+            border-radius: 1rem;
+            border: 2px solid var(--border-gold);
+            padding: 2rem;
+            position: relative;
+            min-height: 400px;
+            overflow: hidden;
+        }
+
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 0.5rem;
+            height: 100%;
+        }
+
+        .map-tile {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .map-tile:hover {
+            transform: scale(1.1);
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .map-tile.explored {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+        }
+
+        .map-tile.exploring {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: #f59e0b;
+            animation: exploring-pulse 2s infinite;
+        }
+
+        .map-tile.unknown {
+            background: rgba(107, 114, 128, 0.2);
+            border-color: #6b7280;
+            color: #6b7280;
+        }
+
+        .map-tile.capital {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            border-color: var(--gold-light);
+            color: white;
+            font-weight: bold;
+        }
+
+        @keyframes exploring-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .tile-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95);
+            color: var(--text-light);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-gold);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 20;
+        }
+
+        .map-tile:hover .tile-tooltip {
+            opacity: 1;
+        }
+
+        .exploration-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .exploration-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .exploration-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--gold-light);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .exploration-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .exploration-icon {
+            font-size: 2.5rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            border-radius: 50%;
+            color: white;
+        }
+
+        .exploration-info {
+            flex: 1;
+        }
+
+        .exploration-name {
+            color: var(--gold-light);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .exploration-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .exploration-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .exploration-stat {
+            text-align: center;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+        }
+
+        .stat-value {
+            color: var(--gold-light);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .exploration-cost {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-gold);
+        }
+
+        .cost-items {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .cost-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .exploration-btn {
+            padding: 0.6rem 1.2rem;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .exploration-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px var(--shadow-gold);
+        }
+
+        .exploration-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .exploration-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .active-explorations {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .exploration-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .exploration-item-icon {
+            font-size: 1.5rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        .exploration-item-info {
+            flex: 1;
+        }
+
+        .exploration-item-name {
+            color: var(--gold-light);
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .exploration-item-progress {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .exploration-item-eta {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+            transition: width 0.3s ease;
+        }
+
+        .discoveries-list {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .discovery-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid var(--gold-primary);
+        }
+
+        .discovery-icon {
+            font-size: 1.5rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        .discovery-content {
+            flex: 1;
+        }
+
+        .discovery-title {
+            color: var(--gold-light);
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .discovery-description {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .discovery-reward {
+            color: var(--success-green);
+            font-size: 0.8rem;
+        }
+
+        .discovery-time {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .quick-btn {
+            padding: 0.8rem;
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--text-light);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--gold-light);
+            background: rgba(217, 119, 6, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .exploration-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+            
+            .map-grid {
+                grid-template-columns: repeat(6, 1fr);
+                grid-template-rows: repeat(4, 1fr);
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../../../mobile-2025.css">
+    <script src="../../../common-header-2025.js"></script>
+    <script src="../../../resource-updater.js"></script>
+</head>
+<body>
+    <!-- Particules d'arrière-plan -->
+    <div class="particles"></div>
+
+    <!-- INTERFACE PRINCIPALE DU JEU -->
+    <div class="imperium-ui">
+        <!-- HEADER -->
+        <header class="imperium-header">
+            <div class="header-content">
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display">
+                    <!-- Les ressources seront injectées ici par JS -->
+                </div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar">M</div>
+                    <div>
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPS PRINCIPAL -->
+        <div class="imperium-body">
+            <!-- BARRE LATERALE (Desktop) -->
+            <aside class="imperium-sidebar">
+                <!-- Navigation générée dynamiquement par common-navigation.js -->
+            </aside>
+
+            <!-- CONTENU PRINCIPAL -->
+            <main class="main-content">
+                <div class="view-container">
+                    <h2 class="view-title">🗺️ Explorer le Monde</h2>
+                    <div class="exploration-layout">
+                        <div class="exploration-main">
+                            <!-- Carte du monde -->
+                            <div class="exploration-section">
+                                <h3 class="section-title">🌍 Carte du Monde Connu</h3>
+                                <div class="world-map">
+                                    <div class="map-grid" id="world-map-grid">
+                                        <!-- Généré par JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Options d'exploration -->
+                            <div class="exploration-section">
+                                <h3 class="section-title">🧭 Expéditions Disponibles</h3>
+                                <div class="exploration-options">
+                                    <div class="exploration-card" onclick="startExploration('coastal')">
+                                        <div class="exploration-header">
+                                            <div class="exploration-icon">🏖️</div>
+                                            <div class="exploration-info">
+                                                <div class="exploration-name">Exploration Côtière</div>
+                                                <div class="exploration-description">Découvrir de nouvelles côtes et îles</div>
+                                            </div>
+                                        </div>
+                                        <div class="exploration-stats">
+                                            <div class="exploration-stat">
+                                                <div class="stat-value">2-4h</div>
+                                                <div class="stat-label">Durée</div>
+                                            </div>
+                                            <div class="exploration-stat">
+                                                <div class="stat-value">70%</div>
+                                                <div class="stat-label">Succès</div>
+                                            </div>
+                                            <div class="exploration-stat">
+                                                <div class="stat-value">Moyen</div>
+                                                <div class="stat-label">Risque</div>
+                                            </div>
+                                        </div>
+                                        <div class="exploration-cost">
+                                            <div class="cost-items">
+                                                <div class="cost-item">💰 500</div>
+                                                <div class="cost-item">🚢 1 Navire</div>
+                                                <div class="cost-item">👥 50 Hommes</div>
+                                            </div>
+                                            <button class="exploration-btn">Explorer</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="exploration-card" onclick="startExploration('mountain')">
+                                        <div class="exploration-header">
+                                            <div class="exploration-icon">⛰️</div>
+                                            <div class="exploration-info">
+                                                <div class="exploration-name">Expédition Montagnarde</div>
+                                                <div class="exploration-description">Traverser les chaînes montagneuses</div>
+                                            </div>
+                                        </div>
+                                        <div class="exploration-stats">
+                                            <div class="exploration-stat">
+                                                <div class="stat-value">4-6h</div>
+                                                <div class="stat-label">Durée</div>
+                                            </div>
+                                            <div class="exploration-stat">
+                                                <div class="stat-value">50%</div>
+                                                <div class="stat-label">Succès</div>
+                                            </div>
+                                            <div class="exploration-stat">
+                                                <div class="stat-value">Élevé</div>
+                                                <div class="stat-label">Risque</div>
+                                            </div>
+                                        </div>
+                                        <div class="exploration-cost">
+                                            <div class="cost-items">
+                                                <div class="cost-item">💰 800</div>
+                                                <div class="cost-item">⚔️ 100 Soldats</div>
+                                                <div class="cost-item">🍞 200 Vivres</div>
+                                            </div>
+                                            <button class="exploration-btn">Explorer</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="exploration-card" onclick="startExploration('desert')">
+                                        <div class="exploration-header">
+                                            <div class="exploration-icon">🏜️</div>
+                                            <div class="exploration-info">
+                                                <div class="exploration-name">Traversée du Désert</div>
+                                                <div class="exploration-description">Découvrir les oasis cachées</div>
+                                            </div>
+                                        </div>
+                                        <div class="exploration-stats">
+                                            <div class="exploration-stat">
+                                                <div class="stat-value">6-8h</div>
+                                                <div class="stat-label">Durée</div>
+                                            </div>
+                                            <div class="exploration-stat">
+                                                <div class="stat-value">30%</div>
+                                                <div class="stat-label">Succès</div>
+                                            </div>
+                                            <div class="exploration-stat">
+                                                <div class="stat-value">Très Élevé</div>
+                                                <div class="stat-label">Risque</div>
+                                            </div>
+                                        </div>
+                                        <div class="exploration-cost">
+                                            <div class="cost-items">
+                                                <div class="cost-item">💰 1200</div>
+                                                <div class="cost-item">🐪 20 Chameaux</div>
+                                                <div class="cost-item">💧 500 Eau</div>
+                                            </div>
+                                            <button class="exploration-btn">Explorer</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="exploration-card" onclick="startExploration('forest')">
+                                        <div class="exploration-header">
+                                            <div class="exploration-icon">🌲</div>
+                                            <div class="exploration-info">
+                                                <div class="exploration-name">Exploration Forestière</div>
+                                                <div class="exploration-description">Cartographier les forêts denses</div>
+                                            </div>
+                                        </div>
+                                        <div class="exploration-stats">
+                                            <div class="exploration-stat">
+                                                <div class="stat-value">3-5h</div>
+                                                <div class="stat-label">Durée</div>
+                                            </div>
+                                            <div class="exploration-stat">
+                                                <div class="stat-value">60%</div>
+                                                <div class="stat-label">Succès</div>
+                                            </div>
+                                            <div class="exploration-stat">
+                                                <div class="stat-value">Moyen</div>
+                                                <div class="stat-label">Risque</div>
+                                            </div>
+                                        </div>
+                                        <div class="exploration-cost">
+                                            <div class="cost-items">
+                                                <div class="cost-item">💰 600</div>
+                                                <div class="cost-item">🏹 75 Éclaireurs</div>
+                                                <div class="cost-item">🗡️ 25 Gardes</div>
+                                            </div>
+                                            <button class="exploration-btn">Explorer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panneau d'exploration -->
+                        <div class="exploration-panel">
+                            <!-- Explorations en cours -->
+                            <div class="panel-section">
+                                <h3 class="section-title">🏃 Expéditions en Cours</h3>
+                                <div class="active-explorations">
+                                    <div class="exploration-item">
+                                        <div class="exploration-item-icon">🏖️</div>
+                                        <div class="exploration-item-info">
+                                            <div class="exploration-item-name">Côtes Orientales</div>
+                                            <div class="exploration-item-progress">Cartographie en cours</div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 75%;"></div>
+                                            </div>
+                                            <div class="exploration-item-eta">Retour dans 1h 15min</div>
+                                        </div>
+                                    </div>
+                                    <div class="exploration-item">
+                                        <div class="exploration-item-icon">🌲</div>
+                                        <div class="exploration-item-info">
+                                            <div class="exploration-item-name">Forêt de Gaule</div>
+                                            <div class="exploration-item-progress">Établissement du camp</div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 40%;"></div>
+                                            </div>
+                                            <div class="exploration-item-eta">Retour dans 2h 45min</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Découvertes récentes -->
+                            <div class="panel-section">
+                                <h3 class="section-title">🏆 Découvertes Récentes</h3>
+                                <div class="discoveries-list">
+                                    <div class="discovery-item">
+                                        <div class="discovery-icon">🏝️</div>
+                                        <div class="discovery-content">
+                                            <div class="discovery-title">Île aux Perles</div>
+                                            <div class="discovery-description">Une île riche en perles et coraux précieux</div>
+                                            <div class="discovery-reward">+2000 or, +500 perles</div>
+                                            <div class="discovery-time">Il y a 3 heures</div>
+                                        </div>
+                                    </div>
+                                    <div class="discovery-item">
+                                        <div class="discovery-icon">⛰️</div>
+                                        <div class="discovery-content">
+                                            <div class="discovery-title">Mine d'Argent</div>
+                                            <div class="discovery-description">Gisement d'argent dans les montagnes</div>
+                                            <div class="discovery-reward">+1500 or, +300 argent/h</div>
+                                            <div class="discovery-time">Il y a 1 jour</div>
+                                        </div>
+                                    </div>
+                                    <div class="discovery-item">
+                                        <div class="discovery-icon">🏛️</div>
+                                        <div class="discovery-content">
+                                            <div class="discovery-title">Ruines Antiques</div>
+                                            <div class="discovery-description">Temple abandonné avec des artefacts</div>
+                                            <div class="discovery-reward">+1000 or, +50 culture</div>
+                                            <div class="discovery-time">Il y a 2 jours</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions rapides -->
+                            <div class="panel-section">
+                                <h3 class="section-title">⚡ Actions Rapides</h3>
+                                <div class="quick-actions">
+                                    <button class="quick-btn" onclick="autoExplore()">🤖 Auto-Explorer</button>
+                                    <button class="quick-btn" onclick="recallExpeditions()">🔙 Rappeler Tout</button>
+                                    <button class="quick-btn" onclick="viewMap()">🗺️ Carte Complète</button>
+                                    <button class="quick-btn" onclick="explorationHistory()">📚 Historique</button>
+                                </div>
+                            </div>
+
+                            <!-- Statistiques d'exploration -->
+                            <div class="panel-section">
+                                <h3 class="section-title">📊 Statistiques</h3>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div style="text-align: center; background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 0.5rem;">
+                                        <div style="color: var(--gold-light); font-size: 1.5rem; font-weight: bold;">24</div>
+                                        <div style="color: var(--text-muted); font-size: 0.8rem;">Territoires Découverts</div>
+                                    </div>
+                                    <div style="text-align: center; background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 0.5rem;">
+                                        <div style="color: var(--gold-light); font-size: 1.5rem; font-weight: bold;">68%</div>
+                                        <div style="color: var(--text-muted); font-size: 0.8rem;">Taux de Succès</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Données de la carte du monde
+        const worldMap = [
+            ['🏛️', '🌊', '🏝️', '❓', '❓', '❓', '❓', '❓'],
+            ['🌾', '🌊', '🌊', '🏖️', '❓', '❓', '❓', '❓'],
+            ['⛰️', '🌲', '🌊', '🌊', '🏝️', '❓', '❓', '❓'],
+            ['🏜️', '⛰️', '🌲', '🌊', '🌊', '🏖️', '❓', '❓'],
+            ['🏜️', '🏜️', '⛰️', '🌲', '🌊', '🌊', '❓', '❓'],
+            ['❓', '🏜️', '🏜️', '⛰️', '🌲', '🌊', '❓', '❓']
+        ];
+
+        const tileTypes = {
+            '🏛️': { name: 'Votre Capitale', status: 'capital' },
+            '🌊': { name: 'Océan', status: 'explored' },
+            '🏝️': { name: 'Île', status: 'explored' },
+            '🏖️': { name: 'Côte', status: 'exploring' },
+            '🌾': { name: 'Plaines', status: 'explored' },
+            '⛰️': { name: 'Montagnes', status: 'explored' },
+            '🌲': { name: 'Forêt', status: 'explored' },
+            '🏜️': { name: 'Désert', status: 'explored' },
+            '❓': { name: 'Territoire Inconnu', status: 'unknown' }
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page Explorer Monde chargée');
+            generateWorldMap();
+            startExplorationUpdates();
+        });
+
+        function generateWorldMap() {
+            const mapGrid = document.getElementById('world-map-grid');
+            mapGrid.innerHTML = '';
+
+            worldMap.forEach((row, y) => {
+                row.forEach((tile, x) => {
+                    const tileElement = document.createElement('div');
+                    const tileInfo = tileTypes[tile];
+                    
+                    tileElement.className = `map-tile ${tileInfo.status}`;
+                    tileElement.textContent = tile;
+                    tileElement.onclick = () => exploreTile(x, y, tile);
+                    
+                    // Tooltip
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tile-tooltip';
+                    tooltip.textContent = tileInfo.name;
+                    tileElement.appendChild(tooltip);
+                    
+                    mapGrid.appendChild(tileElement);
+                });
+            });
+        }
+
+        function exploreTile(x, y, tileType) {
+            const tileInfo = tileTypes[tileType];
+            
+            if (tileInfo.status === 'unknown') {
+                if (confirm(`Explorer ce territoire inconnu ?\n\nCoût: 1000 or\nRisque: Élevé\nDurée: 4-6 heures`)) {
+                    alert('🧭 Expédition lancée vers le territoire inconnu !\n\nVos éclaireurs partent en reconnaissance.');
+                }
+            } else if (tileInfo.status === 'explored') {
+                alert(`${tileInfo.name}\n\nTerritoire déjà exploré.\nVous pouvez y établir des avant-postes ou des routes commerciales.`);
+            } else if (tileInfo.status === 'exploring') {
+                alert(`${tileInfo.name}\n\nExploration en cours...\nVos équipes cartographient actuellement cette zone.`);
+            } else if (tileInfo.status === 'capital') {
+                alert('🏛️ Votre Capitale\n\nLe cœur de votre empire romain.\nTous les chemins mènent à Rome !');
+            }
+        }
+
+        function startExploration(type) {
+            const explorations = {
+                coastal: {
+                    name: 'Exploration Côtière',
+                    description: 'Vos navires partent explorer les côtes inconnues.',
+                    duration: '2-4 heures',
+                    cost: '500 or, 1 navire, 50 hommes'
+                },
+                mountain: {
+                    name: 'Expédition Montagnarde',
+                    description: 'Vos soldats traversent les chaînes montagneuses.',
+                    duration: '4-6 heures',
+                    cost: '800 or, 100 soldats, 200 vivres'
+                },
+                desert: {
+                    name: 'Traversée du Désert',
+                    description: 'Une expédition périlleuse à travers le désert.',
+                    duration: '6-8 heures',
+                    cost: '1200 or, 20 chameaux, 500 eau'
+                },
+                forest: {
+                    name: 'Exploration Forestière',
+                    description: 'Vos éclaireurs cartographient les forêts denses.',
+                    duration: '3-5 heures',
+                    cost: '600 or, 75 éclaireurs, 25 gardes'
+                }
+            };
+
+            const exploration = explorations[type];
+            
+            if (confirm(`Lancer ${exploration.name} ?\n\n${exploration.description}\n\nDurée: ${exploration.duration}\nCoût: ${exploration.cost}`)) {
+                alert(`🧭 ${exploration.name} lancée !\n\nVos équipes partent à l'aventure.\nVous recevrez un rapport à leur retour.`);
+            }
+        }
+
+        function startExplorationUpdates() {
+            // Simulation des mises à jour d'exploration
+            setInterval(() => {
+                // Ici on mettrait à jour les barres de progression
+                // et les statuts des explorations en cours
+            }, 5000);
+        }
+
+        function autoExplore() {
+            if (confirm('Activer l\'auto-exploration ?\n\nVos éclaireurs exploreront automatiquement les territoires adjacents.\n\nCoût: 100 or/heure')) {
+                alert('🤖 Auto-exploration activée !\n\nVos éclaireurs travaillent maintenant de manière autonome.');
+            }
+        }
+
+        function recallExpeditions() {
+            if (confirm('Rappeler toutes les expéditions ?\n\nCela annulera toutes les explorations en cours.')) {
+                alert('🔙 Toutes les expéditions ont été rappelées.\n\nVos équipes rentrent à la base.');
+            }
+        }
+
+        function viewMap() {
+            alert('🗺️ Carte Complète\n\nAffichage de la carte détaillée avec toutes les découvertes, routes commerciales et avant-postes.');
+        }
+
+        function explorationHistory() {
+            alert('📚 Historique d\'Exploration\n\n• Île aux Perles découverte (3h)\n• Mine d\'Argent trouvée (1j)\n• Ruines Antiques explorées (2j)\n• Route vers la Gaule ouverte (3j)\n• Oasis du désert cartographiée (5j)');
+        }
+    </script>
+
+    <script src="../../../../../../../link-buttons-to-functions.js"></script>
+</body>
+</html>

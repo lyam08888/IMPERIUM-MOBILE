@@ -1,0 +1,871 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIUM - Entrepôts de la Cité</title>
+    <meta name="description" content="Gérez le stockage et la capacité de vos entrepôts romains.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23b45309'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='serif' font-size='20' font-weight='bold'>I</text></svg>" type="image/svg+xml">
+
+    <!-- Styles et scripts communs -->
+    <link rel="stylesheet" href="../common-styles.css">
+    <script src="../common-navigation.js"></script>
+    <script src="../game-engine.js"></script>
+    <script src="../advanced-game-systems.js"></script>
+    <script src="../save-system.js"></script>
+    <script src="../ui-manager.js"></script>
+    <script src="../global-console.js"></script>
+
+    <style>
+        .warehouses-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        .warehouses-main {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .warehouses-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .storage-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .storage-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .storage-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .storage-card.warning {
+            border-color: #f59e0b;
+        }
+
+        .storage-card.critical {
+            border-color: var(--roman-red);
+            animation: critical-pulse 2s infinite;
+        }
+
+        @keyframes critical-pulse {
+            0%, 100% { border-color: var(--roman-red); }
+            50% { border-color: #dc2626; }
+        }
+
+        .storage-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .storage-icon {
+            font-size: 2.5rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            border-radius: 50%;
+            color: white;
+        }
+
+        .storage-info {
+            flex: 1;
+        }
+
+        .storage-name {
+            color: var(--gold-light);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .storage-capacity {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .storage-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        .storage-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .storage-fill.normal {
+            background: linear-gradient(90deg, var(--success-green), #16a34a);
+        }
+
+        .storage-fill.warning {
+            background: linear-gradient(90deg, #f59e0b, #eab308);
+        }
+
+        .storage-fill.critical {
+            background: linear-gradient(90deg, var(--roman-red), #dc2626);
+        }
+
+        .storage-percentage {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .storage-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .current-stock {
+            color: var(--text-light);
+            font-weight: bold;
+        }
+
+        .max-capacity {
+            color: var(--text-muted);
+        }
+
+        .warehouses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .warehouse-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.8rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .warehouse-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .warehouse-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .warehouse-icon {
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            border-radius: 50%;
+            color: white;
+        }
+
+        .warehouse-info {
+            flex: 1;
+        }
+
+        .warehouse-name {
+            color: var(--gold-light);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .warehouse-level {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .warehouse-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .warehouse-stat {
+            text-align: center;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+        }
+
+        .stat-value {
+            color: var(--gold-light);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .warehouse-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-weight: bold;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px var(--shadow-gold);
+        }
+
+        .action-btn.secondary {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+
+        .action-btn.secondary:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .warehouses-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            border: 1px solid var(--border-gold);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-gold);
+        }
+
+        .alert-card {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid var(--roman-red);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-icon {
+            color: var(--roman-red);
+            font-size: 1.2rem;
+        }
+
+        .alert-title {
+            color: var(--roman-red);
+            font-weight: bold;
+        }
+
+        .alert-description {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .quick-btn {
+            padding: 0.8rem;
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--text-light);
+            border: 1px solid var(--border-gold);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--gold-light);
+            background: rgba(217, 119, 6, 0.1);
+        }
+
+        .expansion-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .expansion-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            border: none;
+            border-radius: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', serif;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .expansion-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow-gold);
+        }
+
+        .expansion-btn.secondary {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+
+        .expansion-btn.secondary:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .storage-tips {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--success-green);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .tips-title {
+            color: var(--success-green);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .tips-content {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .warehouses-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../../../mobile-2025.css">
+    <script src="../../../common-header-2025.js"></script>
+    <script src="../../../resource-updater.js"></script>
+</head>
+<body>
+    <!-- Particules d'arrière-plan -->
+    <div class="particles"></div>
+
+    <!-- INTERFACE PRINCIPALE DU JEU -->
+    <div class="imperium-ui">
+        <!-- HEADER -->
+        <header class="imperium-header">
+            <div class="header-content">
+                <h1 class="imperium-logo">IMPERIUM</h1>
+                <div id="resources-display" class="resources-display">
+                    <!-- Les ressources seront injectées ici par JS -->
+                </div>
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar">M</div>
+                    <div>
+                        <div class="player-name" id="player-name"></div>
+                        <div class="player-level" id="player-title-level"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPS PRINCIPAL -->
+        <div class="imperium-body">
+            <!-- BARRE LATERALE (Desktop) -->
+            <aside class="imperium-sidebar">
+                <!-- Navigation générée dynamiquement par common-navigation.js -->
+            </aside>
+
+            <!-- CONTENU PRINCIPAL -->
+            <main class="main-content">
+                <div class="view-container">
+                    <h2 class="view-title">🏪 Entrepôts de la Cité</h2>
+                    <div class="warehouses-layout">
+                        <div class="warehouses-main">
+                            <!-- Vue d'ensemble du stockage -->
+                            <div class="warehouses-section">
+                                <h3 class="section-title">📊 État du Stockage</h3>
+                                <div class="storage-overview">
+                                    <div class="storage-card">
+                                        <div class="storage-header">
+                                            <div class="storage-icon">🪵</div>
+                                            <div class="storage-info">
+                                                <div class="storage-name">Bois</div>
+                                                <div class="storage-capacity">Entrepôt Principal</div>
+                                            </div>
+                                        </div>
+                                        <div class="storage-bar">
+                                            <div class="storage-fill normal" style="width: 65%;">
+                                                <div class="storage-percentage">65%</div>
+                                            </div>
+                                        </div>
+                                        <div class="storage-details">
+                                            <div class="current-stock">5,200 unités</div>
+                                            <div class="max-capacity">/ 8,000</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="storage-card">
+                                        <div class="storage-header">
+                                            <div class="storage-icon">🪨</div>
+                                            <div class="storage-info">
+                                                <div class="storage-name">Pierre</div>
+                                                <div class="storage-capacity">Entrepôt Principal</div>
+                                            </div>
+                                        </div>
+                                        <div class="storage-bar">
+                                            <div class="storage-fill normal" style="width: 45%;">
+                                                <div class="storage-percentage">45%</div>
+                                            </div>
+                                        </div>
+                                        <div class="storage-details">
+                                            <div class="current-stock">3,600 unités</div>
+                                            <div class="max-capacity">/ 8,000</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="storage-card warning">
+                                        <div class="storage-header">
+                                            <div class="storage-icon">🍷</div>
+                                            <div class="storage-info">
+                                                <div class="storage-name">Vin</div>
+                                                <div class="storage-capacity">Cave à Vin</div>
+                                            </div>
+                                        </div>
+                                        <div class="storage-bar">
+                                            <div class="storage-fill warning" style="width: 85%;">
+                                                <div class="storage-percentage">85%</div>
+                                            </div>
+                                        </div>
+                                        <div class="storage-details">
+                                            <div class="current-stock">4,250 unités</div>
+                                            <div class="max-capacity">/ 5,000</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="storage-card critical">
+                                        <div class="storage-header">
+                                            <div class="storage-icon">⚔️</div>
+                                            <div class="storage-info">
+                                                <div class="storage-name">Fer</div>
+                                                <div class="storage-capacity">Arsenal</div>
+                                            </div>
+                                        </div>
+                                        <div class="storage-bar">
+                                            <div class="storage-fill critical" style="width: 95%;">
+                                                <div class="storage-percentage">95%</div>
+                                            </div>
+                                        </div>
+                                        <div class="storage-details">
+                                            <div class="current-stock">5,700 unités</div>
+                                            <div class="max-capacity">/ 6,000</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="storage-card">
+                                        <div class="storage-header">
+                                            <div class="storage-icon">💰</div>
+                                            <div class="storage-info">
+                                                <div class="storage-name">Or</div>
+                                                <div class="storage-capacity">Trésor Impérial</div>
+                                            </div>
+                                        </div>
+                                        <div class="storage-bar">
+                                            <div class="storage-fill normal" style="width: 30%;">
+                                                <div class="storage-percentage">∞</div>
+                                            </div>
+                                        </div>
+                                        <div class="storage-details">
+                                            <div class="current-stock">156,780 pièces</div>
+                                            <div class="max-capacity">/ Illimité</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="storage-card">
+                                        <div class="storage-header">
+                                            <div class="storage-icon">🍞</div>
+                                            <div class="storage-info">
+                                                <div class="storage-name">Nourriture</div>
+                                                <div class="storage-capacity">Greniers</div>
+                                            </div>
+                                        </div>
+                                        <div class="storage-bar">
+                                            <div class="storage-fill normal" style="width: 70%;">
+                                                <div class="storage-percentage">70%</div>
+                                            </div>
+                                        </div>
+                                        <div class="storage-details">
+                                            <div class="current-stock">7,000 unités</div>
+                                            <div class="max-capacity">/ 10,000</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Gestion des entrepôts -->
+                            <div class="warehouses-section">
+                                <h3 class="section-title">🏗️ Gestion des Entrepôts</h3>
+                                <div class="warehouses-grid">
+                                    <div class="warehouse-card">
+                                        <div class="warehouse-header">
+                                            <div class="warehouse-icon">🏪</div>
+                                            <div class="warehouse-info">
+                                                <div class="warehouse-name">Entrepôt Principal</div>
+                                                <div class="warehouse-level">Niveau 5</div>
+                                            </div>
+                                        </div>
+                                        <div class="warehouse-stats">
+                                            <div class="warehouse-stat">
+                                                <div class="stat-value">8,000</div>
+                                                <div class="stat-label">Capacité</div>
+                                            </div>
+                                            <div class="warehouse-stat">
+                                                <div class="stat-value">95%</div>
+                                                <div class="stat-label">Efficacité</div>
+                                            </div>
+                                        </div>
+                                        <div class="warehouse-actions">
+                                            <button class="action-btn" onclick="upgradeWarehouse('main')">🔧 Améliorer</button>
+                                            <button class="action-btn secondary" onclick="manageWarehouse('main')">⚙️ Gérer</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="warehouse-card">
+                                        <div class="warehouse-header">
+                                            <div class="warehouse-icon">🍷</div>
+                                            <div class="warehouse-info">
+                                                <div class="warehouse-name">Cave à Vin</div>
+                                                <div class="warehouse-level">Niveau 3</div>
+                                            </div>
+                                        </div>
+                                        <div class="warehouse-stats">
+                                            <div class="warehouse-stat">
+                                                <div class="stat-value">5,000</div>
+                                                <div class="stat-label">Capacité</div>
+                                            </div>
+                                            <div class="warehouse-stat">
+                                                <div class="stat-value">88%</div>
+                                                <div class="stat-label">Efficacité</div>
+                                            </div>
+                                        </div>
+                                        <div class="warehouse-actions">
+                                            <button class="action-btn" onclick="upgradeWarehouse('wine')">🔧 Améliorer</button>
+                                            <button class="action-btn secondary" onclick="manageWarehouse('wine')">⚙️ Gérer</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="warehouse-card">
+                                        <div class="warehouse-header">
+                                            <div class="warehouse-icon">⚔️</div>
+                                            <div class="warehouse-info">
+                                                <div class="warehouse-name">Arsenal</div>
+                                                <div class="warehouse-level">Niveau 4</div>
+                                            </div>
+                                        </div>
+                                        <div class="warehouse-stats">
+                                            <div class="warehouse-stat">
+                                                <div class="stat-value">6,000</div>
+                                                <div class="stat-label">Capacité</div>
+                                            </div>
+                                            <div class="warehouse-stat">
+                                                <div class="stat-value">92%</div>
+                                                <div class="stat-label">Efficacité</div>
+                                            </div>
+                                        </div>
+                                        <div class="warehouse-actions">
+                                            <button class="action-btn" onclick="upgradeWarehouse('arsenal')">🔧 Améliorer</button>
+                                            <button class="action-btn secondary" onclick="manageWarehouse('arsenal')">⚙️ Gérer</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="warehouse-card">
+                                        <div class="warehouse-header">
+                                            <div class="warehouse-icon">🍞</div>
+                                            <div class="warehouse-info">
+                                                <div class="warehouse-name">Greniers</div>
+                                                <div class="warehouse-level">Niveau 6</div>
+                                            </div>
+                                        </div>
+                                        <div class="warehouse-stats">
+                                            <div class="warehouse-stat">
+                                                <div class="stat-value">10,000</div>
+                                                <div class="stat-label">Capacité</div>
+                                            </div>
+                                            <div class="warehouse-stat">
+                                                <div class="stat-value">98%</div>
+                                                <div class="stat-label">Efficacité</div>
+                                            </div>
+                                        </div>
+                                        <div class="warehouse-actions">
+                                            <button class="action-btn" onclick="upgradeWarehouse('granary')">🔧 Améliorer</button>
+                                            <button class="action-btn secondary" onclick="manageWarehouse('granary')">⚙️ Gérer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panneau de gestion -->
+                        <div class="warehouses-panel">
+                            <!-- Alertes de stockage -->
+                            <div class="panel-section">
+                                <h3 class="section-title">⚠️ Alertes</h3>
+                                <div class="alert-card">
+                                    <div class="alert-header">
+                                        <div class="alert-icon">🚨</div>
+                                        <div class="alert-title">Arsenal Saturé</div>
+                                    </div>
+                                    <div class="alert-description">L'arsenal est à 95% de capacité. Améliorez-le ou vendez du fer.</div>
+                                </div>
+                                <div class="alert-card">
+                                    <div class="alert-header">
+                                        <div class="alert-icon">⚠️</div>
+                                        <div class="alert-title">Cave à Vin Pleine</div>
+                                    </div>
+                                    <div class="alert-description">La cave à vin est à 85% de capacité. Production ralentie.</div>
+                                </div>
+                            </div>
+
+                            <!-- Actions d'expansion -->
+                            <div class="panel-section">
+                                <h3 class="section-title">🏗️ Expansion</h3>
+                                <div class="expansion-options">
+                                    <button class="expansion-btn" onclick="buildNewWarehouse()">
+                                        🏪 Construire Nouvel Entrepôt
+                                    </button>
+                                    <button class="expansion-btn secondary" onclick="upgradeAllWarehouses()">
+                                        🔧 Améliorer Tous les Entrepôts
+                                    </button>
+                                    <button class="expansion-btn secondary" onclick="optimizeStorage()">
+                                        📊 Optimiser le Stockage
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Actions rapides -->
+                            <div class="panel-section">
+                                <h3 class="section-title">⚡ Actions Rapides</h3>
+                                <div class="quick-actions">
+                                    <button class="quick-btn" onclick="sellExcess()">💰 Vendre Surplus</button>
+                                    <button class="quick-btn" onclick="redistributeResources()">🔄 Redistribuer</button>
+                                    <button class="quick-btn" onclick="emergencyExpansion()">🚨 Expansion d'Urgence</button>
+                                    <button class="quick-btn" onclick="viewStorageHistory()">📈 Historique</button>
+                                </div>
+                            </div>
+
+                            <!-- Statistiques de stockage -->
+                            <div class="panel-section">
+                                <h3 class="section-title">📊 Statistiques</h3>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div style="text-align: center; background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 0.5rem;">
+                                        <div style="color: var(--gold-light); font-size: 1.5rem; font-weight: bold;">37,000</div>
+                                        <div style="color: var(--text-muted); font-size: 0.8rem;">Capacité Totale</div>
+                                    </div>
+                                    <div style="text-align: center; background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 0.5rem;">
+                                        <div style="color: var(--gold-light); font-size: 1.5rem; font-weight: bold;">68%</div>
+                                        <div style="color: var(--text-muted); font-size: 0.8rem;">Utilisation Moyenne</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 1rem; text-align: center; background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 0.5rem;">
+                                    <div style="color: var(--gold-light); font-size: 1.5rem; font-weight: bold;">93%</div>
+                                    <div style="color: var(--text-muted); font-size: 0.8rem;">Efficacité Globale</div>
+                                </div>
+                            </div>
+
+                            <!-- Conseils de stockage -->
+                            <div class="storage-tips">
+                                <div class="tips-title">💡 Conseils de Stockage</div>
+                                <div class="tips-content">
+                                    <p><strong>🏪 Priorité :</strong> Améliorez l'arsenal (95% plein)</p>
+                                    <p><strong>💰 Économie :</strong> Vendez le surplus de vin</p>
+                                    <p><strong>🔧 Efficacité :</strong> Réparez les entrepôts endommagés</p>
+                                    <p><strong>📈 Croissance :</strong> Planifiez l'expansion future</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Données des entrepôts
+        const warehousesData = {
+            main: { name: 'Entrepôt Principal', level: 5, capacity: 8000, efficiency: 95 },
+            wine: { name: 'Cave à Vin', level: 3, capacity: 5000, efficiency: 88 },
+            arsenal: { name: 'Arsenal', level: 4, capacity: 6000, efficiency: 92 },
+            granary: { name: 'Greniers', level: 6, capacity: 10000, efficiency: 98 }
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page Entrepôts chargée');
+            initializeWarehouses();
+            startStorageUpdates();
+        });
+
+        function initializeWarehouses() {
+            updateStorageDisplay();
+            checkStorageAlerts();
+        }
+
+        function updateStorageDisplay() {
+            // Mise à jour des barres de stockage en temps réel
+            // Cette fonction serait connectée au moteur de jeu
+        }
+
+        function checkStorageAlerts() {
+            // Vérifier les alertes de stockage
+            // Déclencher des notifications si nécessaire
+        }
+
+        function startStorageUpdates() {
+            // Démarrer les mises à jour automatiques
+            setInterval(() => {
+                updateStorageDisplay();
+                checkStorageAlerts();
+            }, 5000);
+        }
+
+        function upgradeWarehouse(warehouseId) {
+            const warehouse = warehousesData[warehouseId];
+            const cost = warehouse.level * 500;
+            
+            if (confirm(`Améliorer ${warehouse.name} ?\n\nNiveau actuel: ${warehouse.level}\nNiveau suivant: ${warehouse.level + 1}\n\nCoût: ${cost} or\nNouvelle capacité: +${warehouse.level * 1000}\nTemps: ${warehouse.level * 2}h`)) {
+                alert(`🔧 Amélioration de ${warehouse.name} lancée !\n\nL'amélioration sera terminée dans ${warehouse.level * 2} heures.\nCapacité augmentée de ${warehouse.level * 1000} unités.`);
+            }
+        }
+
+        function manageWarehouse(warehouseId) {
+            const warehouse = warehousesData[warehouseId];
+            alert(`Gestion de ${warehouse.name}\n\nNiveau: ${warehouse.level}\nCapacité: ${warehouse.capacity.toLocaleString()}\nEfficacité: ${warehouse.efficiency}%\n\nOptions:\n• Réorganiser le stockage\n• Réparer les dégâts\n• Assigner plus d'ouvriers\n• Voir l'historique`);
+        }
+
+        function buildNewWarehouse() {
+            if (confirm('Construire un nouvel entrepôt ?\n\nTypes disponibles:\n• Entrepôt Général (2000 or)\n• Entrepôt Spécialisé (3000 or)\n• Silo à Grains (2500 or)\n\nChoisir Entrepôt Général ?')) {
+                alert('🏪 Construction d\'un nouvel entrepôt lancée !\n\nCapacité: 5,000 unités\nTemps de construction: 8 heures\nCoût: 2,000 or');
+            }
+        }
+
+        function upgradeAllWarehouses() {
+            if (confirm('Améliorer tous les entrepôts ?\n\nCoût total: 8,500 or\nTemps total: 24 heures\nAugmentation de capacité: +15,000 unités')) {
+                alert('🔧 Amélioration de tous les entrepôts lancée !\n\nVos ouvriers travaillent sur tous les chantiers.\nCapacité totale augmentée significativement.');
+            }
+        }
+
+        function optimizeStorage() {
+            alert('📊 Optimisation du Stockage\n\nAnalyse terminée:\n\n• Redistribution des ressources: +5% d\'efficacité\n• Réorganisation des espaces: +2,000 capacité\n• Amélioration des flux: +10% vitesse\n\nOptimisations appliquées !');
+        }
+
+        function sellExcess() {
+            if (confirm('Vendre le surplus de ressources ?\n\nRessources en surplus:\n• Vin: 1,250 unités (3,750 or)\n• Fer: 700 unités (2,100 or)\n\nTotal: 5,850 or')) {
+                alert('💰 Vente du surplus terminée !\n\n+5,850 or ajoutés à votre trésor\nEspace libéré dans les entrepôts');
+            }
+        }
+
+        function redistributeResources() {
+            alert('🔄 Redistribution des Ressources\n\nOptimisation automatique:\n\n• Bois: Réparti équitablement\n• Pierre: Concentrée pour construction\n• Fer: Transféré vers arsenal secondaire\n• Vin: Stocké dans caves optimales\n\nRedistribution terminée !');
+        }
+
+        function emergencyExpansion() {
+            if (confirm('Expansion d\'urgence ?\n\nConstruction immédiate d\'entrepôts temporaires.\n\nCoût: 5,000 or\nCapacité supplémentaire: +10,000 unités\nDurée: 7 jours')) {
+                alert('🚨 Expansion d\'urgence activée !\n\nEntrepôts temporaires construits instantanément.\n+10,000 unités de capacité disponibles.');
+            }
+        }
+
+        function viewStorageHistory() {
+            alert('📈 Historique du Stockage\n\nÉvolution des 30 derniers jours:\n\n• Capacité totale: +15% (expansion)\n• Utilisation moyenne: 68% (stable)\n• Pics de stockage: Fer (3 alertes)\n• Optimisations: 2 réorganisations\n• Ventes de surplus: 12,500 or générés');
+        }
+    </script>
+
+    <script src="../../../../../../../link-buttons-to-functions.js"></script>
+</body>
+</html>

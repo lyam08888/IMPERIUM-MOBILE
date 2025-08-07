@@ -1,6 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="fr">
-<head>
+<html lang="fr"><head><script src="../../common-interactions.js"></script></head><body>﻿
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMPERIUM - Production par Heure</title>
@@ -385,8 +385,11 @@
             }
         }
     </style>
-</head>
-<body>
+    <link rel="stylesheet" href="../../../mobile-2025.css">
+    <script src="../../../common-header-2025.js"></script>
+    <script src="../../../resource-updater.js"></script>
+
+
     <!-- Particules d'arrière-plan -->
     <div class="particles"></div>
 
@@ -658,7 +661,7 @@
                                 <button class="action-btn secondary" onclick="boostProduction('resources')">
                                     📦 Boost Ressources (+75% - 45min)
                                 </button>
-                                <button class="action-btn secondary" onclick="boostProduction('research')">
+                                <button class="action-btn secondary" data-action="research" data-params="{&quot;researchType&quot;:&quot;generic_research&quot;,&quot;cost&quot;:{&quot;gold&quot;:100,&quot;research&quot;:50},&quot;time&quot;:10000,&quot;benefits&quot;:{&quot;productionBoost&quot;:{&quot;research&quot;:0.1}}}">
                                     🎓 Boost Recherche (+200% - 20min)
                                 </button>
                             </div>
@@ -777,5 +780,6 @@
     </script>
 
     <script src="../../../../../../../link-buttons-to-functions.js"></script>
-</body>
-</html>
+
+
+</body></html>

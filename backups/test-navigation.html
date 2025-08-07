@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Navigation IMPERIUM</title>
+    <script src="Navigation/common-navigation.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1e293b; color: white; }
+        .test-button { 
+            background: #d97706; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            margin: 10px; 
+            cursor: pointer; 
+        }
+        .test-button:hover { background: #f59e0b; }
+        .result { margin: 20px 0; padding: 10px; background: #334155; border-radius: 5px; }
+    </style>
+    <link rel="stylesheet" href="./mobile-2025.css">
+    <script src="./common-header-2025.js"></script>
+    <script src="./resource-updater.js"></script>
+</head>
+<body>
+    <h1>🧪 Test de Navigation IMPERIUM</h1>
+    
+    <div class="result">
+        <h3>Configuration de navigation chargée :</h3>
+        <div id="config-info"></div>
+    </div>
+    
+    <div class="result">
+        <h3>Test des liens de navigation :</h3>
+        <button class="test-button" onclick="testNavigation('cite')">🏛️ Ma Cité</button>
+        <button class="test-button" onclick="testNavigation('monde')">🌍 Monde</button>
+        <button class="test-button" onclick="testNavigation('province')">🏝️ Province</button>
+        <button class="test-button" onclick="testNavigation('academie')">📚 Académie</button>
+        <button class="test-button" onclick="testNavigation('legions')">⚔️ Légions</button>
+    </div>
+    
+    <div class="result">
+        <h3>Résultats des tests :</h3>
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        // Afficher la configuration chargée
+        document.addEventListener('DOMContentLoaded', function() {
+            const configInfo = document.getElementById('config-info');
+            if (typeof NAVIGATION_CONFIG !== 'undefined') {
+                configInfo.innerHTML = `
+                    <p>✅ NAVIGATION_CONFIG chargé avec ${Object.keys(NAVIGATION_CONFIG).length} pages</p>
+                    <p>Pages disponibles: ${Object.keys(NAVIGATION_CONFIG).join(', ')}</p>
+                `;
+            } else {
+                configInfo.innerHTML = '<p>❌ NAVIGATION_CONFIG non chargé</p>';
+            }
+        });
+        
+        // Fonction de test de navigation
+        function testNavigation(pageKey) {
+            const results = document.getElementById('test-results');
+            
+            try {
+                if (typeof navigateTo === 'function') {
+                    results.innerHTML += `<p>🧪 Test de navigation vers "${pageKey}"...</p>`;
+                    
+                    // Au lieu de naviguer réellement, on teste juste la fonction
+                    const config = NAVIGATION_CONFIG[pageKey];
+                    if (config) {
+                        results.innerHTML += `<p>✅ Configuration trouvée: ${config.title} (${config.file})</p>`;
+                        results.innerHTML += `<p>🔗 URL qui serait utilisée: ${config.file}</p>`;
+                    } else {
+                        results.innerHTML += `<p>❌ Configuration non trouvée pour "${pageKey}"</p>`;
+                    }
+                } else {
+                    results.innerHTML += '<p>❌ Fonction navigateTo non disponible</p>';
+                }
+            } catch (error) {
+                results.innerHTML += `<p>❌ Erreur: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
